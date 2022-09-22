@@ -105,7 +105,7 @@ namespace VNRDnTAIApi
                 v.DefaultApiVersion = new ApiVersion(1, 0);
                 v.AssumeDefaultVersionWhenUnspecified = true;
                 v.ReportApiVersions = true;
-                //v.ApiVersionReader = new HeaderApiVersionReader("x-api-version");
+                v.ApiVersionReader = new HeaderApiVersionReader("x-api-version");
             });
 
             services.AddCors(options =>
