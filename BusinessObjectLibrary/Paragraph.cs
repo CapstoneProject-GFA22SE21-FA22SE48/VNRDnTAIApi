@@ -10,22 +10,25 @@ namespace BusinessObjectLibrary
         public Paragraph()
         {
             Keywords = new HashSet<Keyword>();
-            ParagraphModificationRequests = new HashSet<ParagraphModificationRequest>();
+            ParagraphModificationRequestModifiedParagraphs = new HashSet<ParagraphModificationRequest>();
+            ParagraphModificationRequestModifyingParagraphs = new HashSet<ParagraphModificationRequest>();
             ReferenceParagraphs = new HashSet<Reference>();
             ReferenceReferenceParagraphs = new HashSet<Reference>();
             SignParagraphs = new HashSet<SignParagraph>();
         }
 
         public Guid Id { get; set; }
-        public string Name { get; set; }
         public Guid SectionId { get; set; }
+        public string Name { get; set; }
         public string Description { get; set; }
         public int Status { get; set; }
+        public string AdditionalPenalty { get; set; }
         public bool IsDeleted { get; set; }
 
         public virtual Section Section { get; set; }
         public virtual ICollection<Keyword> Keywords { get; set; }
-        public virtual ICollection<ParagraphModificationRequest> ParagraphModificationRequests { get; set; }
+        public virtual ICollection<ParagraphModificationRequest> ParagraphModificationRequestModifiedParagraphs { get; set; }
+        public virtual ICollection<ParagraphModificationRequest> ParagraphModificationRequestModifyingParagraphs { get; set; }
         public virtual ICollection<Reference> ReferenceParagraphs { get; set; }
         public virtual ICollection<Reference> ReferenceReferenceParagraphs { get; set; }
         public virtual ICollection<SignParagraph> SignParagraphs { get; set; }

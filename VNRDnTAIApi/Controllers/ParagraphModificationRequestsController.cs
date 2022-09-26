@@ -41,16 +41,17 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // GET: api/ParagraphModificationRequests/Paragraphs/5/Users/5
-        [HttpGet("Paragraphs/{paragraphId}/Users/{userId}")]
+        // GET: api/ParagraphModificationRequests/ModifyingParagraphs/5
+        [HttpGet("ModifyingParagraphs/{modifyingParagraphId}")]
         [ProducesResponseType(typeof(ParagraphModificationRequest), 200)]
         [ProducesResponseType(500)]
         public async Task<ActionResult<ParagraphModificationRequest>>
-            GetParagraphModificationRequestByParagraphIdUserId(Guid paragraphId, Guid userId)
+            GetParagraphModificationRequestByModifyingParagraphId(Guid modifyingParagraphId)
         {
             try
             {
-                return StatusCode(200, await _entity.GetParagraphModificationRequestByParagraphIdUserIdAsync(paragraphId, userId));
+                return StatusCode(200, 
+                    await _entity.GetParagraphModificationRequestByModifyingParagraphIdAsync(modifyingParagraphId));
             }
             catch (Exception ex)
             {
@@ -58,16 +59,17 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // GET: api/ParagraphModificationRequests/Paragraphs/5
-        [HttpGet("Paragraphs/{paragraphId}")]
+        // GET: api/ParagraphModificationRequests/ModifiedParagraphs/5
+        [HttpGet("ModifiedParagraphs/{modifiedParagraphId}")]
         [ProducesResponseType(typeof(IEnumerable<ParagraphModificationRequest>), 200)]
         [ProducesResponseType(500)]
         public async Task<ActionResult<IEnumerable<ParagraphModificationRequest>>> 
-            GetParagraphModificationRequestsByParagraphId(Guid paragraphId)
+            GetParagraphModificationRequestsByModifiedParagraphId(Guid modifiedParagraphId)
         {
             try
             {
-                return StatusCode(200, await _entity.GetParagraphModificationRequestsByParagraphIdAsync(paragraphId));
+                return StatusCode(200, 
+                    await _entity.GetParagraphModificationRequestsByModifiedParagraphIdAsync(modifiedParagraphId));
             }
             catch (Exception ex)
             {
@@ -75,16 +77,16 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // GET: api/ParagraphModificationRequests/Users/5
-        [HttpGet("Users/{userId}")]
+        // GET: api/ParagraphModificationRequests/Scribes/5
+        [HttpGet("Scribes/{scribeId}")]
         [ProducesResponseType(typeof(IEnumerable<ParagraphModificationRequest>), 200)]
         [ProducesResponseType(500)]
         public async Task<ActionResult<IEnumerable<ParagraphModificationRequest>>>
-            GetParagraphModificationRequestsByUserId(Guid userId)
+            GetParagraphModificationRequestsByScribeId(Guid scribeId)
         {
             try
             {
-                return StatusCode(200, await _entity.GetParagraphModificationRequestsByUserIdAsync(userId));
+                return StatusCode(200, await _entity.GetParagraphModificationRequestsByScribeIdAsync(scribeId));
             }
             catch (Exception ex)
             {
@@ -98,9 +100,9 @@ namespace VNRDnTAIApi.Controllers
         [ProducesResponseType(500)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> 
-            PutParagraphModificationRequest(Guid paragraphId, Guid userid, ParagraphModificationRequest paragraphModificationRequest)
+            PutParagraphModificationRequest(Guid modifyingParagraphId, Guid scribeId, ParagraphModificationRequest paragraphModificationRequest)
         {
-            if (paragraphId != paragraphModificationRequest.ParagraphId || userid != paragraphModificationRequest.UserId)
+            if (modifyingParagraphId != paragraphModificationRequest.ModifyingParagraphId || scribeId != paragraphModificationRequest.ScribeId)
             {
                 return BadRequest();
             }
@@ -131,15 +133,15 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // DELETE: api/ParagraphModificationRequests/Paragraphs/5/Users/5
-        [HttpDelete("Paragraphs/{paragraphId}/Users/{userId}")]
+        // DELETE: api/ParagraphModificationRequests/Paragraphs/5
+        [HttpDelete("Paragraphs/{modifyingParagraphId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> DeleteParagraphModificationRequest(Guid paragraphId, Guid userId)
+        public async Task<IActionResult> DeleteParagraphModificationRequest(Guid modifyingParagraphId)
         {
             try
             {
-                await _entity.RemoveParagraphModificationRequest(paragraphId, userId);
+                await _entity.RemoveParagraphModificationRequest(modifyingParagraphId);
                 return StatusCode(204);
             }
             catch (Exception ex)

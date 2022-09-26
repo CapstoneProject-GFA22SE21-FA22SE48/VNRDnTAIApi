@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 namespace BusinessObjectLibrary
 {
-    public partial class ParagraphModificationRequest
+    public partial class QuestionModificationRequest
     {
-        public Guid ModifiedParagraphId { get; set; }
-        public Guid ModifyingParagraphId { get; set; }
+        public Guid ModifiedQuestionId { get; set; }
+        public Guid ModifyingQuestionId { get; set; }
         public Guid ScribeId { get; set; }
         public Guid AdminId { get; set; }
         public int OperationType { get; set; }
@@ -16,8 +16,8 @@ namespace BusinessObjectLibrary
         public bool IsDeleted { get; set; }
 
         public virtual User Admin { get; set; }
-        public virtual Paragraph ModifiedParagraph { get; set; }
-        public virtual Paragraph ModifyingParagraph { get; set; }
+        public virtual Question ModifiedQuestion { get; set; }
+        public virtual Question ModifyingQuestion { get; set; }
         public virtual User Scribe { get; set; }
     }
 }

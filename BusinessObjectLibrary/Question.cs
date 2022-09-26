@@ -17,6 +17,7 @@ namespace BusinessObjectLibrary
         public string Name { get; set; }
         public string Question1 { get; set; }
         public string ImageUrl { get; set; }
+        public int Status { get; set; }
         public bool IsDeleted { get; set; }
 
         public virtual TestCategory TestCategory { get; set; }

@@ -18,6 +18,7 @@ namespace DataAccessLibrary.Interfaces
         IGenericRepository<Paragraph> Paragraphs { get; }
         IGenericRepository<ParagraphModificationRequest> ParagraphModificationRequests { get; }
         IGenericRepository<Question> Questions { get; }
+        IGenericRepository<QuestionModificationRequest> QuestionModificationRequests { get; }
         IGenericRepository<Reference> References { get; }
         IGenericRepository<Section> Sections { get; }
         IGenericRepository<Sign> Signs { get; }
@@ -27,6 +28,7 @@ namespace DataAccessLibrary.Interfaces
         IGenericRepository<Statue> Statues { get; }
         IGenericRepository<TestCategory> TestCategories { get; }
         IGenericRepository<User> Users { get; }
+        IGenericRepository<UserModificationRequest> UserModificationRequests { get; }
         IGenericRepository<VehicleCategory> VehicleCategories { get; }
         #endregion
 

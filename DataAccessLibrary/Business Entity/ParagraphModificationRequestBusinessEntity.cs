@@ -21,43 +21,47 @@ namespace DataAccessLibrary.Business_Entity
                 .Where(paragraphModificationRequest => !paragraphModificationRequest.IsDeleted);
         }
 
-        public async Task<ParagraphModificationRequest> GetParagraphModificationRequestByParagraphIdUserIdAsync(Guid paragraphId, Guid userId)
+        public async Task<ParagraphModificationRequest> 
+            GetParagraphModificationRequestByModifyingParagraphIdAsync(Guid modifyingParagraphId)
         {
             return (await work.ParagraphModificationRequests.GetAllAsync())
-                .Where(p => !p.IsDeleted && p.ParagraphId.Equals(paragraphId) && p.UserId.Equals(userId))
+                .Where(p => !p.IsDeleted && p.ModifyingParagraphId.Equals(modifyingParagraphId))
                 .FirstOrDefault();
         }
 
         public async Task<IEnumerable<ParagraphModificationRequest>> 
-            GetParagraphModificationRequestsByParagraphIdAsync(Guid paragraphId)
+            GetParagraphModificationRequestsByModifiedParagraphIdAsync(Guid modifiedParagraphId)
         {
             return (await work.ParagraphModificationRequests.GetAllAsync())
-                .Where(p => !p.IsDeleted && p.ParagraphId.Equals(paragraphId));
+                .Where(p => !p.IsDeleted && p.ModifiedParagraphId.Equals(modifiedParagraphId));
         }
 
         public async Task<IEnumerable<ParagraphModificationRequest>> 
-            GetParagraphModificationRequestsByUserIdAsync(Guid userId)
+            GetParagraphModificationRequestsByScribeIdAsync(Guid scribeId)
         {
             return (await work.ParagraphModificationRequests.GetAllAsync())
-                .Where(p => !p.IsDeleted && p.UserId.Equals(userId));
+                .Where(p => !p.IsDeleted && p.ScribeId.Equals(scribeId));
         }
 
-        public async Task<ParagraphModificationRequest> AddParagraphModificationRequest(ParagraphModificationRequest paragraphModificationRequest)
+        public async Task<ParagraphModificationRequest> 
+            AddParagraphModificationRequest(ParagraphModificationRequest paragraphModificationRequest)
         {
             paragraphModificationRequest.IsDeleted = false;
             await work.ParagraphModificationRequests.AddAsync(paragraphModificationRequest);
             await work.Save();
             return paragraphModificationRequest;
         }
-        public async Task<ParagraphModificationRequest> UpdateParagraphModificationRequest(ParagraphModificationRequest paragraphModificationRequest)
+        public async Task<ParagraphModificationRequest> 
+            UpdateParagraphModificationRequest(ParagraphModificationRequest paragraphModificationRequest)
         {
             work.ParagraphModificationRequests.Update(paragraphModificationRequest);
             await work.Save();
             return paragraphModificationRequest;
         }
-        public async Task RemoveParagraphModificationRequest(Guid paragraphId, Guid userId)
+        public async Task RemoveParagraphModificationRequest(Guid modifyingParagraphId)
         {
-            ParagraphModificationRequest paragraphModificationRequest = await work.ParagraphModificationRequests.GetAsync(paragraphId, userId);
+            ParagraphModificationRequest paragraphModificationRequest = 
+                await work.ParagraphModificationRequests.GetAsync(modifyingParagraphId);
             paragraphModificationRequest.IsDeleted = true;
             work.ParagraphModificationRequests.Update(paragraphModificationRequest);
             await work.Save();

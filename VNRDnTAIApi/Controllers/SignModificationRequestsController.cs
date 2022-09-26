@@ -41,16 +41,16 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // GET: api/SignModificationRequests/Signs/5/Users/5
-        [HttpGet("Signs/{signId}/Users/{userId}")]
+        // GET: api/SignModificationRequests/Signs/5
+        [HttpGet("Signs/{modifyingSignId}")]
         [ProducesResponseType(typeof(SignModificationRequest), 200)]
         [ProducesResponseType(500)]
         public async Task<ActionResult<SignModificationRequest>>
-            GetSignModificationRequestBySignIdUserId(Guid signId, Guid userId)
+            GetSignModificationRequestByModifyingSignId(Guid modifyingSignId)
         {
             try
             {
-                return StatusCode(200, await _entity.GetSignModificationRequestBySignIdUserIdAsync(signId, userId));
+                return StatusCode(200, await _entity.GetSignModificationRequestByModifyingSignIdAsync(modifyingSignId));
             }
             catch (Exception ex)
             {
@@ -59,15 +59,15 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/SignModificationRequests/Signs/5
-        [HttpGet("Signs/{signId}")]
+        [HttpGet("Signs/{modifiedSignId}")]
         [ProducesResponseType(typeof(IEnumerable<SignModificationRequest>), 200)]
         [ProducesResponseType(500)]
         public async Task<ActionResult<IEnumerable<SignModificationRequest>>>
-            GetSignModificationRequestsBySignId(Guid signId)
+            GetSignModificationRequestsByModifiedSignId(Guid modifiedSignId)
         {
             try
             {
-                return StatusCode(200, await _entity.GetSignModificationRequestsBySignIdAsync(signId));
+                return StatusCode(200, await _entity.GetSignModificationRequestsByModifiedSignIdAsync(modifiedSignId));
             }
             catch (Exception ex)
             {
@@ -75,16 +75,16 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // GET: api/SignModificationRequests/Users/5
-        [HttpGet("Users/{userId}")]
+        // GET: api/SignModificationRequests/Scribes/5
+        [HttpGet("Scribes/{scribeId}")]
         [ProducesResponseType(typeof(IEnumerable<SignModificationRequest>), 200)]
         [ProducesResponseType(500)]
         public async Task<ActionResult<IEnumerable<SignModificationRequest>>>
-            GetSignModificationRequestsByUserId(Guid userId)
+            GetSignModificationRequestsByScribeId(Guid scribeId)
         {
             try
             {
-                return StatusCode(200, await _entity.GetSignModificationRequestsByUserIdAsync(userId));
+                return StatusCode(200, await _entity.GetSignModificationRequestsByScribeIdAsync(scribeId));
             }
             catch (Exception ex)
             {
@@ -98,9 +98,9 @@ namespace VNRDnTAIApi.Controllers
         [ProducesResponseType(500)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> 
-            PutSignModificationRequest(Guid signId, Guid userId, SignModificationRequest signModificationRequest)
+            PutSignModificationRequest(Guid modifyingSignId, Guid scribeId, SignModificationRequest signModificationRequest)
         {
-            if (signId != signModificationRequest.SignId || userId != signModificationRequest.UserId)
+            if (modifyingSignId != signModificationRequest.ModifyingSignId || scribeId != signModificationRequest.ScribeId)
             {
                 return BadRequest();
             }
@@ -131,15 +131,15 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // DELETE: api/SignModificationRequests/Signs/5/Users/5
-        [HttpDelete("Signs/{signId}/Users/{userId}")]
+        // DELETE: api/SignModificationRequests/Signs/5
+        [HttpDelete("Signs/{modifyingSignId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> DeleteSignModificationRequest(Guid signId, Guid userId)
+        public async Task<IActionResult> DeleteSignModificationRequest(Guid modifyingSignId)
         {
             try
             {
-                await _entity.RemoveSignModificationRequest(signId, userId);
+                await _entity.RemoveSignModificationRequest(modifyingSignId);
                 return StatusCode(204);
             }
             catch (Exception ex)

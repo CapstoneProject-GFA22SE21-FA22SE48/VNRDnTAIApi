@@ -26,6 +26,7 @@ namespace DataAccessLibrary.Implementations
         public IGenericRepository<ParagraphModificationRequest> ParagraphModificationRequests { get; }
 
         public IGenericRepository<Question> Questions { get; }
+        public IGenericRepository<QuestionModificationRequest> QuestionModificationRequests { get; }
 
         public IGenericRepository<Reference> References { get; }
 
@@ -44,6 +45,8 @@ namespace DataAccessLibrary.Implementations
         public IGenericRepository<TestCategory> TestCategories { get; }
 
         public IGenericRepository<User> Users { get; }
+        public IGenericRepository<UserModificationRequest> UserModificationRequests { get; }
+
 
         public IGenericRepository<VehicleCategory> VehicleCategories { get; }
 
@@ -54,9 +57,9 @@ namespace DataAccessLibrary.Implementations
             IGenericRepository<Gpssign> gpssigns, 
             IGenericRepository<Keyword> keywords, 
             IGenericRepository<Paragraph> paragraphs, 
-            IGenericRepository<ParagraphModificationRequest> 
-            paragraphModificationRequests, 
-            IGenericRepository<Question> questions, 
+            IGenericRepository<ParagraphModificationRequest> paragraphModificationRequests, 
+            IGenericRepository<Question> questions,
+            IGenericRepository<QuestionModificationRequest> questionModificationRequests,
             IGenericRepository<Reference> references, 
             IGenericRepository<Section> sections, 
             IGenericRepository<Sign> signs, 
@@ -65,7 +68,8 @@ namespace DataAccessLibrary.Implementations
             IGenericRepository<SignParagraph> signParagraphs, 
             IGenericRepository<Statue> statues, 
             IGenericRepository<TestCategory> testCategories, 
-            IGenericRepository<User> users, 
+            IGenericRepository<User> users,
+            IGenericRepository<UserModificationRequest> userModificationRequests,
             IGenericRepository<VehicleCategory> vehicleCategories)
         {
             this.context = context;
@@ -77,6 +81,7 @@ namespace DataAccessLibrary.Implementations
             Paragraphs = paragraphs;
             ParagraphModificationRequests = paragraphModificationRequests;
             Questions = questions;
+            QuestionModificationRequests = questionModificationRequests;
             References = references;
             Sections = sections;
             Signs = signs;
@@ -86,6 +91,7 @@ namespace DataAccessLibrary.Implementations
             Statues = statues;
             TestCategories = testCategories;
             Users = users;
+            UserModificationRequests = userModificationRequests;
             VehicleCategories = vehicleCategories;
         }
 
