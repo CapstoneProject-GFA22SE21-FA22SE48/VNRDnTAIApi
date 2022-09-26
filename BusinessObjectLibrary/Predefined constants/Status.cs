@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 
 namespace BusinessObjectLibrary.Predefined_constants
 {
-    public enum ParagraphStatus
+    public enum Status
     {
-        PENDING = 0,
-        ACTIVE = 1,
-        INACTIVE = 2,
-        REJECTED = 3
+        Pending = 0,
+        Unclaimed = 1,
+        Claimed = 2,
+        Confirmed = 3,
+        Denied = 4,
+        Active = 5,
+        Deactivated = 6
     }
 }

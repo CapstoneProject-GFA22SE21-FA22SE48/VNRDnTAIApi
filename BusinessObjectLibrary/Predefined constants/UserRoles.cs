@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BusinessObjectLibrary.Predefined_constants
 {
-    public enum UserRole
+    public enum UserRoles
     {
         ADMIN = 0,
         SCRIBE = 1,
