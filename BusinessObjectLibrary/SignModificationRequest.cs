@@ -9,8 +9,8 @@ namespace BusinessObjectLibrary
     {
         public Guid ModifiedSignId { get; set; }
         public Guid ModifyingSignId { get; set; }
-        public Guid ScribeId { get; set; }
-        public Guid AdminId { get; set; }
+        public Guid? ScribeId { get; set; }
+        public Guid? AdminId { get; set; }
         public int OperationType { get; set; }
         public string ImageUrl { get; set; }
         public int Status { get; set; }
