@@ -15,7 +15,7 @@ namespace BusinessObjectLibrary
         public Guid Id { get; set; }
         public Guid TestCategoryId { get; set; }
         public string Name { get; set; }
-        public string Question1 { get; set; }
+        public string Content { get; set; }
         public string ImageUrl { get; set; }
         public int Status { get; set; }
         public bool IsDeleted { get; set; }

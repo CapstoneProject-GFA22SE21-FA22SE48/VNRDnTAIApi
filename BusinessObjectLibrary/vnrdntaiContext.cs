@@ -139,7 +139,7 @@ namespace BusinessObjectLibrary
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.AdditionalPenalty).HasMaxLength(1000);
+                entity.Property(e => e.AdditionalPenalty).HasMaxLength(2000);
 
                 entity.Property(e => e.Description).HasMaxLength(2000);
 
@@ -155,7 +155,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<ParagraphModificationRequest>(entity =>
             {
                 entity.HasKey(e => new { e.ModifiedParagraphId, e.ModifyingParagraphId })
-                    .HasName("PK__Paragrap__D8B4943AFCE78894");
+                    .HasName("PK__Paragrap__D8B4943A418C5713");
 
                 entity.ToTable("ParagraphModificationRequest");
 
@@ -190,16 +190,15 @@ namespace BusinessObjectLibrary
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
+                entity.Property(e => e.Content)
+                    .IsRequired()
+                    .HasMaxLength(2000);
+
                 entity.Property(e => e.ImageUrl).HasMaxLength(500);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(10);
-
-                entity.Property(e => e.Question1)
-                    .IsRequired()
-                    .HasMaxLength(2000)
-                    .HasColumnName("Question");
 
                 entity.HasOne(d => d.TestCategory)
                     .WithMany(p => p.Questions)
@@ -242,7 +241,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<Reference>(entity =>
             {
                 entity.HasKey(e => new { e.ParagraphId, e.ReferenceParagraphId })
-                    .HasName("PK__Referenc__44419EC0FBA17AD9");
+                    .HasName("PK__Referenc__44419EC0151BB0AB");
 
                 entity.ToTable("Reference");
 
@@ -333,7 +332,6 @@ namespace BusinessObjectLibrary
                 entity.HasOne(d => d.Admin)
                     .WithMany()
                     .HasForeignKey(d => d.AdminId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__SignModif__Admin__534D60F1");
 
                 entity.HasOne(d => d.ModifiedSign)
@@ -351,7 +349,6 @@ namespace BusinessObjectLibrary
                 entity.HasOne(d => d.Scribe)
                     .WithMany()
                     .HasForeignKey(d => d.ScribeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__SignModif__Scrib__52593CB8");
             });
 
@@ -430,7 +427,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<UserModificationRequest>(entity =>
             {
                 entity.HasKey(e => new { e.ModifiedUserId, e.ModifyingUserId })
-                    .HasName("PK__UserModi__3C975BE66A2C344F");
+                    .HasName("PK__UserModi__3C975BE61BF28109");
 
                 entity.ToTable("UserModificationRequest");
 
