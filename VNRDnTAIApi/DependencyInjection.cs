@@ -26,6 +26,7 @@ namespace VNRDnTAIApi
             services.AddScoped<IGenericRepository<Paragraph>, GenericRepository<Paragraph>>();
             services.AddScoped<IGenericRepository<ParagraphModificationRequest>, GenericRepository<ParagraphModificationRequest>>();
             services.AddScoped<IGenericRepository<Question>, GenericRepository<Question>>();
+            services.AddScoped<IGenericRepository<QuestionModificationRequest>, GenericRepository<QuestionModificationRequest>>();
             services.AddScoped<IGenericRepository<Reference>, GenericRepository<Reference>>();
             services.AddScoped<IGenericRepository<Section>, GenericRepository<Section>>();
             services.AddScoped<IGenericRepository<Sign>, GenericRepository<Sign>>();
@@ -35,6 +36,7 @@ namespace VNRDnTAIApi
             services.AddScoped<IGenericRepository<Statue>, GenericRepository<Statue>>();
             services.AddScoped<IGenericRepository<TestCategory>, GenericRepository<TestCategory>>();
             services.AddScoped<IGenericRepository<User>, GenericRepository<User>>();
+            services.AddScoped<IGenericRepository<UserModificationRequest>, GenericRepository<UserModificationRequest>>();
             services.AddScoped<IGenericRepository<VehicleCategory>, GenericRepository<VehicleCategory>>();
             #endregion
 
