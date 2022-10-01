@@ -12,6 +12,7 @@ namespace DataAccessLibrary.Interfaces
         #region Repository
         IGenericRepository<Answer> Answers { get; }
         IGenericRepository<Column> Columns { get; }
+        IGenericRepository<Comment> Comments { get; }
         IGenericRepository<Decree> Decrees { get; }
         IGenericRepository<Gpssign> Gpssigns { get; }
         IGenericRepository<Keyword> Keywords { get; }
@@ -27,6 +28,9 @@ namespace DataAccessLibrary.Interfaces
         IGenericRepository<SignParagraph> SignParagraphs { get; }
         IGenericRepository<Statue> Statues { get; }
         IGenericRepository<TestCategory> TestCategories { get; }
+        IGenericRepository<TestResult> TestResults { get; }
+        IGenericRepository<TestResultDetail> TestResultDetails { get; }
+
         IGenericRepository<User> Users { get; }
         IGenericRepository<UserModificationRequest> UserModificationRequests { get; }
         IGenericRepository<VehicleCategory> VehicleCategories { get; }

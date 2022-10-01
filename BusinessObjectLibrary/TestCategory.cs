@@ -10,6 +10,7 @@ namespace BusinessObjectLibrary
         public TestCategory()
         {
             Questions = new HashSet<Question>();
+            TestResults = new HashSet<TestResult>();
         }
 
         public Guid Id { get; set; }
@@ -17,5 +18,6 @@ namespace BusinessObjectLibrary
         public bool IsDeleted { get; set; }
 
         public virtual ICollection<Question> Questions { get; set; }
+        public virtual ICollection<TestResult> TestResults { get; set; }
     }
 }

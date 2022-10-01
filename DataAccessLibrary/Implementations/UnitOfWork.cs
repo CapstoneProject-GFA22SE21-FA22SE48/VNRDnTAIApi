@@ -15,6 +15,8 @@ namespace DataAccessLibrary.Implementations
 
         public IGenericRepository<Column> Columns { get; }
 
+        public IGenericRepository<Comment> Comments { get; }
+
         public IGenericRepository<Decree> Decrees { get; }
 
         public IGenericRepository<Gpssign> Gpssigns { get; }
@@ -44,15 +46,21 @@ namespace DataAccessLibrary.Implementations
 
         public IGenericRepository<TestCategory> TestCategories { get; }
 
+        public IGenericRepository<TestResult> TestResults { get; }
+
+        public IGenericRepository<TestResultDetail> TestResultDetails { get; }
+
         public IGenericRepository<User> Users { get; }
+
         public IGenericRepository<UserModificationRequest> UserModificationRequests { get; }
 
-
         public IGenericRepository<VehicleCategory> VehicleCategories { get; }
+
 
         public UnitOfWork(vnrdntaiContext context, 
             IGenericRepository<Answer> answers, 
             IGenericRepository<Column> columns, 
+            IGenericRepository<Comment> comments,
             IGenericRepository<Decree> decrees, 
             IGenericRepository<Gpssign> gpssigns, 
             IGenericRepository<Keyword> keywords, 
@@ -68,6 +76,8 @@ namespace DataAccessLibrary.Implementations
             IGenericRepository<SignParagraph> signParagraphs, 
             IGenericRepository<Statue> statues, 
             IGenericRepository<TestCategory> testCategories, 
+            IGenericRepository<TestResult> testResults,
+            IGenericRepository<TestResultDetail> testResultsDetails,
             IGenericRepository<User> users,
             IGenericRepository<UserModificationRequest> userModificationRequests,
             IGenericRepository<VehicleCategory> vehicleCategories)
@@ -75,6 +85,7 @@ namespace DataAccessLibrary.Implementations
             this.context = context;
             Answers = answers;
             Columns = columns;
+            Comments = comments;
             Decrees = decrees;
             Gpssigns = gpssigns;
             Keywords = keywords;
@@ -90,6 +101,8 @@ namespace DataAccessLibrary.Implementations
             SignParagraphs = signParagraphs;
             Statues = statues;
             TestCategories = testCategories;
+            TestResults = testResults;
+            TestResultDetails = testResultsDetails;
             Users = users;
             UserModificationRequests = userModificationRequests;
             VehicleCategories = vehicleCategories;

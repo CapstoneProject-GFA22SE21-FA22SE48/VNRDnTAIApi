@@ -127,6 +127,15 @@ namespace VNRDnTAIApi.Controllers
         {
             try
             {
+                if (string.IsNullOrEmpty(loginUserDTO.Username))
+                {
+                    throw new Exception("Vui lòng nhập tên đăng nhập!");
+                }
+
+                if (string.IsNullOrEmpty(loginUserDTO.Password))
+                {
+                    throw new Exception("Vui lòng nhập mật khẩu!");
+                }
                 User user = await _entity
                     .Login(loginUserDTO.Username, loginUserDTO.Password);
 
@@ -136,7 +145,7 @@ namespace VNRDnTAIApi.Controllers
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Role, "admin"),
+                    new Claim(ClaimTypes.Role, user.Role == 0 ? "admin" : "scribe"),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 };
 
@@ -154,17 +163,18 @@ namespace VNRDnTAIApi.Controllers
 
                     return StatusCode(200, new
                     {
-                        token = new JwtSecurityTokenHandler().WriteToken(token)
+                        token = new JwtSecurityTokenHandler().WriteToken(token),
+                        user = user
                     });
                 } 
                 else
                 {
-                    throw new Exception("Login failed! Please check your login information and try again...");
+                    throw new Exception("Sai tên đăng nhập hoặc mật khẩu");
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                return Unauthorized(ex.Message);
+                return Unauthorized("Có lỗi xảy ra. Vui lòng thử lại sau.");
             }
         }
     }

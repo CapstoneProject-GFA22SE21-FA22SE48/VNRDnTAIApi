@@ -5,24 +5,20 @@ using System.Collections.Generic;
 
 namespace BusinessObjectLibrary
 {
-    public partial class Question
+    public partial class TestResult
     {
-        public Question()
+        public TestResult()
         {
-            Answers = new HashSet<Answer>();
             TestResultDetails = new HashSet<TestResultDetail>();
         }
 
         public Guid Id { get; set; }
+        public Guid UserId { get; set; }
         public Guid TestCategoryId { get; set; }
-        public string Name { get; set; }
-        public string Content { get; set; }
-        public string ImageUrl { get; set; }
-        public int Status { get; set; }
         public bool IsDeleted { get; set; }
 
         public virtual TestCategory TestCategory { get; set; }
-        public virtual ICollection<Answer> Answers { get; set; }
+        public virtual User User { get; set; }
         public virtual ICollection<TestResultDetail> TestResultDetails { get; set; }
     }
 }

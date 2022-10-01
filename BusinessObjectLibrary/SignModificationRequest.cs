@@ -9,6 +9,7 @@ namespace BusinessObjectLibrary
     {
         public Guid ModifiedSignId { get; set; }
         public Guid ModifyingSignId { get; set; }
+        public Guid UserId { get; set; }
         public Guid? ScribeId { get; set; }
         public Guid? AdminId { get; set; }
         public int OperationType { get; set; }
@@ -20,5 +21,6 @@ namespace BusinessObjectLibrary
         public virtual Sign ModifiedSign { get; set; }
         public virtual Sign ModifyingSign { get; set; }
         public virtual User Scribe { get; set; }
+        public virtual User User { get; set; }
     }
 }

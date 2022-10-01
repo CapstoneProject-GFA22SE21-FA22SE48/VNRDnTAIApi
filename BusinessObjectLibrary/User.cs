@@ -9,8 +9,10 @@ namespace BusinessObjectLibrary
     {
         public User()
         {
+            Comments = new HashSet<Comment>();
             ParagraphModificationRequestAdmins = new HashSet<ParagraphModificationRequest>();
             ParagraphModificationRequestScribes = new HashSet<ParagraphModificationRequest>();
+            TestResults = new HashSet<TestResult>();
             UserModificationRequestArbitratingAdmins = new HashSet<UserModificationRequest>();
             UserModificationRequestModifiedUsers = new HashSet<UserModificationRequest>();
             UserModificationRequestModifyingUsers = new HashSet<UserModificationRequest>();
@@ -24,8 +26,10 @@ namespace BusinessObjectLibrary
         public int Status { get; set; }
         public bool IsDeleted { get; set; }
 
+        public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<ParagraphModificationRequest> ParagraphModificationRequestAdmins { get; set; }
         public virtual ICollection<ParagraphModificationRequest> ParagraphModificationRequestScribes { get; set; }
+        public virtual ICollection<TestResult> TestResults { get; set; }
         public virtual ICollection<UserModificationRequest> UserModificationRequestArbitratingAdmins { get; set; }
         public virtual ICollection<UserModificationRequest> UserModificationRequestModifiedUsers { get; set; }
         public virtual ICollection<UserModificationRequest> UserModificationRequestModifyingUsers { get; set; }

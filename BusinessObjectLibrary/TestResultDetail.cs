@@ -5,20 +5,17 @@ using System.Collections.Generic;
 
 namespace BusinessObjectLibrary
 {
-    public partial class Answer
+    public partial class TestResultDetail
     {
-        public Answer()
-        {
-            TestResultDetails = new HashSet<TestResultDetail>();
-        }
-
         public Guid Id { get; set; }
+        public Guid TestResultId { get; set; }
         public Guid QuestionId { get; set; }
-        public string Description { get; set; }
+        public Guid AnswerId { get; set; }
         public bool IsCorrect { get; set; }
         public bool IsDeleted { get; set; }
 
+        public virtual Answer Answer { get; set; }
         public virtual Question Question { get; set; }
-        public virtual ICollection<TestResultDetail> TestResultDetails { get; set; }
+        public virtual TestResult TestResult { get; set; }
     }
 }
