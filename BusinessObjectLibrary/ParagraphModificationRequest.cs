@@ -13,6 +13,7 @@ namespace BusinessObjectLibrary
         public Guid AdminId { get; set; }
         public int OperationType { get; set; }
         public int Status { get; set; }
+        public DateTime CreatedDate { get; set; }
         public bool IsDeleted { get; set; }
 
         public virtual User Admin { get; set; }

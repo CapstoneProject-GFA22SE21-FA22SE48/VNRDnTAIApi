@@ -177,9 +177,11 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<ParagraphModificationRequest>(entity =>
             {
                 entity.HasKey(e => new { e.ModifiedParagraphId, e.ModifyingParagraphId })
-                    .HasName("PK__Paragrap__D8B4943A8006B93A");
+                    .HasName("PK__Paragrap__D8B4943A10D43F2E");
 
                 entity.ToTable("ParagraphModificationRequest");
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Admin)
                     .WithMany(p => p.ParagraphModificationRequestAdmins)
@@ -235,6 +237,8 @@ namespace BusinessObjectLibrary
 
                 entity.ToTable("QuestionModificationRequest");
 
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
                 entity.HasOne(d => d.Admin)
                     .WithMany()
                     .HasForeignKey(d => d.AdminId)
@@ -263,7 +267,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<Reference>(entity =>
             {
                 entity.HasKey(e => new { e.ParagraphId, e.ReferenceParagraphId })
-                    .HasName("PK__Referenc__44419EC022F727E5");
+                    .HasName("PK__Referenc__44419EC0721C1C1A");
 
                 entity.ToTable("Reference");
 
@@ -347,6 +351,8 @@ namespace BusinessObjectLibrary
 
                 entity.ToTable("SignModificationRequest");
 
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
                 entity.Property(e => e.ImageUrl)
                     .IsRequired()
                     .HasMaxLength(500);
@@ -376,6 +382,7 @@ namespace BusinessObjectLibrary
                 entity.HasOne(d => d.User)
                     .WithMany()
                     .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__SignModif__UserI__52593CB8");
             });
 
@@ -498,9 +505,11 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<UserModificationRequest>(entity =>
             {
                 entity.HasKey(e => new { e.ModifiedUserId, e.ModifyingUserId })
-                    .HasName("PK__UserModi__3C975BE698FA3B0D");
+                    .HasName("PK__UserModi__3C975BE6C44F9562");
 
                 entity.ToTable("UserModificationRequest");
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.ArbitratingAdmin)
                     .WithMany(p => p.UserModificationRequestArbitratingAdmins)

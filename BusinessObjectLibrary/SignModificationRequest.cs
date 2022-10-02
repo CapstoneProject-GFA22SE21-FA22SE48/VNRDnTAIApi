@@ -15,6 +15,7 @@ namespace BusinessObjectLibrary
         public int OperationType { get; set; }
         public string ImageUrl { get; set; }
         public int Status { get; set; }
+        public DateTime CreatedDate { get; set; }
         public bool IsDeleted { get; set; }
 
         public virtual User Admin { get; set; }

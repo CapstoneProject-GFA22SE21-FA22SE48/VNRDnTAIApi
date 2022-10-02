@@ -129,12 +129,12 @@ namespace VNRDnTAIApi.Controllers
             {
                 if (string.IsNullOrEmpty(loginUserDTO.Username))
                 {
-                    throw new Exception("Vui lòng nhập tên đăng nhập!");
+                    throw new ArgumentException("Vui lòng nhập tên đăng nhập!");
                 }
 
                 if (string.IsNullOrEmpty(loginUserDTO.Password))
                 {
-                    throw new Exception("Vui lòng nhập mật khẩu!");
+                    throw new ArgumentException("Vui lòng nhập mật khẩu!");
                 }
                 User user = await _entity
                     .Login(loginUserDTO.Username, loginUserDTO.Password);
@@ -170,6 +170,10 @@ namespace VNRDnTAIApi.Controllers
                 {
                     throw new Exception("Sai tên đăng nhập hoặc mật khẩu");
                 }
+            }
+            catch (ArgumentException ae)
+            {
+                return Unauthorized(ae.Message);
             }
             catch
             {
