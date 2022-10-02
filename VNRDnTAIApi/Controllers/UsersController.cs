@@ -143,9 +143,9 @@ namespace VNRDnTAIApi.Controllers
                 {
                     var authClaims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Role, user.Role == 0 ? "admin" : "scribe"),
+                    new Claim("Id", user.Id.ToString()),
+                    new Claim("Username", user.Username),
+                    new Claim("Role", user.Role.ToString()),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 };
 
@@ -164,7 +164,6 @@ namespace VNRDnTAIApi.Controllers
                     return StatusCode(200, new
                     {
                         token = new JwtSecurityTokenHandler().WriteToken(token),
-                        user = user
                     });
                 } 
                 else
