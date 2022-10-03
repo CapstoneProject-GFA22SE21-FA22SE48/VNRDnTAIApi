@@ -24,6 +24,7 @@ namespace BusinessObjectLibrary
         public string Password { get; set; }
         public int Role { get; set; }
         public int Status { get; set; }
+        public DateTime CreatedDate { get; set; }
         public bool IsDeleted { get; set; }
 
         public virtual ICollection<Comment> Comments { get; set; }

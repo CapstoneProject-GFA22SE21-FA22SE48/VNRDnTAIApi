@@ -177,7 +177,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<ParagraphModificationRequest>(entity =>
             {
                 entity.HasKey(e => new { e.ModifiedParagraphId, e.ModifyingParagraphId })
-                    .HasName("PK__Paragrap__D8B4943A10D43F2E");
+                    .HasName("PK__Paragrap__D8B4943AD31F7687");
 
                 entity.ToTable("ParagraphModificationRequest");
 
@@ -267,7 +267,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<Reference>(entity =>
             {
                 entity.HasKey(e => new { e.ParagraphId, e.ReferenceParagraphId })
-                    .HasName("PK__Referenc__44419EC0721C1C1A");
+                    .HasName("PK__Referenc__44419EC0F62F3D6E");
 
                 entity.ToTable("Reference");
 
@@ -449,6 +449,8 @@ namespace BusinessObjectLibrary
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
                 entity.HasOne(d => d.TestCategory)
                     .WithMany(p => p.TestResults)
                     .HasForeignKey(d => d.TestCategoryId)
@@ -493,6 +495,8 @@ namespace BusinessObjectLibrary
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
                 entity.Property(e => e.Password)
                     .IsRequired()
                     .HasMaxLength(20);
@@ -505,7 +509,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<UserModificationRequest>(entity =>
             {
                 entity.HasKey(e => new { e.ModifiedUserId, e.ModifyingUserId })
-                    .HasName("PK__UserModi__3C975BE6C44F9562");
+                    .HasName("PK__UserModi__3C975BE68A055790");
 
                 entity.ToTable("UserModificationRequest");
 
