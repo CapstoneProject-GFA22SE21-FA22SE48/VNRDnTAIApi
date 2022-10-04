@@ -1,5 +1,7 @@
 ﻿using BusinessObjectLibrary;
+using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +22,25 @@ namespace DataAccessLibrary.Business_Entity
             return (await work.Users.GetAllAsync())
                 .Where(user => !user.IsDeleted);
         }
+
+        public async Task<IEnumerable<User>> GetMembersAsync()
+        {
+            var user = (await work.Users.GetAllAsync())
+                .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.USER);
+            return user;
+        }
+
+        public async Task<IEnumerable<User>> GetMembersByUserNameAsync(string keywordUserName)
+        {
+            var user = (await work.Users.GetAllAsync())
+                .Where(
+                    user => !user.IsDeleted && 
+                    user.Role == (int)UserRoles.USER && 
+                    user.Username.ToLower().Contains(keywordUserName.ToLower())
+                 );
+            return user;
+        }
+
         public async Task<User> GetUserAsync(Guid id)
         {
             return (await work.Users.GetAllAsync())
@@ -53,6 +74,21 @@ namespace DataAccessLibrary.Business_Entity
             return (await work.Users.GetAllAsync())
                 .Where((user) => user.Username == username && user.Password == password)
                 .FirstOrDefault();
+        }
+
+        public async Task<AdminUserByYearDTO> GetAdminUserByYearReport()
+        {
+            AdminUserByYearDTO adminUserByYear = new AdminUserByYearDTO();
+            List<string> listNumberUserByYear = new List<string>();
+            IEnumerable<User> users = await work.Users.GetAllAsync();
+            int minYear = (from u in users select u.CreatedDate).Min().Year;
+            for (int i = minYear; i <= DateTime.Now.Year; i++)
+            {
+                listNumberUserByYear.Add(i.ToString() + "-" + (await work.Users.GetAllAsync())
+                .Where(u => !u.IsDeleted && u.CreatedDate.Year == i).Count().ToString());
+            }
+            adminUserByYear.UserByYear = listNumberUserByYear;
+            return adminUserByYear;
         }
     }
 }

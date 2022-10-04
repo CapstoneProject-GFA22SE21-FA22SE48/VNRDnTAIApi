@@ -47,6 +47,22 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
+        // GET: api/Users/Members
+        [HttpGet("Members")]
+        [ProducesResponseType(typeof(IEnumerable<User>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<User>>> GetMembers()
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetMembersAsync());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         // GET: api/Users/5
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(User), 200)]
@@ -180,5 +196,22 @@ namespace VNRDnTAIApi.Controllers
                 return Unauthorized("Có lỗi xảy ra. Vui lòng thử lại sau.");
             }
         }
+
+        // GET: api/Users/Members/ByUserName
+        [HttpGet("Members/ByName/{keywordUserName}")]
+        [ProducesResponseType(typeof(IEnumerable<User>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<User>>> GetMembersByName(string keywordUserName)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetMembersByUserNameAsync(keywordUserName));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
     }
 }
