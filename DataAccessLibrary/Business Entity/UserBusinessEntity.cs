@@ -27,7 +27,7 @@ namespace DataAccessLibrary.Business_Entity
         {
             var user = (await work.Users.GetAllAsync())
                 .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.USER);
-            return user;
+            return user.OrderBy(u => u.Username);
         }
 
         public async Task<IEnumerable<User>> GetMembersByUserNameAsync(string keywordUserName)
@@ -38,7 +38,7 @@ namespace DataAccessLibrary.Business_Entity
                     user.Role == (int)UserRoles.USER && 
                     user.Username.ToLower().Contains(keywordUserName.ToLower())
                  );
-            return user;
+            return user.OrderBy(u => u.Username);
         }
 
         public async Task<User> GetUserAsync(Guid id)

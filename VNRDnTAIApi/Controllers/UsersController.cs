@@ -51,11 +51,17 @@ namespace VNRDnTAIApi.Controllers
         [HttpGet("Members")]
         [ProducesResponseType(typeof(IEnumerable<User>), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<User>>> GetMembers()
+        public async Task<ActionResult<IEnumerable<User>>> GetMembers(string? keywordUsername)
         {
             try
             {
-                return StatusCode(200, await _entity.GetMembersAsync());
+                if (string.IsNullOrEmpty(keywordUsername))
+                {
+                    return StatusCode(200, await _entity.GetMembersAsync());
+                } else
+                {
+                    return StatusCode(200, await _entity.GetMembersByUserNameAsync(keywordUsername));
+                }
             }
             catch (Exception ex)
             {
@@ -184,10 +190,14 @@ namespace VNRDnTAIApi.Controllers
                 } 
                 else
                 {
-                    throw new Exception("Sai tên đăng nhập hoặc mật khẩu");
+                    throw new ApplicationException("Sai tên đăng nhập hoặc mật khẩu");
                 }
             }
             catch (ArgumentException ae)
+            {
+                return Unauthorized(ae.Message);
+            }
+            catch (ApplicationException ae)
             {
                 return Unauthorized(ae.Message);
             }
@@ -196,22 +206,5 @@ namespace VNRDnTAIApi.Controllers
                 return Unauthorized("Có lỗi xảy ra. Vui lòng thử lại sau.");
             }
         }
-
-        // GET: api/Users/Members/ByUserName
-        [HttpGet("Members/ByName/{keywordUserName}")]
-        [ProducesResponseType(typeof(IEnumerable<User>), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<User>>> GetMembersByName(string keywordUserName)
-        {
-            try
-            {
-                return StatusCode(200, await _entity.GetMembersByUserNameAsync(keywordUserName));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
     }
 }
