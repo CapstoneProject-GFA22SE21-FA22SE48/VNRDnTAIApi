@@ -17,8 +17,15 @@ namespace DataAccessLibrary.Business_Entity
         }
         public async Task<IEnumerable<Question>> GetQuestionsAsync()
         {
-            return (await work.Questions.GetAllAsync())
+            return (await work.Questions.GetAllAsync(nameof(Question.Answers)))
                 .Where(question => !question.IsDeleted);
+        }
+
+        public async Task<IEnumerable<Question>> GetRandomTestSetByCategory(string categoryName)
+        {
+            var testCatId = (await work.TestCategories.GetAllAsync()).First(cat => cat.Name == categoryName).Id;
+            return (await work.Questions.GetAllAsync(nameof(Question.Answers)))
+                .Where(question => !question.IsDeleted && question.TestCategoryId.ToString().Equals(testCatId.ToString())).Take(20);
         }
         public async Task<Question> GetQuestionAsync(Guid id)
         {
