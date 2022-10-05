@@ -5,7 +5,6 @@ using DTOsLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Business_Entity
@@ -27,18 +26,32 @@ namespace DataAccessLibrary.Business_Entity
         {
             var user = (await work.Users.GetAllAsync())
                 .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.USER);
-            return user.OrderBy(u => u.Username);
+            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
         }
 
         public async Task<IEnumerable<User>> GetMembersByUserNameAsync(string keywordUserName)
         {
             var user = (await work.Users.GetAllAsync())
                 .Where(
-                    user => !user.IsDeleted && 
-                    user.Role == (int)UserRoles.USER && 
+                    user => !user.IsDeleted &&
+                    user.Role == (int)UserRoles.USER &&
                     user.Username.ToLower().Contains(keywordUserName.ToLower())
                  );
-            return user.OrderBy(u => u.Username);
+            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
+        }
+
+        public async Task<IEnumerable<User>> GetMembersByCreatedDateRangeAsync(
+            DateTime startDate,
+            DateTime endDate)
+        {
+            var user = (await work.Users.GetAllAsync())
+                .Where(
+                    user => !user.IsDeleted &&
+                    user.Role == (int)UserRoles.USER &&
+                    user.CreatedDate.CompareTo(startDate) >= 0 &&
+                    user.CreatedDate.CompareTo(endDate) <= 0
+                 );
+            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
         }
 
         public async Task<User> GetUserAsync(Guid id)
@@ -60,6 +73,31 @@ namespace DataAccessLibrary.Business_Entity
             work.Users.Update(user);
             await work.Save();
             return user;
+        }
+
+        //Deactivate Member: status (deactivated) + comment (isDeleted = true)
+        public async Task<User> DeactivateMember(User member)
+        {
+            User deactivatingMember = await work.Users.GetAsync(member.Id);
+            deactivatingMember.Status = (int)Status.Deactivated;
+            IEnumerable<Comment> comments = (await work.Comments.GetAllAsync())
+                .Where(c => !c.IsDeleted && c.UserId == member.Id);
+            foreach (Comment comment in comments)
+            {
+                comment.IsDeleted = true;
+            }
+            await work.Save();
+            return deactivatingMember;
+
+        }
+
+        public async Task<User> ReEnableMember(User member)
+        {
+            User reEnablingMember = await work.Users.GetAsync(member.Id);
+            reEnablingMember.Status = (int)Status.Active;
+            await work.Save();
+            return reEnablingMember;
+
         }
         public async Task RemoveUser(Guid id)
         {

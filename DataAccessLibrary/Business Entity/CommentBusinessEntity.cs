@@ -26,6 +26,13 @@ namespace DataAccessLibrary.Business_Entity
                 .Where(comment => !comment.IsDeleted && comment.Id.Equals(id))
                 .FirstOrDefault();
         }
+
+        public async Task<IEnumerable<Comment>> GetCommentsByMemberId(Guid memberId)
+        {
+            IEnumerable<Comment> comments = (await work.Comments.GetAllAsync())
+                .Where(c => !c.IsDeleted && c.UserId.Equals(memberId));
+            return comments.OrderBy(c => c.CreatedDate);
+        }
         public async Task<Comment> AddComment(Comment comment)
         {
             comment.Id = Guid.NewGuid();

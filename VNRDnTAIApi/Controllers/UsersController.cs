@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BusinessObjectLibrary;
+﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using DTOsLibrary;
-using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using VNRDnTAILibrary;
 
 namespace VNRDnTAIApi.Controllers
@@ -58,10 +55,27 @@ namespace VNRDnTAIApi.Controllers
                 if (string.IsNullOrEmpty(keywordUsername))
                 {
                     return StatusCode(200, await _entity.GetMembersAsync());
-                } else
+                }
+                else
                 {
                     return StatusCode(200, await _entity.GetMembersByUserNameAsync(keywordUsername));
                 }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // GET: api/Users/Members/DateRange/
+        [HttpGet("Members/DateRange")]
+        [ProducesResponseType(typeof(IEnumerable<User>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<User>>> GetMembers(DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetMembersByCreatedDateRangeAsync(startDate, endDate));
             }
             catch (Exception ex)
             {
@@ -100,6 +114,50 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.UpdateUser(user));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // PUT: api/Users/Members/Deactivate
+        [HttpPut("Members/Deactivate/{id}")]
+        [ProducesResponseType(typeof(User), 200)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> DeactivateMember(Guid id, User member)
+        {
+            if (id != member.Id)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                return StatusCode(200, await _entity.DeactivateMember(member));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // PUT: api/Users/Members/ReEnable
+        [HttpPut("Members/ReEnable/{id}")]
+        [ProducesResponseType(typeof(User), 200)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> ReEnableMember(Guid id, User member)
+        {
+            if (id != member.Id)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                return StatusCode(200, await _entity.ReEnableMember(member));
             }
             catch (Exception ex)
             {
@@ -177,7 +235,7 @@ namespace VNRDnTAIApi.Controllers
                     var token = new JwtSecurityToken(
                         issuer: VNRDnTAIConfiguration.JwtIssuer,
                         audience: VNRDnTAIConfiguration.JwtAudience,
-                        expires: DateTime.Now.AddHours(2),
+                        //expires: DateTime.Now.AddHours(2),
                         claims: authClaims,
                         signingCredentials:
                             new SigningCredentials(authSignature, SecurityAlgorithms.HmacSha256)
@@ -187,7 +245,7 @@ namespace VNRDnTAIApi.Controllers
                     {
                         token = new JwtSecurityTokenHandler().WriteToken(token),
                     });
-                } 
+                }
                 else
                 {
                     throw new ApplicationException("Sai tên đăng nhập hoặc mật khẩu");
