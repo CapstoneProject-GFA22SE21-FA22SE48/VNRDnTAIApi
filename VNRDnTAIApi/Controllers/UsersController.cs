@@ -67,6 +67,29 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
+        // GET: api/Users/Scribes
+        [HttpGet("Scribes")]
+        [ProducesResponseType(typeof(IEnumerable<User>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<User>>> GetScribes(string? keywordUsername)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(keywordUsername))
+                {
+                    return StatusCode(200, await _entity.GetScribesAsync());
+                }
+                else
+                {
+                    return StatusCode(200, await _entity.GetScribesByUserNameAsync(keywordUsername));
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         // GET: api/Users/Members/DateRange/
         [HttpGet("Members/DateRange")]
         [ProducesResponseType(typeof(IEnumerable<User>), 200)]
@@ -76,6 +99,22 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.GetMembersByCreatedDateRangeAsync(startDate, endDate));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // GET: api/Users/Scribes/DateRange/
+        [HttpGet("Scribes/DateRange")]
+        [ProducesResponseType(typeof(IEnumerable<User>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<User>>> GetScribes(DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetScribesByCreatedDateRangeAsync(startDate, endDate));
             }
             catch (Exception ex)
             {
@@ -236,6 +275,7 @@ namespace VNRDnTAIApi.Controllers
                         issuer: VNRDnTAIConfiguration.JwtIssuer,
                         audience: VNRDnTAIConfiguration.JwtAudience,
                         //expires: DateTime.Now.AddHours(2),
+                        expires: DateTime.MaxValue,
                         claims: authClaims,
                         signingCredentials:
                             new SigningCredentials(authSignature, SecurityAlgorithms.HmacSha256)

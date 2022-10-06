@@ -3,7 +3,6 @@ using DataAccessLibrary.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Business_Entity
@@ -19,6 +18,12 @@ namespace DataAccessLibrary.Business_Entity
         {
             return (await work.Answers.GetAllAsync())
                 .Where(answer => !answer.IsDeleted);
+        }
+
+        public async Task<IEnumerable<Answer>> GetAnswersByQuestionIdAsync(Guid questionId)
+        {
+            return (await work.Answers.GetAllAsync())
+                .Where(answer => !answer.IsDeleted && answer.QuestionId == questionId);
         }
         public async Task<Answer> GetAnswerAsync(Guid id)
         {

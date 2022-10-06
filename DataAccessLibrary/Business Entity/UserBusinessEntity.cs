@@ -54,6 +54,38 @@ namespace DataAccessLibrary.Business_Entity
             return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
         }
 
+        public async Task<IEnumerable<User>> GetScribesAsync()
+        {
+            var user = (await work.Users.GetAllAsync())
+                .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.SCRIBE);
+            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
+        }
+
+        public async Task<IEnumerable<User>> GetScribesByUserNameAsync(string keywordUserName)
+        {
+            var user = (await work.Users.GetAllAsync())
+                .Where(
+                    user => !user.IsDeleted &&
+                    user.Role == (int)UserRoles.SCRIBE &&
+                    user.Username.ToLower().Contains(keywordUserName.ToLower())
+                 );
+            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
+        }
+
+        public async Task<IEnumerable<User>> GetScribesByCreatedDateRangeAsync(
+            DateTime startDate,
+            DateTime endDate)
+        {
+            var user = (await work.Users.GetAllAsync())
+                .Where(
+                    user => !user.IsDeleted &&
+                    user.Role == (int)UserRoles.SCRIBE &&
+                    user.CreatedDate.CompareTo(startDate) >= 0 &&
+                    user.CreatedDate.CompareTo(endDate) <= 0
+                 );
+            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
+        }
+
         public async Task<User> GetUserAsync(Guid id)
         {
             return (await work.Users.GetAllAsync())
@@ -114,19 +146,37 @@ namespace DataAccessLibrary.Business_Entity
                 .FirstOrDefault();
         }
 
-        public async Task<AdminUserByYearDTO> GetAdminUserByYearReport()
+        public async Task<MemberByYearReportDTO> GetMemberByYearReport()
         {
-            AdminUserByYearDTO adminUserByYear = new AdminUserByYearDTO();
-            List<string> listNumberUserByYear = new List<string>();
+            MemberByYearReportDTO memberByYear = new MemberByYearReportDTO();
+            List<string> listNumberMemberByYear = new List<string>();
             IEnumerable<User> users = await work.Users.GetAllAsync();
             int minYear = (from u in users select u.CreatedDate).Min().Year;
             for (int i = minYear; i <= DateTime.Now.Year; i++)
             {
-                listNumberUserByYear.Add(i.ToString() + "-" + (await work.Users.GetAllAsync())
-                .Where(u => !u.IsDeleted && u.CreatedDate.Year == i).Count().ToString());
+                listNumberMemberByYear.Add(i.ToString() + "-" + users
+                .Where(u => !u.IsDeleted && u.Role == (int)UserRoles.USER
+                        && u.CreatedDate.Year == i).Count().ToString());
             }
-            adminUserByYear.UserByYear = listNumberUserByYear;
-            return adminUserByYear;
+            memberByYear.MembersByYear = listNumberMemberByYear;
+            return memberByYear;
+        }
+
+        public async Task<NewMemberReportDTO> GetNewMemberReport(int month, int year)
+        {
+            NewMemberReportDTO newMember = new NewMemberReportDTO();
+            List<string> listNumberNewMemberByDay = new List<string>();
+            IEnumerable<User> users = await work.Users.GetAllAsync();
+            int dayCount = DateTime.DaysInMonth(year, month);
+            for (int i = 1; i <= dayCount; i++)
+            {
+                listNumberNewMemberByDay.Add(i.ToString() + "-" + users
+                    .Where(u => !u.IsDeleted && u.Role == (int)UserRoles.USER
+                            && u.CreatedDate.Day == i && u.CreatedDate.Month == month
+                            && u.CreatedDate.Year == year).Count().ToString());
+            }
+            newMember.NewMembersByDay = listNumberNewMemberByDay;
+            return newMember;
         }
     }
 }
