@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BusinessObjectLibrary;
+﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace VNRDnTAIApi.Controllers
 {
@@ -33,6 +29,22 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.GetAnswersAsync());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // GET: api/Answers/Question
+        [HttpGet("Question/{questionId}")]
+        [ProducesResponseType(typeof(IEnumerable<Answer>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<Answer>>> GetAnswersByQuestionId(Guid questionId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetAnswersByQuestionIdAsync(questionId));
             }
             catch (Exception ex)
             {

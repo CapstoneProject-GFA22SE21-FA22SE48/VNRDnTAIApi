@@ -1,9 +1,9 @@
 ﻿using BusinessObjectLibrary;
+using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Business_Entity
@@ -18,7 +18,8 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<IEnumerable<Question>> GetQuestionsAsync()
         {
             return (await work.Questions.GetAllAsync())
-                .Where(question => !question.IsDeleted);
+                .Where(question => !question.IsDeleted && question.Status == (int)Status.Active)
+                .OrderBy(u => int.Parse(u.Name.Split(" ")[1]));
         }
         public async Task<Question> GetQuestionAsync(Guid id)
         {

@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BusinessObjectLibrary;
-using DataAccessLibrary.Business_Entity;
+﻿using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using DTOsLibrary;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace VNRDnTAIApi.Controllers
 {
-    [Route("api/{controller}")]
+    [Route("api/[controller]")]
     [ApiController]
     [ApiVersion("1.0")]
     public class AdminReportsController : ControllerBase
@@ -25,15 +19,31 @@ namespace VNRDnTAIApi.Controllers
             _userEntity = new UserBusinessEntity(work);
         }
 
-        // GET: api/AdminReports/UserByYear
-        [HttpGet("UserByYear")]
-        [ProducesResponseType(typeof(AdminUserByYearDTO), 200)]
+        // GET: api/AdminReports/MemberByYear
+        [HttpGet("MemberByYear")]
+        [ProducesResponseType(typeof(MemberByYearReportDTO), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<AdminUserByYearDTO>> GetAdminUserByYear()
+        public async Task<ActionResult<MemberByYearReportDTO>> GetMemberByYear()
         {
             try
             {
-                return StatusCode(200, await _userEntity.GetAdminUserByYearReport());
+                return StatusCode(200, await _userEntity.GetMemberByYearReport());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // GET: api/AdminReports/NewMember
+        [HttpGet("NewMember/{month}/{year}")]
+        [ProducesResponseType(typeof(NewMemberReportDTO), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<NewMemberReportDTO>> GetNewMember(int month, int year)
+        {
+            try
+            {
+                return StatusCode(200, await _userEntity.GetNewMemberReport(month, year));
             }
             catch (Exception ex)
             {
