@@ -20,6 +20,7 @@ namespace DataAccessLibrary.Business_Entity
             return (await work.TestCategories.GetAllAsync())
                 .Where(testCategory => !testCategory.IsDeleted);
         }
+
         public async Task<TestCategory> GetTestCategoryAsync(Guid id)
         {
             return (await work.TestCategories.GetAllAsync())
