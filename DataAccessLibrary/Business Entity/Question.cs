@@ -25,7 +25,7 @@ namespace DataAccessLibrary.Business_Entity
         {
             var testCatId = (await work.TestCategories.GetAllAsync()).First(cat => cat.Name == categoryName).Id;
             return (await work.Questions.GetAllAsync(nameof(Question.Answers)))
-                .Where(question => !question.IsDeleted && question.TestCategoryId.ToString().Equals(testCatId.ToString())).Take(20);
+                .Where(question => !question.IsDeleted && question.TestCategoryId.ToString().Equals(testCatId.ToString())).OrderBy(r => Guid.NewGuid()).Take(20);
         }
         public async Task<Question> GetQuestionAsync(Guid id)
         {
