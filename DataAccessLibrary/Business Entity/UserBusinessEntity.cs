@@ -86,6 +86,24 @@ namespace DataAccessLibrary.Business_Entity
             return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
         }
 
+        public async Task<IEnumerable<User>> GetAdminsAsync()
+        {
+            var user = (await work.Users.GetAllAsync())
+                .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.ADMIN);
+            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
+        }
+
+        public async Task<IEnumerable<User>> GetAdminsByUserNameAsync(string keywordUserName)
+        {
+            var user = (await work.Users.GetAllAsync())
+                .Where(
+                    user => !user.IsDeleted &&
+                    user.Role == (int)UserRoles.ADMIN &&
+                    user.Username.ToLower().Contains(keywordUserName.ToLower())
+                 );
+            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
+        }
+
         public async Task<User> GetUserAsync(Guid id)
         {
             return (await work.Users.GetAllAsync())
@@ -139,10 +157,11 @@ namespace DataAccessLibrary.Business_Entity
             await work.Save();
         }
 
-        public async Task<User> Login(string username, string password)
+        public async Task<User> LoginWeb(string username, string password)
         {
             return (await work.Users.GetAllAsync())
-                .Where((user) => user.Username == username && user.Password == password)
+                .Where((user) => user.Username == username
+                    && user.Password == password && user.Role != (int)UserRoles.USER)
                 .FirstOrDefault();
         }
 
