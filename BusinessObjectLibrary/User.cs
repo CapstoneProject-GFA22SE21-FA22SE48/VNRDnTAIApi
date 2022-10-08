@@ -20,7 +20,6 @@ namespace BusinessObjectLibrary
             TestResults = new HashSet<TestResult>();
             UserModificationRequestArbitratingAdmins = new HashSet<UserModificationRequest>();
             UserModificationRequestModifiedUsers = new HashSet<UserModificationRequest>();
-            UserModificationRequestModifyingUsers = new HashSet<UserModificationRequest>();
             UserModificationRequestPromotingAdmins = new HashSet<UserModificationRequest>();
         }
 
@@ -32,6 +31,7 @@ namespace BusinessObjectLibrary
         public DateTime CreatedDate { get; set; }
         public bool IsDeleted { get; set; }
 
+        public virtual UserModificationRequest UserModificationRequestModifyingUser { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<ParagraphModificationRequest> ParagraphModificationRequestAdmins { get; set; }
         public virtual ICollection<ParagraphModificationRequest> ParagraphModificationRequestScribes { get; set; }
@@ -43,7 +43,6 @@ namespace BusinessObjectLibrary
         public virtual ICollection<TestResult> TestResults { get; set; }
         public virtual ICollection<UserModificationRequest> UserModificationRequestArbitratingAdmins { get; set; }
         public virtual ICollection<UserModificationRequest> UserModificationRequestModifiedUsers { get; set; }
-        public virtual ICollection<UserModificationRequest> UserModificationRequestModifyingUsers { get; set; }
         public virtual ICollection<UserModificationRequest> UserModificationRequestPromotingAdmins { get; set; }
     }
 }

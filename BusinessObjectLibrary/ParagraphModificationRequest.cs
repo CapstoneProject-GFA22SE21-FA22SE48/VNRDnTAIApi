@@ -7,8 +7,8 @@ namespace BusinessObjectLibrary
 {
     public partial class ParagraphModificationRequest
     {
-        public Guid ModifiedParagraphId { get; set; }
         public Guid ModifyingParagraphId { get; set; }
+        public Guid? ModifiedParagraphId { get; set; }
         public Guid ScribeId { get; set; }
         public Guid AdminId { get; set; }
         public int OperationType { get; set; }

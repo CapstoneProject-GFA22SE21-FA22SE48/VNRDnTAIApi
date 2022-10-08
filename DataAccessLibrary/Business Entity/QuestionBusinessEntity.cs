@@ -56,7 +56,6 @@ namespace DataAccessLibrary.Business_Entity
                 question.IsDeleted = false;
             }
             question.Status = (int)Status.Deactivated;
-            await work.Questions.AddAsync(question);
 
             //Add new question answers
             foreach (Answer answer in question.Answers)
@@ -69,9 +68,9 @@ namespace DataAccessLibrary.Business_Entity
                 {
                     answer.IsDeleted = false;
                 }
-                await work.Answers.AddAsync(answer);
             }
 
+            await work.Questions.AddAsync(question);
             await work.Save();
             return question;
         }

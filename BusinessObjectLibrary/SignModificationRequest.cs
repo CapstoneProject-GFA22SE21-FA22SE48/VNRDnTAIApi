@@ -7,8 +7,8 @@ namespace BusinessObjectLibrary
 {
     public partial class SignModificationRequest
     {
-        public Guid ModifiedSignId { get; set; }
         public Guid ModifyingSignId { get; set; }
+        public Guid? ModifiedSignId { get; set; }
         public Guid UserId { get; set; }
         public Guid? ScribeId { get; set; }
         public Guid? AdminId { get; set; }
