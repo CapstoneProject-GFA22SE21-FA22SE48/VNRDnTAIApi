@@ -42,6 +42,39 @@ namespace DataAccessLibrary.Business_Entity
             await work.Save();
             return question;
         }
+
+        public async Task<Question> AddQuestionForROM(Question question)
+        {
+            //Add new deactivated question
+            question.TestCategory = null;
+            question.Id = Guid.NewGuid();
+
+            //If the question is for Delete ROM, then keep IsDeleted = true
+            if (question.IsDeleted == true) { }
+            else
+            {
+                question.IsDeleted = false;
+            }
+            question.Status = (int)Status.Deactivated;
+            await work.Questions.AddAsync(question);
+
+            //Add new question answers
+            foreach (Answer answer in question.Answers)
+            {
+                answer.Id = Guid.NewGuid();
+                answer.QuestionId = question.Id;
+                //If the answer is for Delete ROM, then keep IsDeleted = true
+                if (answer.IsDeleted == true) { }
+                else
+                {
+                    answer.IsDeleted = false;
+                }
+                await work.Answers.AddAsync(answer);
+            }
+
+            await work.Save();
+            return question;
+        }
         public async Task<Question> UpdateQuestion(Question question)
         {
             work.Questions.Update(question);
