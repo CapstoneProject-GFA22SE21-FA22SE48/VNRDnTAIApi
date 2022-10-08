@@ -174,10 +174,12 @@ namespace BusinessObjectLibrary
 
             modelBuilder.Entity<ParagraphModificationRequest>(entity =>
             {
-                entity.HasKey(e => new { e.ModifiedParagraphId, e.ModifyingParagraphId })
-                    .HasName("PK__Paragrap__D8B4943A36ADE0B6");
+                entity.HasKey(e => e.ModifyingParagraphId)
+                    .HasName("PK__Paragrap__0DD235152B531367");
 
                 entity.ToTable("ParagraphModificationRequest");
+
+                entity.Property(e => e.ModifyingParagraphId).ValueGeneratedNever();
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
@@ -190,14 +192,13 @@ namespace BusinessObjectLibrary
                 entity.HasOne(d => d.ModifiedParagraph)
                     .WithMany(p => p.ParagraphModificationRequestModifiedParagraphs)
                     .HasForeignKey(d => d.ModifiedParagraphId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Paragraph__Modif__403A8C7D");
+                    .HasConstraintName("FK__Paragraph__Modif__412EB0B6");
 
                 entity.HasOne(d => d.ModifyingParagraph)
-                    .WithMany(p => p.ParagraphModificationRequestModifyingParagraphs)
-                    .HasForeignKey(d => d.ModifyingParagraphId)
+                    .WithOne(p => p.ParagraphModificationRequestModifyingParagraph)
+                    .HasForeignKey<ParagraphModificationRequest>(d => d.ModifyingParagraphId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Paragraph__Modif__412EB0B6");
+                    .HasConstraintName("FK__Paragraph__Modif__403A8C7D");
 
                 entity.HasOne(d => d.Scribe)
                     .WithMany(p => p.ParagraphModificationRequestScribes)
@@ -231,10 +232,12 @@ namespace BusinessObjectLibrary
 
             modelBuilder.Entity<QuestionModificationRequest>(entity =>
             {
-                entity.HasKey(e => new { e.ModifiedQuestionId, e.ModifyingQuestionId })
-                    .HasName("PK__Question__83935102BA0AFCB6");
+                entity.HasKey(e => e.ModifyingQuestionId)
+                    .HasName("PK__Question__94B14AC71CC69209");
 
                 entity.ToTable("QuestionModificationRequest");
+
+                entity.Property(e => e.ModifyingQuestionId).ValueGeneratedNever();
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
@@ -247,14 +250,13 @@ namespace BusinessObjectLibrary
                 entity.HasOne(d => d.ModifiedQuestion)
                     .WithMany(p => p.QuestionModificationRequestModifiedQuestions)
                     .HasForeignKey(d => d.ModifiedQuestionId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__QuestionM__Modif__628FA481");
+                    .HasConstraintName("FK__QuestionM__Modif__6383C8BA");
 
                 entity.HasOne(d => d.ModifyingQuestion)
-                    .WithMany(p => p.QuestionModificationRequestModifyingQuestions)
-                    .HasForeignKey(d => d.ModifyingQuestionId)
+                    .WithOne(p => p.QuestionModificationRequestModifyingQuestion)
+                    .HasForeignKey<QuestionModificationRequest>(d => d.ModifyingQuestionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__QuestionM__Modif__6383C8BA");
+                    .HasConstraintName("FK__QuestionM__Modif__628FA481");
 
                 entity.HasOne(d => d.Scribe)
                     .WithMany(p => p.QuestionModificationRequestScribes)
@@ -266,7 +268,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<Reference>(entity =>
             {
                 entity.HasKey(e => new { e.ParagraphId, e.ReferenceParagraphId })
-                    .HasName("PK__Referenc__44419EC0BB59BB67");
+                    .HasName("PK__Referenc__44419EC0382517F5");
 
                 entity.ToTable("Reference");
 
@@ -346,10 +348,12 @@ namespace BusinessObjectLibrary
 
             modelBuilder.Entity<SignModificationRequest>(entity =>
             {
-                entity.HasKey(e => new { e.ModifiedSignId, e.ModifyingSignId })
-                    .HasName("PK__SignModi__1830AA163A7AB34A");
+                entity.HasKey(e => e.ModifyingSignId)
+                    .HasName("PK__SignModi__029C8C101C22B6E0");
 
                 entity.ToTable("SignModificationRequest");
+
+                entity.Property(e => e.ModifyingSignId).ValueGeneratedNever();
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
@@ -365,14 +369,13 @@ namespace BusinessObjectLibrary
                 entity.HasOne(d => d.ModifiedSign)
                     .WithMany(p => p.SignModificationRequestModifiedSigns)
                     .HasForeignKey(d => d.ModifiedSignId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__SignModif__Modif__5165187F");
+                    .HasConstraintName("FK__SignModif__Modif__52593CB8");
 
                 entity.HasOne(d => d.ModifyingSign)
-                    .WithMany(p => p.SignModificationRequestModifyingSigns)
-                    .HasForeignKey(d => d.ModifyingSignId)
+                    .WithOne(p => p.SignModificationRequestModifyingSign)
+                    .HasForeignKey<SignModificationRequest>(d => d.ModifyingSignId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__SignModif__Modif__52593CB8");
+                    .HasConstraintName("FK__SignModif__Modif__5165187F");
 
                 entity.HasOne(d => d.Scribe)
                     .WithMany(p => p.SignModificationRequestScribes)
@@ -510,10 +513,12 @@ namespace BusinessObjectLibrary
 
             modelBuilder.Entity<UserModificationRequest>(entity =>
             {
-                entity.HasKey(e => new { e.ModifiedUserId, e.ModifyingUserId })
-                    .HasName("PK__UserModi__3C975BE6346B59DB");
+                entity.HasKey(e => e.ModifyingUserId)
+                    .HasName("PK__UserModi__D245B669DB1FE52A");
 
                 entity.ToTable("UserModificationRequest");
+
+                entity.Property(e => e.ModifyingUserId).ValueGeneratedNever();
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
@@ -526,14 +531,13 @@ namespace BusinessObjectLibrary
                 entity.HasOne(d => d.ModifiedUser)
                     .WithMany(p => p.UserModificationRequestModifiedUsers)
                     .HasForeignKey(d => d.ModifiedUserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__UserModif__Modif__267ABA7A");
+                    .HasConstraintName("FK__UserModif__Modif__276EDEB3");
 
                 entity.HasOne(d => d.ModifyingUser)
-                    .WithMany(p => p.UserModificationRequestModifyingUsers)
-                    .HasForeignKey(d => d.ModifyingUserId)
+                    .WithOne(p => p.UserModificationRequestModifyingUser)
+                    .HasForeignKey<UserModificationRequest>(d => d.ModifyingUserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__UserModif__Modif__276EDEB3");
+                    .HasConstraintName("FK__UserModif__Modif__267ABA7A");
 
                 entity.HasOne(d => d.PromotingAdmin)
                     .WithMany(p => p.UserModificationRequestPromotingAdmins)

@@ -11,7 +11,6 @@ namespace BusinessObjectLibrary
         {
             Keywords = new HashSet<Keyword>();
             ParagraphModificationRequestModifiedParagraphs = new HashSet<ParagraphModificationRequest>();
-            ParagraphModificationRequestModifyingParagraphs = new HashSet<ParagraphModificationRequest>();
             ReferenceParagraphs = new HashSet<Reference>();
             ReferenceReferenceParagraphs = new HashSet<Reference>();
             SignParagraphs = new HashSet<SignParagraph>();
@@ -26,9 +25,9 @@ namespace BusinessObjectLibrary
         public bool IsDeleted { get; set; }
 
         public virtual Section Section { get; set; }
+        public virtual ParagraphModificationRequest ParagraphModificationRequestModifyingParagraph { get; set; }
         public virtual ICollection<Keyword> Keywords { get; set; }
         public virtual ICollection<ParagraphModificationRequest> ParagraphModificationRequestModifiedParagraphs { get; set; }
-        public virtual ICollection<ParagraphModificationRequest> ParagraphModificationRequestModifyingParagraphs { get; set; }
         public virtual ICollection<Reference> ReferenceParagraphs { get; set; }
         public virtual ICollection<Reference> ReferenceReferenceParagraphs { get; set; }
         public virtual ICollection<SignParagraph> SignParagraphs { get; set; }

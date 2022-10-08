@@ -11,7 +11,6 @@ namespace BusinessObjectLibrary
         {
             Answers = new HashSet<Answer>();
             QuestionModificationRequestModifiedQuestions = new HashSet<QuestionModificationRequest>();
-            QuestionModificationRequestModifyingQuestions = new HashSet<QuestionModificationRequest>();
             TestResultDetails = new HashSet<TestResultDetail>();
         }
 
@@ -24,9 +23,9 @@ namespace BusinessObjectLibrary
         public bool IsDeleted { get; set; }
 
         public virtual TestCategory TestCategory { get; set; }
+        public virtual QuestionModificationRequest QuestionModificationRequestModifyingQuestion { get; set; }
         public virtual ICollection<Answer> Answers { get; set; }
         public virtual ICollection<QuestionModificationRequest> QuestionModificationRequestModifiedQuestions { get; set; }
-        public virtual ICollection<QuestionModificationRequest> QuestionModificationRequestModifyingQuestions { get; set; }
         public virtual ICollection<TestResultDetail> TestResultDetails { get; set; }
     }
 }
