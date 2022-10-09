@@ -1,9 +1,9 @@
 ﻿using BusinessObjectLibrary;
+using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Business_Entity
@@ -43,9 +43,12 @@ namespace DataAccessLibrary.Business_Entity
                 .Where(q => !q.IsDeleted && q.ScribeId.Equals(scribeId));
         }
 
+        // This ROM can be used in add, update a Question
         public async Task<QuestionModificationRequest>
-            AddQuestionModificationRequest(QuestionModificationRequest questionModificationRequest)
+            CreateQuestionModificationRequest(QuestionModificationRequest questionModificationRequest)
         {
+            questionModificationRequest.Status = (int)Status.Pending;
+            questionModificationRequest.CreatedDate = DateTime.Now;
             questionModificationRequest.IsDeleted = false;
             await work.QuestionModificationRequests.AddAsync(questionModificationRequest);
             await work.Save();

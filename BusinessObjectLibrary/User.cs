@@ -12,10 +12,14 @@ namespace BusinessObjectLibrary
             Comments = new HashSet<Comment>();
             ParagraphModificationRequestAdmins = new HashSet<ParagraphModificationRequest>();
             ParagraphModificationRequestScribes = new HashSet<ParagraphModificationRequest>();
+            QuestionModificationRequestAdmins = new HashSet<QuestionModificationRequest>();
+            QuestionModificationRequestScribes = new HashSet<QuestionModificationRequest>();
+            SignModificationRequestAdmins = new HashSet<SignModificationRequest>();
+            SignModificationRequestScribes = new HashSet<SignModificationRequest>();
+            SignModificationRequestUsers = new HashSet<SignModificationRequest>();
             TestResults = new HashSet<TestResult>();
             UserModificationRequestArbitratingAdmins = new HashSet<UserModificationRequest>();
             UserModificationRequestModifiedUsers = new HashSet<UserModificationRequest>();
-            UserModificationRequestModifyingUsers = new HashSet<UserModificationRequest>();
             UserModificationRequestPromotingAdmins = new HashSet<UserModificationRequest>();
         }
 
@@ -27,13 +31,18 @@ namespace BusinessObjectLibrary
         public DateTime CreatedDate { get; set; }
         public bool IsDeleted { get; set; }
 
+        public virtual UserModificationRequest UserModificationRequestModifyingUser { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<ParagraphModificationRequest> ParagraphModificationRequestAdmins { get; set; }
         public virtual ICollection<ParagraphModificationRequest> ParagraphModificationRequestScribes { get; set; }
+        public virtual ICollection<QuestionModificationRequest> QuestionModificationRequestAdmins { get; set; }
+        public virtual ICollection<QuestionModificationRequest> QuestionModificationRequestScribes { get; set; }
+        public virtual ICollection<SignModificationRequest> SignModificationRequestAdmins { get; set; }
+        public virtual ICollection<SignModificationRequest> SignModificationRequestScribes { get; set; }
+        public virtual ICollection<SignModificationRequest> SignModificationRequestUsers { get; set; }
         public virtual ICollection<TestResult> TestResults { get; set; }
         public virtual ICollection<UserModificationRequest> UserModificationRequestArbitratingAdmins { get; set; }
         public virtual ICollection<UserModificationRequest> UserModificationRequestModifiedUsers { get; set; }
-        public virtual ICollection<UserModificationRequest> UserModificationRequestModifyingUsers { get; set; }
         public virtual ICollection<UserModificationRequest> UserModificationRequestPromotingAdmins { get; set; }
     }
 }

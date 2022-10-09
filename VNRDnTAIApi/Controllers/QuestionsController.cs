@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BusinessObjectLibrary;
+﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace VNRDnTAIApi.Controllers
 {
@@ -117,7 +113,7 @@ namespace VNRDnTAIApi.Controllers
         {
             try
             {
-                return StatusCode(201, await _entity.AddQuestion(question));
+                return StatusCode(201, await _entity.AddQuestionForROM(question));
             }
             catch (Exception ex)
             {

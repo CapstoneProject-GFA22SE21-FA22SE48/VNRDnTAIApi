@@ -90,6 +90,29 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
+        // GET: api/Users/Admins
+        [HttpGet("Admins")]
+        [ProducesResponseType(typeof(IEnumerable<User>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<User>>> GetAdmins(string? keywordUsername)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(keywordUsername))
+                {
+                    return StatusCode(200, await _entity.GetAdminsAsync());
+                }
+                else
+                {
+                    return StatusCode(200, await _entity.GetAdminsByUserNameAsync(keywordUsername));
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         // GET: api/Users/Members/DateRange/
         [HttpGet("Members/DateRange")]
         [ProducesResponseType(typeof(IEnumerable<User>), 200)]
@@ -256,7 +279,7 @@ namespace VNRDnTAIApi.Controllers
                     throw new ArgumentException("Vui lòng nhập mật khẩu!");
                 }
                 User user = await _entity
-                    .Login(loginUserDTO.Username, loginUserDTO.Password);
+                    .LoginWeb(loginUserDTO.Username, loginUserDTO.Password);
 
                 if (user != null)
                 {

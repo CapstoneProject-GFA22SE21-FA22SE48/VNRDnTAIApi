@@ -10,6 +10,7 @@ namespace BusinessObjectLibrary
         public Sign()
         {
             Gpssigns = new HashSet<Gpssign>();
+            SignModificationRequestModifiedSigns = new HashSet<SignModificationRequest>();
             SignParagraphs = new HashSet<SignParagraph>();
         }
 
@@ -22,7 +23,9 @@ namespace BusinessObjectLibrary
         public bool IsDeleted { get; set; }
 
         public virtual SignCategory SignCategory { get; set; }
+        public virtual SignModificationRequest SignModificationRequestModifyingSign { get; set; }
         public virtual ICollection<Gpssign> Gpssigns { get; set; }
+        public virtual ICollection<SignModificationRequest> SignModificationRequestModifiedSigns { get; set; }
         public virtual ICollection<SignParagraph> SignParagraphs { get; set; }
     }
 }
