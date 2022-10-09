@@ -1,10 +1,10 @@
 ﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Implementations
@@ -33,7 +33,7 @@ namespace DataAccessLibrary.Implementations
         public void Delete(Guid id)
         {
             T entity = GetAsync(id).Result;
-            if(entity == null)
+            if (entity == null)
             {
                 throw new Exception("Entity does not exist!");
             }
@@ -51,7 +51,7 @@ namespace DataAccessLibrary.Implementations
             {
                 List<T> cachedDatas = await dbSet.ToListAsync();
                 return cachedDatas;
-            } 
+            }
             else
             {
                 List<T> cachesDatas = await dbSet.AsNoTracking().ToListAsync();
@@ -62,9 +62,9 @@ namespace DataAccessLibrary.Implementations
         public async Task<IEnumerable<T>> GetAllAsync(params string[] otherEntities)
         {
             IQueryable<T> entities = null;
-            foreach(string other in otherEntities)
+            foreach (string other in otherEntities)
             {
-                if(entities == null)
+                if (entities == null)
                 {
                     entities = dbSet.Include(other);
                 }
@@ -74,6 +74,20 @@ namespace DataAccessLibrary.Implementations
                 }
             }
             return await entities.ToListAsync();
+        }
+
+        public async Task<IEnumerable<T>>
+            GetAllMultiIncludeAsync(
+                Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null,
+                bool disableTracking = true)
+        {
+            IQueryable<T> query = dbSet;
+            if (disableTracking)
+            {
+                query = query.AsNoTracking();
+            }
+            query = include(query);
+            return await query.ToListAsync();
         }
 
         public async Task<T> GetAsync(Guid id)

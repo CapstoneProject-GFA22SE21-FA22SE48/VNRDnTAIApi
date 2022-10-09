@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Query;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Interfaces
@@ -34,6 +34,11 @@ namespace DataAccessLibrary.Interfaces
         /// <param name="otherEntities">Include other entities</param>
         /// <returns></returns>
         Task<IEnumerable<T>> GetAllAsync(params string[] otherEntities);
+
+        Task<IEnumerable<T>> GetAllMultiIncludeAsync(
+            Func<IQueryable<T>, IIncludableQueryable<T, object>> include,
+            bool disableTracking = true);
+
 
         /// <summary>
         /// Add new entity to database

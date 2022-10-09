@@ -1,9 +1,9 @@
 ﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Business_Entity
@@ -17,8 +17,14 @@ namespace DataAccessLibrary.Business_Entity
         }
         public async Task<IEnumerable<Column>> GetColumnsAsync()
         {
-            return (await work.Columns.GetAllAsync())
+            IEnumerable<Column> columns = (await work.Columns.GetAllMultiIncludeAsync(
+                include: column => column
+                .Include(c => c.Statues)
+                .ThenInclude(st => st.Sections)
+                .ThenInclude(sc => sc.Paragraphs)
+                ))
                 .Where(column => !column.IsDeleted);
+            return columns;
         }
         public async Task<Column> GetColumnAsync(Guid id)
         {
