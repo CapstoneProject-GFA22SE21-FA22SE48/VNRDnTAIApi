@@ -11,7 +11,6 @@ namespace DataAccessLibrary.Business_Entity
     public class ColumnBusinessEntity
     {
         private IUnitOfWork work;
-        private vnrdntaiContext context = new vnrdntaiContext();
         public ColumnBusinessEntity(IUnitOfWork work)
         {
             this.work = work;
