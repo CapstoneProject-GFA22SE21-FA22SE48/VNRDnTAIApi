@@ -41,14 +41,29 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        [HttpGet("GetRandomTestSetByCategoryId")]
+        [HttpGet("GetStudySetByCategoryAndSeparator")]
         [ProducesResponseType(typeof(IEnumerable<Question>), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<Question>>> GetRandomTestSetByCategory([FromQuery] string categoryName)
+        public async Task<ActionResult<IEnumerable<Question>>> GetStudySetByCategoryAndSeparator([FromQuery] string categoryId, [FromQuery] int separator)
         {
             try
             {
-                return StatusCode(200, await _entity.GetRandomTestSetByCategory(categoryName));
+                return StatusCode(200, await _entity.GetStudySetByCategoryAndSeparator(categoryId, separator));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("GetRandomTestSetByCategoryId")]
+        [ProducesResponseType(typeof(IEnumerable<Question>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<Question>>> GetRandomTestSetByCategory([FromQuery] string categoryId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetRandomTestSetByCategory(categoryId));
             }
             catch (Exception ex)
             {

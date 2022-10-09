@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary;
 
 namespace VNRDnTAIApi.Controllers
 {
@@ -49,6 +50,36 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.GetTestResultAsync(id));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("GetTestResultByUserId")]
+        [ProducesResponseType(typeof(TestResult), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<TestResult>> GetTestResultByUserId([FromQuery] Guid userId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetTestResultByUserId(userId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("GetTestAttemptDTOs")]
+        [ProducesResponseType(typeof(TestResult), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<TestAttempDTO>> GetTestAttemptDTOs([FromQuery] Guid testResultId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetTestAttemptDTOs(testResultId));
             }
             catch (Exception ex)
             {

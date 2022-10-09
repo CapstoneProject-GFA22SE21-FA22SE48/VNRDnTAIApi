@@ -22,11 +22,18 @@ namespace DataAccessLibrary.Business_Entity
                 .OrderBy(u => int.Parse(u.Name.Split(" ")[1]));
         }
 
-        public async Task<IEnumerable<Question>> GetRandomTestSetByCategory(string categoryName)
+        public async Task<IEnumerable<Question>> GetStudySetByCategoryAndSeparator(string testCatId, int separator)
         {
-            var testCatId = (await work.TestCategories.GetAllAsync()).First(cat => cat.Name == categoryName).Id;
-            return (await work.Questions.GetAllAsync(nameof(Question.Answers)))
-                .Where(question => !question.IsDeleted && question.TestCategoryId.ToString().Equals(testCatId.ToString())).OrderBy(r => Guid.NewGuid()).Take(20);
+            var res = (await work.Questions.GetAllAsync(nameof(Question.Answers)))
+                .Where(question => !question.IsDeleted && question.TestCategoryId.ToString().Equals(testCatId.ToString())).OrderBy(u => int.Parse(u.Name.Split(" ")[1])).Skip(25 * separator).Take(25);
+            return res;
+        }
+
+        public async Task<IEnumerable<Question>> GetRandomTestSetByCategory(string testCatId)
+        {
+            var res = (await work.Questions.GetAllAsync(nameof(Question.Answers)))
+                .Where(question => !question.IsDeleted && question.TestCategoryId.ToString().Equals(testCatId.ToString())).OrderBy(r => Guid.NewGuid()).Take(25);
+            return res;
         }
         public async Task<Question> GetQuestionAsync(Guid id)
         {
