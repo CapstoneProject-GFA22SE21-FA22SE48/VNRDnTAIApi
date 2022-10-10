@@ -1,8 +1,5 @@
 ﻿using BusinessObjectLibrary;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Interfaces
@@ -16,6 +13,7 @@ namespace DataAccessLibrary.Interfaces
         IGenericRepository<Decree> Decrees { get; }
         IGenericRepository<Gpssign> Gpssigns { get; }
         IGenericRepository<Keyword> Keywords { get; }
+        IGenericRepository<KeywordParagraph> KeywordParagraphs { get; }
         IGenericRepository<Paragraph> Paragraphs { get; }
         IGenericRepository<ParagraphModificationRequest> ParagraphModificationRequests { get; }
         IGenericRepository<Question> Questions { get; }

@@ -1,9 +1,6 @@
 ﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Implementations
@@ -22,6 +19,7 @@ namespace DataAccessLibrary.Implementations
         public IGenericRepository<Gpssign> Gpssigns { get; }
 
         public IGenericRepository<Keyword> Keywords { get; }
+        public IGenericRepository<KeywordParagraph> KeywordParagraphs { get; }
 
         public IGenericRepository<Paragraph> Paragraphs { get; }
 
@@ -57,25 +55,26 @@ namespace DataAccessLibrary.Implementations
         public IGenericRepository<VehicleCategory> VehicleCategories { get; }
 
 
-        public UnitOfWork(vnrdntaiContext context, 
-            IGenericRepository<Answer> answers, 
-            IGenericRepository<Column> columns, 
+        public UnitOfWork(vnrdntaiContext context,
+            IGenericRepository<Answer> answers,
+            IGenericRepository<Column> columns,
             IGenericRepository<Comment> comments,
-            IGenericRepository<Decree> decrees, 
-            IGenericRepository<Gpssign> gpssigns, 
-            IGenericRepository<Keyword> keywords, 
-            IGenericRepository<Paragraph> paragraphs, 
-            IGenericRepository<ParagraphModificationRequest> paragraphModificationRequests, 
+            IGenericRepository<Decree> decrees,
+            IGenericRepository<Gpssign> gpssigns,
+            IGenericRepository<Keyword> keywords,
+            IGenericRepository<KeywordParagraph> keywordParagraphs,
+            IGenericRepository<Paragraph> paragraphs,
+            IGenericRepository<ParagraphModificationRequest> paragraphModificationRequests,
             IGenericRepository<Question> questions,
             IGenericRepository<QuestionModificationRequest> questionModificationRequests,
-            IGenericRepository<Reference> references, 
-            IGenericRepository<Section> sections, 
-            IGenericRepository<Sign> signs, 
-            IGenericRepository<SignCategory> signCategories, 
+            IGenericRepository<Reference> references,
+            IGenericRepository<Section> sections,
+            IGenericRepository<Sign> signs,
+            IGenericRepository<SignCategory> signCategories,
             IGenericRepository<SignModificationRequest> signModificationRequests,
-            IGenericRepository<SignParagraph> signParagraphs, 
-            IGenericRepository<Statue> statues, 
-            IGenericRepository<TestCategory> testCategories, 
+            IGenericRepository<SignParagraph> signParagraphs,
+            IGenericRepository<Statue> statues,
+            IGenericRepository<TestCategory> testCategories,
             IGenericRepository<TestResult> testResults,
             IGenericRepository<TestResultDetail> testResultsDetails,
             IGenericRepository<User> users,
@@ -89,6 +88,7 @@ namespace DataAccessLibrary.Implementations
             Decrees = decrees;
             Gpssigns = gpssigns;
             Keywords = keywords;
+            KeywordParagraphs = keywordParagraphs;
             Paragraphs = paragraphs;
             ParagraphModificationRequests = paragraphModificationRequests;
             Questions = questions;
