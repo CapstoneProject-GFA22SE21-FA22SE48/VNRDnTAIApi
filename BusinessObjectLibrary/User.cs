@@ -27,10 +27,12 @@ namespace BusinessObjectLibrary
         public string Username { get; set; }
         public string Password { get; set; }
         public int Role { get; set; }
+        public Guid? AssignedColumnId { get; set; }
         public int Status { get; set; }
         public DateTime CreatedDate { get; set; }
         public bool IsDeleted { get; set; }
 
+        public virtual Column AssignedColumn { get; set; }
         public virtual UserModificationRequest UserModificationRequestModifyingUser { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<ParagraphModificationRequest> ParagraphModificationRequestAdmins { get; set; }

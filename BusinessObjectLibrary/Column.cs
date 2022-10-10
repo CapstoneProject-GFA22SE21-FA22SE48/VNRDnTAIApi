@@ -10,6 +10,7 @@ namespace BusinessObjectLibrary
         public Column()
         {
             Statues = new HashSet<Statue>();
+            Users = new HashSet<User>();
         }
 
         public Guid Id { get; set; }
@@ -20,5 +21,6 @@ namespace BusinessObjectLibrary
 
         public virtual Decree Decree { get; set; }
         public virtual ICollection<Statue> Statues { get; set; }
+        public virtual ICollection<User> Users { get; set; }
     }
 }

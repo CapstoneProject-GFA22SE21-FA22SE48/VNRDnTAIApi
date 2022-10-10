@@ -9,7 +9,7 @@ namespace BusinessObjectLibrary
     {
         public Paragraph()
         {
-            Keywords = new HashSet<Keyword>();
+            KeywordParagraphs = new HashSet<KeywordParagraph>();
             ParagraphModificationRequestModifiedParagraphs = new HashSet<ParagraphModificationRequest>();
             ReferenceParagraphs = new HashSet<Reference>();
             ReferenceReferenceParagraphs = new HashSet<Reference>();
@@ -26,7 +26,7 @@ namespace BusinessObjectLibrary
 
         public virtual Section Section { get; set; }
         public virtual ParagraphModificationRequest ParagraphModificationRequestModifyingParagraph { get; set; }
-        public virtual ICollection<Keyword> Keywords { get; set; }
+        public virtual ICollection<KeywordParagraph> KeywordParagraphs { get; set; }
         public virtual ICollection<ParagraphModificationRequest> ParagraphModificationRequestModifiedParagraphs { get; set; }
         public virtual ICollection<Reference> ReferenceParagraphs { get; set; }
         public virtual ICollection<Reference> ReferenceReferenceParagraphs { get; set; }

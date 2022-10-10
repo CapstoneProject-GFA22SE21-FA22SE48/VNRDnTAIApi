@@ -24,6 +24,7 @@ namespace VNRDnTAIApi
             services.AddScoped<IGenericRepository<Decree>, GenericRepository<Decree>>();
             services.AddScoped<IGenericRepository<Gpssign>, GenericRepository<Gpssign>>();
             services.AddScoped<IGenericRepository<Keyword>, GenericRepository<Keyword>>();
+            services.AddScoped<IGenericRepository<KeywordParagraph>, GenericRepository<KeywordParagraph>>();
             services.AddScoped<IGenericRepository<Paragraph>, GenericRepository<Paragraph>>();
             services.AddScoped<IGenericRepository<ParagraphModificationRequest>, GenericRepository<ParagraphModificationRequest>>();
             services.AddScoped<IGenericRepository<Question>, GenericRepository<Question>>();
