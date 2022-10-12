@@ -17,8 +17,7 @@ namespace DataAccessLibrary.Business_Entity
         }
         public async Task<IEnumerable<Keyword>> GetKeywordsAsync()
         {
-            return (await work.Keywords.GetAllAsync())
-                .Where(keyword => !keyword.IsDeleted);
+            return (await work.Keywords.GetAllAsync()).Where(keyword => !keyword.IsDeleted).GroupBy(k => k.Name).Select(k => k.FirstOrDefault());
         }
         public async Task<Keyword> GetKeywordAsync(Guid id)
         {

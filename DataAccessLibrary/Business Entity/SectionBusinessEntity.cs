@@ -26,6 +26,12 @@ namespace DataAccessLibrary.Business_Entity
                 .Where(section => !section.IsDeleted && section.Id.Equals(id))
                 .FirstOrDefault();
         }
+        public async Task<IEnumerable<Section>> GetSectionListByQuery(string query)
+        {
+            return (await work.Sections.GetAllAsync())
+                .Where(section => !section.IsDeleted && section.Description.ToLower().Contains(query.Trim().ToLower().Normalize()))
+                .ToList();
+        }
         public async Task<Section> AddSection(Section section)
         {
             section.Id = Guid.NewGuid();

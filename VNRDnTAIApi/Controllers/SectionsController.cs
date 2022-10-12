@@ -57,6 +57,21 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
+        [HttpGet("GetSectionListByQuery")]
+        [ProducesResponseType(typeof(Section), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<Section>> GetSectionListByQuery(string query)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetSectionListByQuery(query));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         // PUT: api/Sections/5
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(Section), 200)]
