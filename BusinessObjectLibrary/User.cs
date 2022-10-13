@@ -9,9 +9,10 @@ namespace BusinessObjectLibrary
     {
         public User()
         {
+            AssignedColumns = new HashSet<AssignedColumn>();
             Comments = new HashSet<Comment>();
-            ParagraphModificationRequestAdmins = new HashSet<ParagraphModificationRequest>();
-            ParagraphModificationRequestScribes = new HashSet<ParagraphModificationRequest>();
+            LawModificationRequestAdmins = new HashSet<LawModificationRequest>();
+            LawModificationRequestScribes = new HashSet<LawModificationRequest>();
             QuestionModificationRequestAdmins = new HashSet<QuestionModificationRequest>();
             QuestionModificationRequestScribes = new HashSet<QuestionModificationRequest>();
             SignModificationRequestAdmins = new HashSet<SignModificationRequest>();
@@ -27,16 +28,16 @@ namespace BusinessObjectLibrary
         public string Username { get; set; }
         public string Password { get; set; }
         public int Role { get; set; }
-        public Guid? AssignedColumnId { get; set; }
+        public string Gmail { get; set; }
         public int Status { get; set; }
         public DateTime CreatedDate { get; set; }
         public bool IsDeleted { get; set; }
 
-        public virtual Column AssignedColumn { get; set; }
         public virtual UserModificationRequest UserModificationRequestModifyingUser { get; set; }
+        public virtual ICollection<AssignedColumn> AssignedColumns { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
-        public virtual ICollection<ParagraphModificationRequest> ParagraphModificationRequestAdmins { get; set; }
-        public virtual ICollection<ParagraphModificationRequest> ParagraphModificationRequestScribes { get; set; }
+        public virtual ICollection<LawModificationRequest> LawModificationRequestAdmins { get; set; }
+        public virtual ICollection<LawModificationRequest> LawModificationRequestScribes { get; set; }
         public virtual ICollection<QuestionModificationRequest> QuestionModificationRequestAdmins { get; set; }
         public virtual ICollection<QuestionModificationRequest> QuestionModificationRequestScribes { get; set; }
         public virtual ICollection<SignModificationRequest> SignModificationRequestAdmins { get; set; }

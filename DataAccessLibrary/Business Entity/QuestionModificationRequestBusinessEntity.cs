@@ -43,17 +43,6 @@ namespace DataAccessLibrary.Business_Entity
                 .Where(q => !q.IsDeleted && q.ScribeId.Equals(scribeId));
         }
 
-        // This ROM can be used in add, update a Question
-        public async Task<QuestionModificationRequest>
-            CreateQuestionModificationRequest(QuestionModificationRequest questionModificationRequest)
-        {
-            questionModificationRequest.Status = (int)Status.Pending;
-            questionModificationRequest.CreatedDate = DateTime.Now;
-            questionModificationRequest.IsDeleted = false;
-            await work.QuestionModificationRequests.AddAsync(questionModificationRequest);
-            await work.Save();
-            return questionModificationRequest;
-        }
         public async Task<QuestionModificationRequest>
             UpdateQuestionModificationRequest(QuestionModificationRequest questionModificationRequest)
         {
@@ -68,6 +57,19 @@ namespace DataAccessLibrary.Business_Entity
             questionModificationRequest.IsDeleted = true;
             work.QuestionModificationRequests.Update(questionModificationRequest);
             await work.Save();
+        }
+
+        //-----------------------------------------------------------
+        // This ROM can be used in add, update, delete a Question
+        public async Task<QuestionModificationRequest>
+            CreateQuestionModificationRequest(QuestionModificationRequest questionModificationRequest)
+        {
+            questionModificationRequest.Status = (int)Status.Pending;
+            questionModificationRequest.CreatedDate = DateTime.Now;
+            questionModificationRequest.IsDeleted = false;
+            await work.QuestionModificationRequests.AddAsync(questionModificationRequest);
+            await work.Save();
+            return questionModificationRequest;
         }
     }
 }

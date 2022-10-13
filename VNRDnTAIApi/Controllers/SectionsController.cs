@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BusinessObjectLibrary;
+﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace VNRDnTAIApi.Controllers
 {
@@ -34,6 +30,22 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.GetSectionsAsync());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // GET: api/Sections/ByStatue/5
+        [HttpGet("ByStatue/{statueId}")]
+        [ProducesResponseType(typeof(IEnumerable<Section>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<Section>>> GetSectionsByStatueId(Guid statueId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetSectionsByStatueIdAsync(statueId));
             }
             catch (Exception ex)
             {
@@ -102,7 +114,7 @@ namespace VNRDnTAIApi.Controllers
         {
             try
             {
-                return StatusCode(201, await _entity.AddSection(section));
+                return StatusCode(201, await _entity.AddSectionForROM(section));
             }
             catch (Exception ex)
             {

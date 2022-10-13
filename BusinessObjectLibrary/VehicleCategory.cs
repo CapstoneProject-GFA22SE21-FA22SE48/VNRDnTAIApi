@@ -9,13 +9,13 @@ namespace BusinessObjectLibrary
     {
         public VehicleCategory()
         {
-            Statues = new HashSet<Statue>();
+            Sections = new HashSet<Section>();
         }
 
         public Guid Id { get; set; }
         public string Name { get; set; }
         public bool IsDeleted { get; set; }
 
-        public virtual ICollection<Statue> Statues { get; set; }
+        public virtual ICollection<Section> Sections { get; set; }
     }
 }

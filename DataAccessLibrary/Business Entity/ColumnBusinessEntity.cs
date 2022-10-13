@@ -1,6 +1,6 @@
 ﻿using BusinessObjectLibrary;
+using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,20 +17,59 @@ namespace DataAccessLibrary.Business_Entity
         }
         public async Task<IEnumerable<Column>> GetColumnsAsync()
         {
-            IEnumerable<Column> columns = (await work.Columns.GetAllMultiIncludeAsync(
-                include: column => column
-                .Include(c => c.Statues)
-                .ThenInclude(st => st.Sections)
-                .ThenInclude(sc => sc.Paragraphs)
-                ))
+            //IEnumerable<Column> columns = (await work.Columns.GetAllMultiIncludeAsync(
+            //    include: column => column
+            //    .Include(c => c.Statues)
+            //    .ThenInclude(st => st.Sections)
+            //    .ThenInclude(sc => sc.Paragraphs)
+            //    ))
+            //    .Where(column => !column.IsDeleted);
+            //return columns;
+            IEnumerable<Column> columns = (await work.Columns.GetAllAsync())
                 .Where(column => !column.IsDeleted);
+
+            List<Statue> statues = (await work.Statues.GetAllAsync())
+                .Where(statue => !statue.IsDeleted
+                        && statue.Status == (int)Status.Active).ToList();
+
+            foreach (Column column in columns)
+            {
+                column.Statues = statues.Where(statue => statue.ColumnId == column.Id).ToList();
+            }
+
             return columns;
         }
+
+        //Scribe get assigned Column
+        public async Task<IEnumerable<Column>> GetAssignedColumnsAsync(Guid columnId)
+        {
+            IEnumerable<Column> assignedColumns =
+                (await work.Columns.GetAllAsync())
+                .Where(column => !column.IsDeleted && column.Id == columnId);
+
+            List<Statue> statues = (await work.Statues.GetAllAsync())
+                .Where(statue => !statue.IsDeleted
+                        && statue.Status == (int)Status.Active).ToList();
+
+            foreach (Column column in assignedColumns)
+            {
+                column.Statues = statues.Where(statue => statue.ColumnId == column.Id).ToList();
+            }
+            return assignedColumns;
+        }
+
         public async Task<Column> GetColumnAsync(Guid id)
         {
-            return (await work.Columns.GetAllAsync())
+            Column column = (await work.Columns.GetAllAsync())
                 .Where(column => !column.IsDeleted && column.Id.Equals(id))
                 .FirstOrDefault();
+
+            List<Statue> statues = (await work.Statues.GetAllAsync())
+                .Where(statue => !statue.IsDeleted
+                        && statue.Status == (int)Status.Active
+                        && statue.ColumnId == column.Id).ToList();
+            column.Statues = statues;
+            return column;
         }
         public async Task<Column> AddColumn(Column column)
         {

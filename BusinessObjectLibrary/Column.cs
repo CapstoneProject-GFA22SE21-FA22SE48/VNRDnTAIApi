@@ -9,8 +9,8 @@ namespace BusinessObjectLibrary
     {
         public Column()
         {
+            AssignedColumns = new HashSet<AssignedColumn>();
             Statues = new HashSet<Statue>();
-            Users = new HashSet<User>();
         }
 
         public Guid Id { get; set; }
@@ -20,7 +20,7 @@ namespace BusinessObjectLibrary
         public bool IsDeleted { get; set; }
 
         public virtual Decree Decree { get; set; }
+        public virtual ICollection<AssignedColumn> AssignedColumns { get; set; }
         public virtual ICollection<Statue> Statues { get; set; }
-        public virtual ICollection<User> Users { get; set; }
     }
 }
