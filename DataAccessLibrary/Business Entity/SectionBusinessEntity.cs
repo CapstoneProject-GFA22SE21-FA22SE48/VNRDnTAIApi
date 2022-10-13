@@ -65,6 +65,14 @@ namespace DataAccessLibrary.Business_Entity
             section.Paragraphs = paragraphs;
             return section;
         }
+        public async Task<IEnumerable<Section>> GetSectionListByQuery(string query)
+        {
+            return (await work.Sections.GetAllAsync())
+                .Where(section => !section.IsDeleted
+                    && section.Description.ToLower().Contains(query.Trim().ToLower().Normalize())
+                    && section.Status == (int)Status.Active)
+                .ToList();
+        }
 
         //This new section is created for ROM of update, delete 
         public async Task<Section> AddSectionForROM(Section section)
