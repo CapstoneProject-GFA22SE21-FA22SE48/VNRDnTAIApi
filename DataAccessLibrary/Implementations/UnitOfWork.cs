@@ -9,6 +9,7 @@ namespace DataAccessLibrary.Implementations
     {
         private readonly vnrdntaiContext context;
         public IGenericRepository<Answer> Answers { get; }
+        public IGenericRepository<AssignedColumn> AssignedColumns { get; }
 
         public IGenericRepository<Column> Columns { get; }
 
@@ -23,7 +24,7 @@ namespace DataAccessLibrary.Implementations
 
         public IGenericRepository<Paragraph> Paragraphs { get; }
 
-        public IGenericRepository<ParagraphModificationRequest> ParagraphModificationRequests { get; }
+        public IGenericRepository<LawModificationRequest> LawModificationRequests { get; }
 
         public IGenericRepository<Question> Questions { get; }
         public IGenericRepository<QuestionModificationRequest> QuestionModificationRequests { get; }
@@ -57,6 +58,7 @@ namespace DataAccessLibrary.Implementations
 
         public UnitOfWork(vnrdntaiContext context,
             IGenericRepository<Answer> answers,
+            IGenericRepository<AssignedColumn> assignedColumns,
             IGenericRepository<Column> columns,
             IGenericRepository<Comment> comments,
             IGenericRepository<Decree> decrees,
@@ -64,7 +66,7 @@ namespace DataAccessLibrary.Implementations
             IGenericRepository<Keyword> keywords,
             IGenericRepository<KeywordParagraph> keywordParagraphs,
             IGenericRepository<Paragraph> paragraphs,
-            IGenericRepository<ParagraphModificationRequest> paragraphModificationRequests,
+            IGenericRepository<LawModificationRequest> lawModificationRequests,
             IGenericRepository<Question> questions,
             IGenericRepository<QuestionModificationRequest> questionModificationRequests,
             IGenericRepository<Reference> references,
@@ -83,6 +85,7 @@ namespace DataAccessLibrary.Implementations
         {
             this.context = context;
             Answers = answers;
+            AssignedColumns = assignedColumns;
             Columns = columns;
             Comments = comments;
             Decrees = decrees;
@@ -90,7 +93,7 @@ namespace DataAccessLibrary.Implementations
             Keywords = keywords;
             KeywordParagraphs = keywordParagraphs;
             Paragraphs = paragraphs;
-            ParagraphModificationRequests = paragraphModificationRequests;
+            LawModificationRequests = lawModificationRequests;
             Questions = questions;
             QuestionModificationRequests = questionModificationRequests;
             References = references;

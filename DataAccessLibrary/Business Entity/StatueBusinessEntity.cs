@@ -1,9 +1,9 @@
 ﻿using BusinessObjectLibrary;
+using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Business_Entity
@@ -17,19 +17,49 @@ namespace DataAccessLibrary.Business_Entity
         }
         public async Task<IEnumerable<Statue>> GetStatuesAsync()
         {
-            return (await work.Statues.GetAllAsync())
-                .Where(statue => !statue.IsDeleted);
+            IEnumerable<Statue> statues = (await work.Statues.GetAllAsync())
+                .Where(statue => !statue.IsDeleted && statue.Status == (int)Status.Active);
+
+            IEnumerable<Section> sections = (await work.Sections.GetAllAsync())
+                .Where(section => !section.IsDeleted
+                        && section.Status == (int)Status.Active);
+
+            foreach (Statue statue in statues)
+            {
+                statue.Sections = sections.Where(section => section.StatueId == statue.Id).ToList();
+            }
+
+            return statues;
         }
         public async Task<Statue> GetStatueAsync(Guid id)
         {
-            return (await work.Statues.GetAllAsync())
-                .Where(statue => !statue.IsDeleted && statue.Id.Equals(id))
+            Statue statue = (await work.Statues.GetAllAsync())
+                .Where(statue => !statue.IsDeleted
+                        && statue.Status == (int)Status.Active
+                        && statue.Id.Equals(id))
                 .FirstOrDefault();
+
+            List<Section> sections = (await work.Sections.GetAllAsync())
+                .Where(section => !section.IsDeleted
+                        && section.Status == (int)Status.Active
+                        && section.StatueId == statue.Id).ToList();
+            statue.Sections = sections;
+            return statue;
         }
-        public async Task<Statue> AddStatue(Statue statue)
+
+        //This new section is created for ROM of update, delete 
+        public async Task<Statue> AddStatueForROM(Statue statue)
         {
             statue.Id = Guid.NewGuid();
-            statue.IsDeleted = false;
+            statue.Status = (int)Status.Deactivated;
+
+            //If the statue is for Delete ROM, then keep IsDeleted = true
+            if (statue.IsDeleted == true) { }
+            else
+            {
+                statue.IsDeleted = false;
+            }
+
             await work.Statues.AddAsync(statue);
             await work.Save();
             return statue;

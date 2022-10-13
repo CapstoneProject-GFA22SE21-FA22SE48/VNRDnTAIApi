@@ -25,20 +25,26 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<IEnumerable<Question>> GetStudySetByCategoryAndSeparator(string testCatId, int separator)
         {
             var res = (await work.Questions.GetAllAsync(nameof(Question.Answers)))
-                .Where(question => !question.IsDeleted && question.TestCategoryId.ToString().Equals(testCatId.ToString())).OrderBy(u => int.Parse(u.Name.Split(" ")[1])).Skip(25 * separator).Take(25);
+                .Where(question => !question.IsDeleted
+                        && question.Status == (int)Status.Active
+                        && question.TestCategoryId.ToString().Equals(testCatId.ToString())).OrderBy(u => int.Parse(u.Name.Split(" ")[1])).Skip(25 * separator).Take(25);
             return res;
         }
 
         public async Task<IEnumerable<Question>> GetRandomTestSetByCategory(string testCatId)
         {
             var res = (await work.Questions.GetAllAsync(nameof(Question.Answers)))
-                .Where(question => !question.IsDeleted && question.TestCategoryId.ToString().Equals(testCatId.ToString())).OrderBy(r => Guid.NewGuid()).Take(25);
+                .Where(question => !question.IsDeleted
+                        && question.Status == (int)Status.Active
+                        && question.TestCategoryId.ToString().Equals(testCatId.ToString())).OrderBy(r => Guid.NewGuid()).Take(25);
             return res;
         }
         public async Task<Question> GetQuestionAsync(Guid id)
         {
             return (await work.Questions.GetAllAsync())
-                .Where(question => !question.IsDeleted && question.Id.Equals(id))
+                .Where(question => !question.IsDeleted
+                        && question.Status == (int)Status.Active
+                        && question.Id.Equals(id))
                 .FirstOrDefault();
         }
         public async Task<Question> AddQuestion(Question question)
@@ -50,6 +56,21 @@ namespace DataAccessLibrary.Business_Entity
             return question;
         }
 
+        public async Task<Question> UpdateQuestion(Question question)
+        {
+            work.Questions.Update(question);
+            await work.Save();
+            return question;
+        }
+        public async Task RemoveQuestion(Guid id)
+        {
+            Question question = await work.Questions.GetAsync(id);
+            question.IsDeleted = true;
+            work.Questions.Update(question);
+            await work.Save();
+        }
+
+        //----------------------------------------------------
         public async Task<Question> AddQuestionForROM(Question question)
         {
             //Add new deactivated question
@@ -80,19 +101,6 @@ namespace DataAccessLibrary.Business_Entity
             await work.Questions.AddAsync(question);
             await work.Save();
             return question;
-        }
-        public async Task<Question> UpdateQuestion(Question question)
-        {
-            work.Questions.Update(question);
-            await work.Save();
-            return question;
-        }
-        public async Task RemoveQuestion(Guid id)
-        {
-            Question question = await work.Questions.GetAsync(id);
-            question.IsDeleted = true;
-            work.Questions.Update(question);
-            await work.Save();
         }
     }
 }

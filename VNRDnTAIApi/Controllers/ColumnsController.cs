@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BusinessObjectLibrary;
+﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace VNRDnTAIApi.Controllers
 {
@@ -33,6 +30,22 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.GetColumnsAsync());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // GET: api/Columns/AssigendColumn/5
+        [HttpGet("AssignedColumn/{columnId}")]
+        [ProducesResponseType(typeof(IEnumerable<Column>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<Column>>> GetAssignedColumn(Guid columnId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetAssignedColumnsAsync(columnId));
             }
             catch (Exception ex)
             {
