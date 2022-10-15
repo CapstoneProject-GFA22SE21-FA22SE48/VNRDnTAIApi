@@ -7,6 +7,11 @@ namespace BusinessObjectLibrary
 {
     public partial class Gpssign
     {
+        public Gpssign()
+        {
+            SignModificationRequests = new HashSet<SignModificationRequest>();
+        }
+
         public Guid Id { get; set; }
         public Guid SignId { get; set; }
         public decimal Latitude { get; set; }
@@ -15,5 +20,6 @@ namespace BusinessObjectLibrary
         public bool IsDeleted { get; set; }
 
         public virtual Sign Sign { get; set; }
+        public virtual ICollection<SignModificationRequest> SignModificationRequests { get; set; }
     }
 }
