@@ -3,7 +3,6 @@ using DataAccessLibrary.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Business_Entity
@@ -43,6 +42,7 @@ namespace DataAccessLibrary.Business_Entity
 
         public async Task<SignModificationRequest> AddSignModificationRequest(SignModificationRequest signModificationRequest)
         {
+            signModificationRequest.Id = Guid.NewGuid();
             signModificationRequest.IsDeleted = false;
             await work.SignModificationRequests.AddAsync(signModificationRequest);
             await work.Save();

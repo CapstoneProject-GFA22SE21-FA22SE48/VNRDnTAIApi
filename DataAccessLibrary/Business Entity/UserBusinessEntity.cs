@@ -25,7 +25,7 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<IEnumerable<User>> GetMembersAsync()
         {
             var user = (await work.Users.GetAllAsync())
-                .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.USER);
+                .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.MEMBER);
             return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
         }
 
@@ -34,7 +34,7 @@ namespace DataAccessLibrary.Business_Entity
             var user = (await work.Users.GetAllAsync())
                 .Where(
                     user => !user.IsDeleted &&
-                    user.Role == (int)UserRoles.USER &&
+                    user.Role == (int)UserRoles.MEMBER &&
                     user.Username.ToLower().Contains(keywordUserName.ToLower())
                  );
             return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
@@ -47,7 +47,7 @@ namespace DataAccessLibrary.Business_Entity
             var user = (await work.Users.GetAllAsync())
                 .Where(
                     user => !user.IsDeleted &&
-                    user.Role == (int)UserRoles.USER &&
+                    user.Role == (int)UserRoles.MEMBER &&
                     user.CreatedDate.CompareTo(startDate) >= 0 &&
                     user.CreatedDate.CompareTo(endDate) <= 0
                  );
@@ -161,7 +161,7 @@ namespace DataAccessLibrary.Business_Entity
         {
             return (await work.Users.GetAllAsync())
                 .Where((user) => user.Username == username
-                    && user.Password == password && user.Role != (int)UserRoles.USER)
+                    && user.Password == password && user.Role != (int)UserRoles.MEMBER)
                 .FirstOrDefault();
         }
 
@@ -174,7 +174,7 @@ namespace DataAccessLibrary.Business_Entity
             for (int i = minYear; i <= DateTime.Now.Year; i++)
             {
                 listNumberMemberByYear.Add(i.ToString() + "-" + users
-                .Where(u => !u.IsDeleted && u.Role == (int)UserRoles.USER
+                .Where(u => !u.IsDeleted && u.Role == (int)UserRoles.MEMBER
                         && u.CreatedDate.Year == i).Count().ToString());
             }
             memberByYear.MembersByYear = listNumberMemberByYear;
@@ -190,7 +190,7 @@ namespace DataAccessLibrary.Business_Entity
             for (int i = 1; i <= dayCount; i++)
             {
                 listNumberNewMemberByDay.Add(i.ToString() + "-" + users
-                    .Where(u => !u.IsDeleted && u.Role == (int)UserRoles.USER
+                    .Where(u => !u.IsDeleted && u.Role == (int)UserRoles.MEMBER
                             && u.CreatedDate.Day == i && u.CreatedDate.Month == month
                             && u.CreatedDate.Year == year).Count().ToString());
             }

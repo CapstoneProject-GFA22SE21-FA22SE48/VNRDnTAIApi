@@ -32,12 +32,13 @@ namespace DataAccessLibrary.Business_Entity
 
         public async Task<IEnumerable<ParagraphDTO>> GetParagraphsBySectionIdAsync(Guid sectionId)
         {
-
-            var tmpTable1 = (await work.Paragraphs.GetAllAsync())
+            IEnumerable<Paragraph> paragraphs = (await work.Paragraphs.GetAllAsync())
                 .Where(paragraph => !paragraph.IsDeleted
                         && paragraph.Status == (int)Status.Active
                         && paragraph.SectionId == sectionId)
-                .OrderBy(paragraph => paragraph.Name).Join(
+                .OrderBy(paragraph => paragraph.Name);
+
+            var tmpData1 = paragraphs.Join(
                     (await work.References.GetAllAsync()),
                     paragraph => paragraph.Id,
                     reference => reference.ParagraphId,
@@ -50,11 +51,13 @@ namespace DataAccessLibrary.Business_Entity
                         Status = paragraph.Status,
                         AdditionalPenalty = paragraph.AdditionalPenalty,
                         IsDeleted = paragraph.IsDeleted,
-                        ReferenceParagraphId = reference.ReferenceParagraphId
+                        ReferenceParagraphId = reference.ReferenceParagraphId,
+                        ReferenceParagraphIsExcluded = reference.IsExcluded
                     }
                     );
 
-            var tmpTable2 = tmpTable1.Join(
+            //Paragraph with reference
+            var tmpData2 = tmpData1.Join(
                 (await work.Paragraphs.GetAllAsync())
                 .Where(paragraph => !paragraph.IsDeleted
                         && paragraph.Status == (int)Status.Active),
@@ -73,17 +76,76 @@ namespace DataAccessLibrary.Business_Entity
                     ReferenceParagraphId = tmp1.ReferenceParagraphId,
                     ReferenceParagraphName = paragraph.Name,
                     ReferenceParagraphDesc = paragraph.Description,
+                    ReferenceParagraphIsExcluded = tmp1.ReferenceParagraphIsExcluded,
+
+                    ReferenceParagraphSectionId = paragraph.SectionId
                 }
             );
+
+            //With section
+            var tmpData3 = tmpData2.Join(
+                (await work.Sections.GetAllAsync())
+                .Where(sc => !sc.IsDeleted && sc.Status == (int)Status.Active),
+                tmp2 => tmp2.ReferenceParagraphSectionId,
+                section => section.Id,
+                (tmp2, section) => new
+                {
+                    Id = tmp2.Id,
+                    SectionId = tmp2.SectionId,
+                    Name = tmp2.Name,
+                    Description = tmp2.Description,
+                    Status = tmp2.Status,
+                    AdditionalPenalty = tmp2.AdditionalPenalty,
+                    IsDeleted = tmp2.IsDeleted,
+
+                    ReferenceParagraphId = tmp2.ReferenceParagraphId,
+                    ReferenceParagraphName = tmp2.Name,
+                    ReferenceParagraphDesc = tmp2.ReferenceParagraphDesc,
+                    ReferenceParagraphIsExcluded = tmp2.ReferenceParagraphIsExcluded,
+
+                    ReferenceParagraphSectionId = tmp2.SectionId,
+                    ReferenceParagraphSectionName = section.Name,
+
+                    ReferenceParagraphSectionStatueId = section.StatueId
+                }
+                );
+
+            //With statue
+            var tmpData4 = tmpData3.Join(
+                (await work.Statues.GetAllAsync())
+                .Where(st => !st.IsDeleted && st.Status == (int)Status.Active),
+                tmp3 => tmp3.ReferenceParagraphSectionStatueId,
+                statue => statue.Id,
+                (tmp3, statue) => new
+                {
+                    Id = tmp3.Id,
+                    SectionId = tmp3.SectionId,
+                    Name = tmp3.Name,
+                    Description = tmp3.Description,
+                    Status = tmp3.Status,
+                    AdditionalPenalty = tmp3.AdditionalPenalty,
+                    IsDeleted = tmp3.IsDeleted,
+
+                    ReferenceParagraphId = tmp3.ReferenceParagraphId,
+                    ReferenceParagraphName = tmp3.Name,
+                    ReferenceParagraphDesc = tmp3.ReferenceParagraphDesc,
+                    ReferenceParagraphIsExcluded = tmp3.ReferenceParagraphIsExcluded,
+
+                    ReferenceParagraphSectionId = tmp3.SectionId,
+                    ReferenceParagraphSectionName = tmp3.ReferenceParagraphSectionName,
+
+                    ReferenceParagraphSectionStatueId = tmp3.ReferenceParagraphSectionStatueId,
+                    ReferenceParagraphSectionStatueName = statue.Name
+                }
+                );
 
             List<ParagraphDTO> dto = new List<ParagraphDTO>();
             List<dynamic> referenceList = null;
 
-            var tmpData = tmpTable2.GroupBy(p => p.Id).Select(p => p.First()).ToList();
-            foreach (var paragraph in tmpData)
+            foreach (var paragraph in paragraphs)
             {
                 referenceList = new List<dynamic>();
-                foreach (var data in tmpTable2)
+                foreach (var data in tmpData4)
                 {
                     if (data.Id == paragraph.Id)
                     {
@@ -91,7 +153,14 @@ namespace DataAccessLibrary.Business_Entity
                         {
                             ReferenceParagraphId = data.ReferenceParagraphId,
                             ReferenceParagraphName = data.ReferenceParagraphName,
-                            ReferenceParagraphDesc = data.ReferenceParagraphDesc
+                            ReferenceParagraphDesc = data.ReferenceParagraphDesc,
+
+                            ReferenceParagraphSectionId = data.ReferenceParagraphSectionId,
+                            ReferenceParagraphSectionName = data.ReferenceParagraphSectionName,
+
+                            ReferenceParagraphSectionStatueId = data.ReferenceParagraphSectionStatueId,
+                            ReferenceParagraphSectionStatueName = data.ReferenceParagraphSectionStatueName,
+                            ReferenceParagraphIsExcluded = data.ReferenceParagraphIsExcluded,
                         });
                     }
                 }
