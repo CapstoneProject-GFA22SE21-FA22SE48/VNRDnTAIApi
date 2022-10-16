@@ -22,7 +22,7 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<IEnumerable<AssignedColumn>> GetAssignedColumnsByScribeIdAsync(Guid scribeId)
         {
             return (await work.AssignedColumns.GetAllAsync(nameof(AssignedColumn.Column)))
-                .Where(assignedColumn => !assignedColumn.IsDeleted && assignedColumn.UserId.Equals(scribeId))
+                .Where(assignedColumn => !assignedColumn.IsDeleted && assignedColumn.ScribeId.Equals(scribeId))
                 .OrderBy(assignedColumn => int.Parse(assignedColumn.Column.Name.Split(" ")[1]));
         }
     }

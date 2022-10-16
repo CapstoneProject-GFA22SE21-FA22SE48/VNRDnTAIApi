@@ -10,6 +10,8 @@ namespace BusinessObjectLibrary
         public User()
         {
             AssignedColumns = new HashSet<AssignedColumn>();
+            AssignedQuestionCategories = new HashSet<AssignedQuestionCategory>();
+            AssignedSignCategories = new HashSet<AssignedSignCategory>();
             Comments = new HashSet<Comment>();
             LawModificationRequestAdmins = new HashSet<LawModificationRequest>();
             LawModificationRequestScribes = new HashSet<LawModificationRequest>();
@@ -21,6 +23,7 @@ namespace BusinessObjectLibrary
             TestResults = new HashSet<TestResult>();
             UserModificationRequestArbitratingAdmins = new HashSet<UserModificationRequest>();
             UserModificationRequestModifiedUsers = new HashSet<UserModificationRequest>();
+            UserModificationRequestModifyingUsers = new HashSet<UserModificationRequest>();
             UserModificationRequestPromotingAdmins = new HashSet<UserModificationRequest>();
         }
 
@@ -33,8 +36,9 @@ namespace BusinessObjectLibrary
         public DateTime CreatedDate { get; set; }
         public bool IsDeleted { get; set; }
 
-        public virtual UserModificationRequest UserModificationRequestModifyingUser { get; set; }
         public virtual ICollection<AssignedColumn> AssignedColumns { get; set; }
+        public virtual ICollection<AssignedQuestionCategory> AssignedQuestionCategories { get; set; }
+        public virtual ICollection<AssignedSignCategory> AssignedSignCategories { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<LawModificationRequest> LawModificationRequestAdmins { get; set; }
         public virtual ICollection<LawModificationRequest> LawModificationRequestScribes { get; set; }
@@ -46,6 +50,7 @@ namespace BusinessObjectLibrary
         public virtual ICollection<TestResult> TestResults { get; set; }
         public virtual ICollection<UserModificationRequest> UserModificationRequestArbitratingAdmins { get; set; }
         public virtual ICollection<UserModificationRequest> UserModificationRequestModifiedUsers { get; set; }
+        public virtual ICollection<UserModificationRequest> UserModificationRequestModifyingUsers { get; set; }
         public virtual ICollection<UserModificationRequest> UserModificationRequestPromotingAdmins { get; set; }
     }
 }

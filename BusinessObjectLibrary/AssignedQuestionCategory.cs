@@ -5,13 +5,13 @@ using System.Collections.Generic;
 
 namespace BusinessObjectLibrary
 {
-    public partial class AssignedColumn
+    public partial class AssignedQuestionCategory
     {
-        public Guid ColumnId { get; set; }
+        public Guid QuestionCategoryId { get; set; }
         public Guid ScribeId { get; set; }
         public bool IsDeleted { get; set; }
 
-        public virtual Column Column { get; set; }
+        public virtual QuestionCategory QuestionCategory { get; set; }
         public virtual User Scribe { get; set; }
     }
 }

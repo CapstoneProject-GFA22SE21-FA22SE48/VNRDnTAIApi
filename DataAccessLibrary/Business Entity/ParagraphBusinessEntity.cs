@@ -99,7 +99,7 @@ namespace DataAccessLibrary.Business_Entity
                     IsDeleted = tmp2.IsDeleted,
 
                     ReferenceParagraphId = tmp2.ReferenceParagraphId,
-                    ReferenceParagraphName = tmp2.Name,
+                    ReferenceParagraphName = tmp2.ReferenceParagraphName,
                     ReferenceParagraphDesc = tmp2.ReferenceParagraphDesc,
                     ReferenceParagraphIsExcluded = tmp2.ReferenceParagraphIsExcluded,
 
@@ -127,7 +127,7 @@ namespace DataAccessLibrary.Business_Entity
                     IsDeleted = tmp3.IsDeleted,
 
                     ReferenceParagraphId = tmp3.ReferenceParagraphId,
-                    ReferenceParagraphName = tmp3.Name,
+                    ReferenceParagraphName = tmp3.ReferenceParagraphName,
                     ReferenceParagraphDesc = tmp3.ReferenceParagraphDesc,
                     ReferenceParagraphIsExcluded = tmp3.ReferenceParagraphIsExcluded,
 
@@ -174,7 +174,9 @@ namespace DataAccessLibrary.Business_Entity
                     AdditionalPenalty = paragraph.AdditionalPenalty,
                     IsDeleted = paragraph.IsDeleted,
 
-                    ReferenceParagraphs = referenceList
+                    ReferenceParagraphs = referenceList.OrderBy(r => int.Parse(r.ReferenceParagraphSectionStatueName.Split(" ")[1]))
+                    .ThenBy(r => int.Parse(r.ReferenceParagraphSectionName.Split(" ")[1]))
+                    .ThenBy(r => r.ReferenceParagraphName).ToList()
                 });
             }
 

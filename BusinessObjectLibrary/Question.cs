@@ -16,12 +16,14 @@ namespace BusinessObjectLibrary
 
         public Guid Id { get; set; }
         public Guid TestCategoryId { get; set; }
+        public Guid QuestionCategoryId { get; set; }
         public string Name { get; set; }
         public string Content { get; set; }
         public string ImageUrl { get; set; }
         public int Status { get; set; }
         public bool IsDeleted { get; set; }
 
+        public virtual QuestionCategory QuestionCategory { get; set; }
         public virtual TestCategory TestCategory { get; set; }
         public virtual QuestionModificationRequest QuestionModificationRequestModifyingQuestion { get; set; }
         public virtual ICollection<Answer> Answers { get; set; }

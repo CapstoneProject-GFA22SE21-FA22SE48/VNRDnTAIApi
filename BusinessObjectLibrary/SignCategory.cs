@@ -9,6 +9,7 @@ namespace BusinessObjectLibrary
     {
         public SignCategory()
         {
+            AssignedSignCategories = new HashSet<AssignedSignCategory>();
             Signs = new HashSet<Sign>();
         }
 
@@ -16,6 +17,7 @@ namespace BusinessObjectLibrary
         public string Name { get; set; }
         public bool IsDeleted { get; set; }
 
+        public virtual ICollection<AssignedSignCategory> AssignedSignCategories { get; set; }
         public virtual ICollection<Sign> Signs { get; set; }
     }
 }
