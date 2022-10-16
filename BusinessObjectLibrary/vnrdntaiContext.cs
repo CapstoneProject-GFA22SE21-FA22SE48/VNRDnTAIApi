@@ -17,6 +17,8 @@ namespace BusinessObjectLibrary
 
         public virtual DbSet<Answer> Answers { get; set; }
         public virtual DbSet<AssignedColumn> AssignedColumns { get; set; }
+        public virtual DbSet<AssignedQuestionCategory> AssignedQuestionCategories { get; set; }
+        public virtual DbSet<AssignedSignCategory> AssignedSignCategories { get; set; }
         public virtual DbSet<Column> Columns { get; set; }
         public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<Decree> Decrees { get; set; }
@@ -26,6 +28,7 @@ namespace BusinessObjectLibrary
         public virtual DbSet<LawModificationRequest> LawModificationRequests { get; set; }
         public virtual DbSet<Paragraph> Paragraphs { get; set; }
         public virtual DbSet<Question> Questions { get; set; }
+        public virtual DbSet<QuestionCategory> QuestionCategories { get; set; }
         public virtual DbSet<QuestionModificationRequest> QuestionModificationRequests { get; set; }
         public virtual DbSet<Reference> References { get; set; }
         public virtual DbSet<Section> Sections { get; set; }
@@ -67,13 +70,13 @@ namespace BusinessObjectLibrary
                     .WithMany(p => p.Answers)
                     .HasForeignKey(d => d.QuestionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Answer__Question__6B24EA82");
+                    .HasConstraintName("FK__Answer__Question__6FE99F9F");
             });
 
             modelBuilder.Entity<AssignedColumn>(entity =>
             {
-                entity.HasKey(e => new { e.ColumnId, e.UserId })
-                    .HasName("PK__Assigned__CBD9CECBA8569E82");
+                entity.HasKey(e => new { e.ColumnId, e.ScribeId })
+                    .HasName("PK__Assigned__C05B11FDB0B0F08F");
 
                 entity.ToTable("AssignedColumn");
 
@@ -83,11 +86,51 @@ namespace BusinessObjectLibrary
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__AssignedC__Colum__2B3F6F97");
 
-                entity.HasOne(d => d.User)
+                entity.HasOne(d => d.Scribe)
                     .WithMany(p => p.AssignedColumns)
-                    .HasForeignKey(d => d.UserId)
+                    .HasForeignKey(d => d.ScribeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__AssignedC__UserI__2C3393D0");
+                    .HasConstraintName("FK__AssignedC__Scrib__2C3393D0");
+            });
+
+            modelBuilder.Entity<AssignedQuestionCategory>(entity =>
+            {
+                entity.HasKey(e => new { e.QuestionCategoryId, e.ScribeId })
+                    .HasName("PK__Assigned__920413739E02E46F");
+
+                entity.ToTable("AssignedQuestionCategory");
+
+                entity.HasOne(d => d.QuestionCategory)
+                    .WithMany(p => p.AssignedQuestionCategories)
+                    .HasForeignKey(d => d.QuestionCategoryId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__AssignedQ__Quest__07C12930");
+
+                entity.HasOne(d => d.Scribe)
+                    .WithMany(p => p.AssignedQuestionCategories)
+                    .HasForeignKey(d => d.ScribeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__AssignedQ__Scrib__08B54D69");
+            });
+
+            modelBuilder.Entity<AssignedSignCategory>(entity =>
+            {
+                entity.HasKey(e => new { e.SignCategoryId, e.ScribeId })
+                    .HasName("PK__Assigned__E7CAD648B705ACFC");
+
+                entity.ToTable("AssignedSignCategory");
+
+                entity.HasOne(d => d.Scribe)
+                    .WithMany(p => p.AssignedSignCategories)
+                    .HasForeignKey(d => d.ScribeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__AssignedS__Scrib__04E4BC85");
+
+                entity.HasOne(d => d.SignCategory)
+                    .WithMany(p => p.AssignedSignCategories)
+                    .HasForeignKey(d => d.SignCategoryId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__AssignedS__SignC__03F0984C");
             });
 
             modelBuilder.Entity<Column>(entity =>
@@ -127,7 +170,7 @@ namespace BusinessObjectLibrary
                     .WithMany(p => p.Comments)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Comment__UserId__73BA3083");
+                    .HasConstraintName("FK__Comment__UserId__787EE5A0");
             });
 
             modelBuilder.Entity<Decree>(entity =>
@@ -172,7 +215,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<KeywordParagraph>(entity =>
             {
                 entity.HasKey(e => new { e.KeywordId, e.ParagraphId })
-                    .HasName("PK__KeywordP__852C78FC8E14E095");
+                    .HasName("PK__KeywordP__852C78FCD11E998C");
 
                 entity.ToTable("KeywordParagraph");
 
@@ -275,17 +318,40 @@ namespace BusinessObjectLibrary
                     .IsRequired()
                     .HasMaxLength(10);
 
+                entity.HasOne(d => d.QuestionCategory)
+                    .WithMany(p => p.Questions)
+                    .HasForeignKey(d => d.QuestionCategoryId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Question__Questi__6D0D32F4");
+
                 entity.HasOne(d => d.TestCategory)
                     .WithMany(p => p.Questions)
                     .HasForeignKey(d => d.TestCategoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Question__TestCa__68487DD7");
+                    .HasConstraintName("FK__Question__TestCa__6C190EBB");
+            });
+
+            modelBuilder.Entity<QuestionCategory>(entity =>
+            {
+                entity.ToTable("QuestionCategory");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(2000);
+
+                entity.HasOne(d => d.TestCategory)
+                    .WithMany(p => p.QuestionCategories)
+                    .HasForeignKey(d => d.TestCategoryId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__QuestionC__TestC__693CA210");
             });
 
             modelBuilder.Entity<QuestionModificationRequest>(entity =>
             {
                 entity.HasKey(e => e.ModifyingQuestionId)
-                    .HasName("PK__Question__94B14AC71625D0D3");
+                    .HasName("PK__Question__94B14AC77380D411");
 
                 entity.ToTable("QuestionModificationRequest");
 
@@ -297,30 +363,30 @@ namespace BusinessObjectLibrary
                     .WithMany(p => p.QuestionModificationRequestAdmins)
                     .HasForeignKey(d => d.AdminId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__QuestionM__Admin__70DDC3D8");
+                    .HasConstraintName("FK__QuestionM__Admin__75A278F5");
 
                 entity.HasOne(d => d.ModifiedQuestion)
                     .WithMany(p => p.QuestionModificationRequestModifiedQuestions)
                     .HasForeignKey(d => d.ModifiedQuestionId)
-                    .HasConstraintName("FK__QuestionM__Modif__6EF57B66");
+                    .HasConstraintName("FK__QuestionM__Modif__73BA3083");
 
                 entity.HasOne(d => d.ModifyingQuestion)
                     .WithOne(p => p.QuestionModificationRequestModifyingQuestion)
                     .HasForeignKey<QuestionModificationRequest>(d => d.ModifyingQuestionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__QuestionM__Modif__6E01572D");
+                    .HasConstraintName("FK__QuestionM__Modif__72C60C4A");
 
                 entity.HasOne(d => d.Scribe)
                     .WithMany(p => p.QuestionModificationRequestScribes)
                     .HasForeignKey(d => d.ScribeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__QuestionM__Scrib__6FE99F9F");
+                    .HasConstraintName("FK__QuestionM__Scrib__74AE54BC");
             });
 
             modelBuilder.Entity<Reference>(entity =>
             {
                 entity.HasKey(e => new { e.ParagraphId, e.ReferenceParagraphId })
-                    .HasName("PK__Referenc__44419EC0C2CBB789");
+                    .HasName("PK__Referenc__44419EC04EFBF4BD");
 
                 entity.ToTable("Reference");
 
@@ -412,26 +478,31 @@ namespace BusinessObjectLibrary
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.GpssignId).HasColumnName("GPSSignId");
+                entity.Property(e => e.ImageUrl).HasMaxLength(500);
 
-                entity.Property(e => e.ImageUrl)
-                    .IsRequired()
-                    .HasMaxLength(500);
+                entity.Property(e => e.ModifiedGpssignId).HasColumnName("ModifiedGPSSignId");
+
+                entity.Property(e => e.ModifyingGpssignId).HasColumnName("ModifyingGPSSignId");
 
                 entity.HasOne(d => d.Admin)
                     .WithMany(p => p.SignModificationRequestAdmins)
                     .HasForeignKey(d => d.AdminId)
-                    .HasConstraintName("FK__SignModif__Admin__6383C8BA");
+                    .HasConstraintName("FK__SignModif__Admin__6477ECF3");
 
-                entity.HasOne(d => d.Gpssign)
-                    .WithMany(p => p.SignModificationRequests)
-                    .HasForeignKey(d => d.GpssignId)
-                    .HasConstraintName("FK__SignModif__GPSSi__60A75C0F");
+                entity.HasOne(d => d.ModifiedGpssign)
+                    .WithMany(p => p.SignModificationRequestModifiedGpssigns)
+                    .HasForeignKey(d => d.ModifiedGpssignId)
+                    .HasConstraintName("FK__SignModif__Modif__619B8048");
 
                 entity.HasOne(d => d.ModifiedSign)
                     .WithMany(p => p.SignModificationRequestModifiedSigns)
                     .HasForeignKey(d => d.ModifiedSignId)
                     .HasConstraintName("FK__SignModif__Modif__5FB337D6");
+
+                entity.HasOne(d => d.ModifyingGpssign)
+                    .WithMany(p => p.SignModificationRequestModifyingGpssigns)
+                    .HasForeignKey(d => d.ModifyingGpssignId)
+                    .HasConstraintName("FK__SignModif__Modif__60A75C0F");
 
                 entity.HasOne(d => d.ModifyingSign)
                     .WithMany(p => p.SignModificationRequestModifyingSigns)
@@ -441,12 +512,12 @@ namespace BusinessObjectLibrary
                 entity.HasOne(d => d.Scribe)
                     .WithMany(p => p.SignModificationRequestScribes)
                     .HasForeignKey(d => d.ScribeId)
-                    .HasConstraintName("FK__SignModif__Scrib__628FA481");
+                    .HasConstraintName("FK__SignModif__Scrib__6383C8BA");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.SignModificationRequestUsers)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__SignModif__UserI__619B8048");
+                    .HasConstraintName("FK__SignModif__UserI__628FA481");
             });
 
             modelBuilder.Entity<SignParagraph>(entity =>
@@ -512,13 +583,13 @@ namespace BusinessObjectLibrary
                     .WithMany(p => p.TestResults)
                     .HasForeignKey(d => d.TestCategoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__TestResul__TestC__778AC167");
+                    .HasConstraintName("FK__TestResul__TestC__7C4F7684");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.TestResults)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__TestResul__UserI__76969D2E");
+                    .HasConstraintName("FK__TestResul__UserI__7B5B524B");
             });
 
             modelBuilder.Entity<TestResultDetail>(entity =>
@@ -531,19 +602,19 @@ namespace BusinessObjectLibrary
                     .WithMany(p => p.TestResultDetails)
                     .HasForeignKey(d => d.AnswerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__TestResul__Answe__7C4F7684");
+                    .HasConstraintName("FK__TestResul__Answe__01142BA1");
 
                 entity.HasOne(d => d.Question)
                     .WithMany(p => p.TestResultDetails)
                     .HasForeignKey(d => d.QuestionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__TestResul__Quest__7B5B524B");
+                    .HasConstraintName("FK__TestResul__Quest__00200768");
 
                 entity.HasOne(d => d.TestResult)
                     .WithMany(p => p.TestResultDetails)
                     .HasForeignKey(d => d.TestResultId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__TestResul__TestR__7A672E12");
+                    .HasConstraintName("FK__TestResul__TestR__7F2BE32F");
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -571,12 +642,10 @@ namespace BusinessObjectLibrary
 
             modelBuilder.Entity<UserModificationRequest>(entity =>
             {
-                entity.HasKey(e => e.ModifyingUserId)
-                    .HasName("PK__UserModi__D245B669DEA84F2E");
+                entity.HasKey(e => new { e.ModifyingUserId, e.ModifiedUserId })
+                    .HasName("PK__UserModi__C95E8661C6491A6D");
 
                 entity.ToTable("UserModificationRequest");
-
-                entity.Property(e => e.ModifyingUserId).ValueGeneratedNever();
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
@@ -589,11 +658,12 @@ namespace BusinessObjectLibrary
                 entity.HasOne(d => d.ModifiedUser)
                     .WithMany(p => p.UserModificationRequestModifiedUsers)
                     .HasForeignKey(d => d.ModifiedUserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__UserModif__Modif__300424B4");
 
                 entity.HasOne(d => d.ModifyingUser)
-                    .WithOne(p => p.UserModificationRequestModifyingUser)
-                    .HasForeignKey<UserModificationRequest>(d => d.ModifyingUserId)
+                    .WithMany(p => p.UserModificationRequestModifyingUsers)
+                    .HasForeignKey(d => d.ModifyingUserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__UserModif__Modif__2F10007B");
 

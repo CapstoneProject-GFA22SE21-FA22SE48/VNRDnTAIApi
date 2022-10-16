@@ -8,7 +8,7 @@ namespace BusinessObjectLibrary
     public partial class UserModificationRequest
     {
         public Guid ModifyingUserId { get; set; }
-        public Guid? ModifiedUserId { get; set; }
+        public Guid ModifiedUserId { get; set; }
         public Guid PromotingAdminId { get; set; }
         public Guid ArbitratingAdminId { get; set; }
         public int Status { get; set; }

@@ -10,6 +10,8 @@ namespace DataAccessLibrary.Implementations
         private readonly vnrdntaiContext context;
         public IGenericRepository<Answer> Answers { get; }
         public IGenericRepository<AssignedColumn> AssignedColumns { get; }
+        public IGenericRepository<AssignedQuestionCategory> AssignedQuestionCategories { get; }
+        public IGenericRepository<AssignedSignCategory> AssignedSignCategories { get; }
 
         public IGenericRepository<Column> Columns { get; }
 
@@ -27,6 +29,7 @@ namespace DataAccessLibrary.Implementations
         public IGenericRepository<LawModificationRequest> LawModificationRequests { get; }
 
         public IGenericRepository<Question> Questions { get; }
+        public IGenericRepository<QuestionCategory> QuestionCategories { get; }
         public IGenericRepository<QuestionModificationRequest> QuestionModificationRequests { get; }
 
         public IGenericRepository<Reference> References { get; }
@@ -59,6 +62,8 @@ namespace DataAccessLibrary.Implementations
         public UnitOfWork(vnrdntaiContext context,
             IGenericRepository<Answer> answers,
             IGenericRepository<AssignedColumn> assignedColumns,
+            IGenericRepository<AssignedQuestionCategory> assignedQuestionCategories,
+            IGenericRepository<AssignedSignCategory> assignedSignCategories,
             IGenericRepository<Column> columns,
             IGenericRepository<Comment> comments,
             IGenericRepository<Decree> decrees,
@@ -68,6 +73,7 @@ namespace DataAccessLibrary.Implementations
             IGenericRepository<Paragraph> paragraphs,
             IGenericRepository<LawModificationRequest> lawModificationRequests,
             IGenericRepository<Question> questions,
+            IGenericRepository<QuestionCategory> questionCategories,
             IGenericRepository<QuestionModificationRequest> questionModificationRequests,
             IGenericRepository<Reference> references,
             IGenericRepository<Section> sections,
@@ -86,6 +92,9 @@ namespace DataAccessLibrary.Implementations
             this.context = context;
             Answers = answers;
             AssignedColumns = assignedColumns;
+            AssignedQuestionCategories = assignedQuestionCategories;
+            AssignedSignCategories = assignedSignCategories;
+            AssignedColumns = assignedColumns;
             Columns = columns;
             Comments = comments;
             Decrees = decrees;
@@ -95,6 +104,7 @@ namespace DataAccessLibrary.Implementations
             Paragraphs = paragraphs;
             LawModificationRequests = lawModificationRequests;
             Questions = questions;
+            QuestionCategories = questionCategories;
             QuestionModificationRequests = questionModificationRequests;
             References = references;
             Sections = sections;

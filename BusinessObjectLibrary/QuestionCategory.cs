@@ -5,21 +5,21 @@ using System.Collections.Generic;
 
 namespace BusinessObjectLibrary
 {
-    public partial class TestCategory
+    public partial class QuestionCategory
     {
-        public TestCategory()
+        public QuestionCategory()
         {
-            QuestionCategories = new HashSet<QuestionCategory>();
+            AssignedQuestionCategories = new HashSet<AssignedQuestionCategory>();
             Questions = new HashSet<Question>();
-            TestResults = new HashSet<TestResult>();
         }
 
         public Guid Id { get; set; }
+        public Guid TestCategoryId { get; set; }
         public string Name { get; set; }
         public bool IsDeleted { get; set; }
 
-        public virtual ICollection<QuestionCategory> QuestionCategories { get; set; }
+        public virtual TestCategory TestCategory { get; set; }
+        public virtual ICollection<AssignedQuestionCategory> AssignedQuestionCategories { get; set; }
         public virtual ICollection<Question> Questions { get; set; }
-        public virtual ICollection<TestResult> TestResults { get; set; }
     }
 }

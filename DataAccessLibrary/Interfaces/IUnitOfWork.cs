@@ -9,6 +9,8 @@ namespace DataAccessLibrary.Interfaces
         #region Repository
         IGenericRepository<Answer> Answers { get; }
         IGenericRepository<AssignedColumn> AssignedColumns { get; }
+        IGenericRepository<AssignedQuestionCategory> AssignedQuestionCategories { get; }
+        IGenericRepository<AssignedSignCategory> AssignedSignCategories { get; }
         IGenericRepository<Column> Columns { get; }
         IGenericRepository<Comment> Comments { get; }
         IGenericRepository<Decree> Decrees { get; }
@@ -18,6 +20,7 @@ namespace DataAccessLibrary.Interfaces
         IGenericRepository<Paragraph> Paragraphs { get; }
         IGenericRepository<LawModificationRequest> LawModificationRequests { get; }
         IGenericRepository<Question> Questions { get; }
+        IGenericRepository<QuestionCategory> QuestionCategories { get; }
         IGenericRepository<QuestionModificationRequest> QuestionModificationRequests { get; }
         IGenericRepository<Reference> References { get; }
         IGenericRepository<Section> Sections { get; }

@@ -20,6 +20,8 @@ namespace VNRDnTAIApi
             #region Repository
             services.AddScoped<IGenericRepository<Answer>, GenericRepository<Answer>>();
             services.AddScoped<IGenericRepository<AssignedColumn>, GenericRepository<AssignedColumn>>();
+            services.AddScoped<IGenericRepository<AssignedQuestionCategory>, GenericRepository<AssignedQuestionCategory>>();
+            services.AddScoped<IGenericRepository<AssignedSignCategory>, GenericRepository<AssignedSignCategory>>();
             services.AddScoped<IGenericRepository<Column>, GenericRepository<Column>>();
             services.AddScoped<IGenericRepository<Comment>, GenericRepository<Comment>>();
             services.AddScoped<IGenericRepository<Decree>, GenericRepository<Decree>>();
@@ -29,6 +31,7 @@ namespace VNRDnTAIApi
             services.AddScoped<IGenericRepository<Paragraph>, GenericRepository<Paragraph>>();
             services.AddScoped<IGenericRepository<LawModificationRequest>, GenericRepository<LawModificationRequest>>();
             services.AddScoped<IGenericRepository<Question>, GenericRepository<Question>>();
+            services.AddScoped<IGenericRepository<QuestionCategory>, GenericRepository<QuestionCategory>>();
             services.AddScoped<IGenericRepository<QuestionModificationRequest>, GenericRepository<QuestionModificationRequest>>();
             services.AddScoped<IGenericRepository<Reference>, GenericRepository<Reference>>();
             services.AddScoped<IGenericRepository<Section>, GenericRepository<Section>>();
