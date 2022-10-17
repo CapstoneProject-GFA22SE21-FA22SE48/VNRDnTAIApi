@@ -3,13 +3,12 @@ using DataAccessLibrary.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Business_Entity
 {
     public class VehicleCategoryBusinessEntity
-    {   
+    {
         private IUnitOfWork work;
         public VehicleCategoryBusinessEntity(IUnitOfWork work)
         {
@@ -18,7 +17,8 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<IEnumerable<VehicleCategory>> GetVehicleCategoriesAsync()
         {
             return (await work.VehicleCategories.GetAllAsync())
-                .Where(vehicleCategory => !vehicleCategory.IsDeleted);
+                .Where(vehicleCategory => !vehicleCategory.IsDeleted)
+                .OrderBy(v => v.Name);
         }
         public async Task<VehicleCategory> GetVehicleCategoryAsync(Guid id)
         {
