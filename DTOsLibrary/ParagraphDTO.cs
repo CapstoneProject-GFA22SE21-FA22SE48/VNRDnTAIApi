@@ -15,7 +15,7 @@ namespace DTOsLibrary
         public bool IsDeleted { get; set; }
 
         public virtual Section Section { get; set; }
-        public virtual List<dynamic> ReferenceParagraphs { get; set; }
+        public virtual List<ReferenceDTO> ReferenceParagraphs { get; set; }
 
     }
 }

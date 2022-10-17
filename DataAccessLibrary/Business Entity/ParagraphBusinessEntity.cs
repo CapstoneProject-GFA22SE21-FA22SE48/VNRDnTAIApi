@@ -140,16 +140,16 @@ namespace DataAccessLibrary.Business_Entity
                 );
 
             List<ParagraphDTO> dto = new List<ParagraphDTO>();
-            List<dynamic> referenceList = null;
+            List<ReferenceDTO> referenceList = null;
 
             foreach (var paragraph in paragraphs)
             {
-                referenceList = new List<dynamic>();
+                referenceList = new List<ReferenceDTO>();
                 foreach (var data in tmpData4)
                 {
                     if (data.Id == paragraph.Id)
                     {
-                        referenceList.Add(new
+                        referenceList.Add(new ReferenceDTO
                         {
                             ReferenceParagraphId = data.ReferenceParagraphId,
                             ReferenceParagraphName = data.ReferenceParagraphName,
@@ -183,13 +183,48 @@ namespace DataAccessLibrary.Business_Entity
             return dto;
         }
 
-        public async Task<Paragraph> AddParagraph(Paragraph paragraph)
+        //This new paragraph is created for ROM of update, delete 
+        public async Task<ParagraphDTO> AddParagraph(ParagraphDTO paragraphDTO)
         {
-            paragraph.Id = Guid.NewGuid();
-            paragraph.IsDeleted = false;
+            paragraphDTO.Id = Guid.NewGuid();
+            paragraphDTO.Status = (int)Status.Deactivated;
+
+            //If the statue is for Delete ROM, then keep IsDeleted = true
+            if (paragraphDTO.IsDeleted == true) { }
+            else
+            {
+                paragraphDTO.IsDeleted = false;
+            }
+
+            //Convert from paragraphDTO to paragraph
+            Paragraph paragraph = new Paragraph
+            {
+                Id = paragraphDTO.Id,
+                SectionId = paragraphDTO.SectionId,
+                Name = paragraphDTO.Name,
+                Description = paragraphDTO.Description,
+                Status = paragraphDTO.Status,
+                AdditionalPenalty = paragraphDTO.AdditionalPenalty,
+                IsDeleted = paragraphDTO.IsDeleted
+            };
+
+            // If the paragraph has reference paragraphs -> insert to Reference table
+            if (paragraphDTO.ReferenceParagraphs != null && paragraphDTO.ReferenceParagraphs.Count > 0)
+            {
+                foreach (var referenceParagraph in paragraphDTO.ReferenceParagraphs)
+                {
+                    await work.References.AddAsync(new Reference
+                    {
+                        ParagraphId = paragraphDTO.Id,
+                        ReferenceParagraphId = referenceParagraph.ReferenceParagraphId,
+                        IsExcluded = referenceParagraph.ReferenceParagraphIsExcluded,
+                    });
+                }
+            }
+
             await work.Paragraphs.AddAsync(paragraph);
             await work.Save();
-            return paragraph;
+            return paragraphDTO;
         }
         public async Task<Paragraph> UpdateParagraph(Paragraph paragraph)
         {

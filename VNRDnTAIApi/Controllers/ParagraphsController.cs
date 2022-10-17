@@ -94,13 +94,13 @@ namespace VNRDnTAIApi.Controllers
 
         // POST: api/Paragraphs
         [HttpPost]
-        [ProducesResponseType(typeof(Paragraph), 201)]
+        [ProducesResponseType(typeof(ParagraphDTO), 201)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<Paragraph>> PostParagraph(Paragraph paragraph)
+        public async Task<ActionResult<ParagraphDTO>> PostParagraph(ParagraphDTO paragraphDTO)
         {
             try
             {
-                return StatusCode(201, await _entity.AddParagraph(paragraph));
+                return StatusCode(201, await _entity.AddParagraph(paragraphDTO));
             }
             catch (Exception ex)
             {
