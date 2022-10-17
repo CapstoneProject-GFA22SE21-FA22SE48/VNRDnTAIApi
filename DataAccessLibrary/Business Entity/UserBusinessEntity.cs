@@ -165,6 +165,21 @@ namespace DataAccessLibrary.Business_Entity
                 .FirstOrDefault();
         }
 
+        public async Task<User> LoginMobile(string username, string password)
+        {
+            return (await work.Users.GetAllAsync())
+                .Where((user) => user.Username == username
+                    && user.Password == password)
+                .FirstOrDefault();
+        }
+
+        public async Task<User> LoginWithEmail(string email)
+        {
+            return (await work.Users.GetAllAsync())
+                .Where((user) => user.Gmail == email)
+                .FirstOrDefault();
+        }
+
         public async Task<MemberByYearReportDTO> GetMemberByYearReport()
         {
             MemberByYearReportDTO memberByYear = new MemberByYearReportDTO();
@@ -197,5 +212,6 @@ namespace DataAccessLibrary.Business_Entity
             newMember.NewMembersByDay = listNumberNewMemberByDay;
             return newMember;
         }
+
     }
 }
