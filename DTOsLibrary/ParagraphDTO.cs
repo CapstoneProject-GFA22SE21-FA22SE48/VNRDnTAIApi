@@ -13,6 +13,7 @@ namespace DTOsLibrary
         public int Status { get; set; }
         public string AdditionalPenalty { get; set; }
         public bool IsDeleted { get; set; }
+        public Guid? KeywordId { get; set; }
 
         public virtual Section Section { get; set; }
         public virtual List<ReferenceDTO> ReferenceParagraphs { get; set; }

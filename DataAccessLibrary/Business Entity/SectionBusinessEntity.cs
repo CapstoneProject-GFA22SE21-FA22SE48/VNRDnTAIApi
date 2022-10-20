@@ -1,6 +1,8 @@
 ﻿using BusinessObjectLibrary;
 using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary;
+using DTOsLibrary.CreateNewLaw;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,6 +50,7 @@ namespace DataAccessLibrary.Business_Entity
             {
                 section.Paragraphs = paragraphs
                     .Where(paragraph => paragraph.SectionId == section.Id).ToList();
+                section.VehicleCategory.Sections = null;
             }
             return sections;
         }
@@ -91,6 +94,104 @@ namespace DataAccessLibrary.Business_Entity
             await work.Save();
             return section;
         }
+
+        //Used for creating a new section (with/without paragraphs)
+        public async Task<Section> CreateNewSection(NewSectionDTO newSectionDTO)
+        {
+            Section newSection = new Section
+            {
+                Id = Guid.NewGuid(),
+                Name = newSectionDTO.Name,
+                VehicleCategoryId = newSectionDTO.VehicleCategoryId,
+                StatueId = newSectionDTO.StatueId,
+                Description = newSectionDTO.Description,
+                MinPenalty = newSectionDTO.MinPenalty,
+                MaxPenalty = newSectionDTO.MaxPenalty,
+                Status = (int)Status.Deactivated,
+                IsDeleted = false
+            };
+
+            await work.Sections.AddAsync(newSection);
+
+            if (newSectionDTO.IsSectionWithNoParagraph)
+            {
+                Paragraph newParagraph = new Paragraph
+                {
+                    Id = Guid.NewGuid(),
+                    SectionId = newSection.Id,
+                    Name = "",
+                    Description = "",
+                    Status = (int)Status.Deactivated,
+                    AdditionalPenalty = "",
+                    IsDeleted = false
+                };
+
+                await work.Paragraphs.AddAsync(newParagraph);
+
+                if (newSectionDTO.ReferenceParagraphs != null)
+                {
+                    foreach (ReferenceDTO referenceParagraph in newSectionDTO.ReferenceParagraphs)
+                    {
+                        Reference reference = new Reference
+                        {
+                            ParagraphId = newParagraph.Id,
+                            ReferenceParagraphId = referenceParagraph.ReferenceParagraphId,
+                            IsExcluded = referenceParagraph.ReferenceParagraphIsExcluded
+                        };
+                        await work.References.AddAsync(reference);
+                    }
+                }
+            }
+            else
+            {
+                if (newSectionDTO.Paragraphs != null)
+                {
+                    foreach (NewParagraphDTO newParagraphDTO in newSectionDTO.Paragraphs)
+                    {
+                        Paragraph paragraph = new Paragraph
+                        {
+                            Id = Guid.NewGuid(),
+                            SectionId = newSection.Id,
+                            Name = newParagraphDTO.Name,
+                            Description = newParagraphDTO.Description,
+                            Status = (int)Status.Deactivated,
+                            AdditionalPenalty = newParagraphDTO.AdditionalPenalty,
+                            IsDeleted = false
+                        };
+                        await work.Paragraphs.AddAsync(paragraph);
+
+                        if (newParagraphDTO.KeywordId != null)
+                        {
+                            KeywordParagraph keywordParagraph = new KeywordParagraph
+                            {
+                                KeywordId = (Guid)newParagraphDTO.KeywordId,
+                                ParagraphId = paragraph.Id,
+                                IsDeleted = false
+                            };
+                            await work.KeywordParagraphs.AddAsync(keywordParagraph);
+                        }
+
+                        if (newParagraphDTO.ReferenceParagraphs != null)
+                        {
+                            foreach (ReferenceDTO referenceParagraph in newParagraphDTO.ReferenceParagraphs)
+                            {
+                                Reference reference = new Reference
+                                {
+                                    ParagraphId = paragraph.Id,
+                                    ReferenceParagraphId = referenceParagraph.ReferenceParagraphId,
+                                    IsExcluded = referenceParagraph.ReferenceParagraphIsExcluded
+                                };
+                                await work.References.AddAsync(reference);
+                            }
+                        }
+                    }
+                }
+            }
+
+            await work.Save();
+            return newSection;
+        }
+
         public async Task<Section> UpdateSection(Section section)
         {
             work.Sections.Update(section);

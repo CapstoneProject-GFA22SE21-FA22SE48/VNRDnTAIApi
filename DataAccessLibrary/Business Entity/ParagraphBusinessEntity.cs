@@ -183,7 +183,7 @@ namespace DataAccessLibrary.Business_Entity
             return dto;
         }
 
-        //This new paragraph is created for ROM of update, delete 
+        //This new paragraph is created for ROM of update, delete, create 
         public async Task<ParagraphDTO> AddParagraph(ParagraphDTO paragraphDTO)
         {
             paragraphDTO.Id = Guid.NewGuid();
@@ -223,6 +223,17 @@ namespace DataAccessLibrary.Business_Entity
             }
 
             await work.Paragraphs.AddAsync(paragraph);
+
+            if (paragraphDTO.KeywordId != null)
+            {
+                KeywordParagraph keywordParagraph = new KeywordParagraph
+                {
+                    ParagraphId = paragraph.Id,
+                    KeywordId = (Guid)paragraphDTO.KeywordId,
+                    IsDeleted = false
+                };
+                await work.KeywordParagraphs.AddAsync(keywordParagraph);
+            }
             await work.Save();
             return paragraphDTO;
         }

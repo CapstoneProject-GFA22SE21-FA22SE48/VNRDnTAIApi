@@ -1,6 +1,7 @@
 ﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -115,6 +116,22 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(201, await _entity.AddSectionForROM(section));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // POST: api/Sections/NewSection
+        [HttpPost("NewSection")]
+        [ProducesResponseType(typeof(Section), 201)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<Section>> CreateNewSection(NewSectionDTO newSectionDTO)
+        {
+            try
+            {
+                return StatusCode(201, await _entity.CreateNewSection(newSectionDTO));
             }
             catch (Exception ex)
             {
