@@ -268,9 +268,9 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 User user = await _entity
-                    .LoginWeb(loginUserDTO.Username, loginUserDTO.Password);
+                    .RegisterMember(loginUserDTO.Username, loginUserDTO.Password, loginUserDTO.Email);
 
-                return StatusCode(200, "Success");
+                return StatusCode(201,user);
             }
             catch (Exception ex)
             {

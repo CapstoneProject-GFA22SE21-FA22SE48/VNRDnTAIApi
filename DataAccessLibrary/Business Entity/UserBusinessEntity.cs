@@ -173,6 +173,33 @@ namespace DataAccessLibrary.Business_Entity
                 .FirstOrDefault();
         }
 
+        public async Task<User> RegisterMember(string username, string password, string email)
+        {
+            User u = (await work.Users.GetAllAsync())
+                .FirstOrDefault((user) => !user.IsDeleted && (user.Username == username
+                    || user.Gmail == email));
+
+            User user = new User();
+            if (u != null)
+            {
+                user.Id = Guid.NewGuid();
+                user.CreatedDate = DateTime.Now;
+                user.Username = username;
+                user.Password = password;
+                if (!string.IsNullOrEmpty(email))
+                {
+                    user.Gmail = email;
+                }
+                user.Role = (int)UserRoles.MEMBER;
+                user.Status = 5;
+                user.IsDeleted = false;
+                await work.Users.AddAsync(user);
+                await work.Save();
+            }
+
+            return user;
+        }
+
         public async Task<User> LoginWithEmail(string email)
         {
             return (await work.Users.GetAllAsync())
