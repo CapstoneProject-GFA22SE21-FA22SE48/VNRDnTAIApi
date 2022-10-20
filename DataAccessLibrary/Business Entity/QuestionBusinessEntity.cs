@@ -22,6 +22,17 @@ namespace DataAccessLibrary.Business_Entity
                 .OrderBy(u => int.Parse(u.Name.Split(" ")[1]));
         }
 
+        //public async Task<IEnumerable<Question> GetAllStudySets(string testCatId) //questioncate
+        //{
+        //    var res = (await work.Questions.GetAllAsync(nameof(Question.Answers)))
+        //        .Where(question => !question.IsDeleted
+        //                && question.Status == (int)Status.Active
+        //                && question.TestCategoryId.ToString()
+        //                .Equals(testCatId.ToString()))
+        //        .OrderBy(u => int.Parse(u.Name.Split(" ")[1]));
+        //    return res;
+        //}
+
         public async Task<IEnumerable<Question>> GetStudySetByCategoryAndSeparator(string testCatId, int separator)
         {
             var res = (await work.Questions.GetAllAsync(nameof(Question.Answers)))
@@ -31,6 +42,7 @@ namespace DataAccessLibrary.Business_Entity
             return res;
         }
 
+        //***
         public async Task<IEnumerable<Question>> GetRandomTestSetByCategory(string testCatId)
         {
             var res = (await work.Questions.GetAllAsync(nameof(Question.Answers)))
