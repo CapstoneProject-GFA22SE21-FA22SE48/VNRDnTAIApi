@@ -259,6 +259,24 @@ namespace VNRDnTAIApi.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+        // POST: api/Users/Register
+        [HttpPost("Register")]
+        [ProducesResponseType(typeof(User), 201)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<User>> Register(LoginUserDTO loginUserDTO)
+        {
+            try
+            {
+                User user = await _entity
+                    .RegisterMember(loginUserDTO.Username, loginUserDTO.Password, loginUserDTO.Email);
+
+                return StatusCode(201,user);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
 
         //POST api/Users/Login
         [HttpPost("Login")]
@@ -269,19 +287,19 @@ namespace VNRDnTAIApi.Controllers
         {
             try
             {
-                if (string.IsNullOrEmpty(loginUserDTO.Username))
-                {
-                    throw new ArgumentException("Vui lòng nhập tên đăng nhập!");
-                }
+                //if (string.IsNullOrEmpty(loginUserDTO.Username))
+                //{
+                //    throw new ArgumentException("Vui lòng nhập tên đăng nhập!");
+                //}
 
-                if (string.IsNullOrEmpty(loginUserDTO.Password))
-                {
-                    throw new ArgumentException("Vui lòng nhập mật khẩu!");
-                }
+                //if (string.IsNullOrEmpty(loginUserDTO.Password))
+                //{
+                //    throw new ArgumentException("Vui lòng nhập mật khẩu!");
+                //}
                 User user = await _entity
                     .LoginWeb(loginUserDTO.Username, loginUserDTO.Password);
 
-                if (user != null)
+                if (user != null && user.Username != "" && user.Password != "")
                 {
                     var authClaims = new List<Claim>
                 {
@@ -321,6 +339,69 @@ namespace VNRDnTAIApi.Controllers
             catch (ApplicationException ae)
             {
                 return Unauthorized(ae.Message);
+            }
+            catch
+            {
+                return Unauthorized("Có lỗi xảy ra. Vui lòng thử lại sau.");
+            }
+        }
+
+        //POST api/Users/AppLogin
+        [HttpPost("AppLogin")]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200)]
+        [AllowAnonymous]
+        public async Task<IActionResult> AppLogin(LoginUserDTO loginUserDTO)
+        {
+            try
+            {
+                User user = await _entity
+                    .LoginMobile(loginUserDTO.Username, loginUserDTO.Password);
+                // second chances
+                if (user == null)
+                {
+                    user = await _entity.LoginWithEmail(loginUserDTO.Email);
+                }
+
+                if (user != null && user.Username != "" && user.Password != "")
+                {
+                    var authClaims = new List<Claim>
+                    {
+                        new Claim("Id", user.Id.ToString()),
+                        new Claim("Username", user.Username),
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                    };
+
+                    var authSignature = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(VNRDnTAIConfiguration.Secret));
+
+                    //Token generate
+                    var token = new JwtSecurityToken(
+                        issuer: VNRDnTAIConfiguration.JwtIssuer,
+                        audience: VNRDnTAIConfiguration.JwtAudience,
+                        //expires: DateTime.Now.AddHours(2),
+                        expires: DateTime.MaxValue,
+                        claims: authClaims,
+                        signingCredentials:
+                            new SigningCredentials(authSignature, SecurityAlgorithms.HmacSha256)
+                        );
+
+                    return StatusCode(200, new
+                    {
+                        token = new JwtSecurityTokenHandler().WriteToken(token),
+                    });
+                }
+                else
+                {
+                    throw new ApplicationException("Sai tên đăng nhập hoặc mật khẩu");
+                }
+            }
+            catch (ArgumentException ae)
+            {
+                return Unauthorized("Có lỗi xảy ra.\n" + ae.Message);
+            }
+            catch (ApplicationException ae)
+            {
+                return Unauthorized("Có lỗi xảy ra.\n" + ae.Message);
             }
             catch
             {
