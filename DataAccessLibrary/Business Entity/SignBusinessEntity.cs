@@ -1,9 +1,9 @@
 ﻿using BusinessObjectLibrary;
+using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Business_Entity
@@ -18,14 +18,31 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<IEnumerable<Sign>> GetSignsAsync()
         {
             return (await work.Signs.GetAllAsync())
-                .Where(sign => !sign.IsDeleted);
+                .Where(sign => !sign.IsDeleted && sign.Status == (int)Status.Active);
         }
         public async Task<Sign> GetSignAsync(Guid id)
         {
             return (await work.Signs.GetAllAsync())
-                .Where(sign => !sign.IsDeleted && sign.Id.Equals(id))
+                .Where(sign => !sign.IsDeleted && sign.Id.Equals(id) && sign.Status == (int)Status.Active)
                 .FirstOrDefault();
         }
+
+        public async Task<IEnumerable<Sign>> GetSignsBySignCategoryIdAsync(Guid signCategoryId)
+        {
+            return (await work.Signs.GetAllAsync())
+                .Where(sign => !sign.IsDeleted && sign.Status == (int)Status.Active && sign.SignCategoryId == signCategoryId);
+        }
+
+        //public async Task<IEnumerable<Sign>> GetScribeAssignedSigns(Guid scribeId)
+        //{
+        //    IEnumerable<Sign> signs = from assignedSignCategory in
+        //                                  (await work.AssignedSignCategories.GetAllAsync())
+        //                                  .Where()
+
+
+
+        //}
+
         public async Task<Sign> AddSign(Sign sign)
         {
             sign.Id = Guid.NewGuid();

@@ -630,12 +630,10 @@ namespace BusinessObjectLibrary
                     .IsUnicode(false);
 
                 entity.Property(e => e.Password)
-                    .IsRequired()
-                    .HasMaxLength(20)
+                    .HasMaxLength(40)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Username)
-                    .IsRequired()
                     .HasMaxLength(255)
                     .IsUnicode(false);
             });
