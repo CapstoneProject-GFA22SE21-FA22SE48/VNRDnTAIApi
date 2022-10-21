@@ -33,12 +33,16 @@ namespace DataAccessLibrary.Business_Entity
         //    return res;
         //}
 
-        public async Task<IEnumerable<Question>> GetStudySetByCategoryAndSeparator(string testCatId, int separator)
+        public async Task<IEnumerable<Question>> GetStudySetByCategoryAndSeparator(string testCatId, string questionCategoryId, int separator)
         {
             var res = (await work.Questions.GetAllAsync(nameof(Question.Answers)))
                 .Where(question => !question.IsDeleted
                         && question.Status == (int)Status.Active
-                        && question.TestCategoryId.ToString().Equals(testCatId.ToString())).OrderBy(u => int.Parse(u.Name.Split(" ")[1])).Skip(25 * separator).Take(25);
+                        && question.TestCategoryId.ToString().Equals(testCatId.ToString())
+                        && question.QuestionCategoryId.ToString().Equals(questionCategoryId.ToString())
+                        ).OrderBy(u => int.Parse(u.Name.Split(" ")[1]))
+                        //.Skip(25 * separator).Take(25)
+                        ;
             return res;
         }
 
