@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VNRDnTAILibrary.Utilities;
 
 namespace DataAccessLibrary.Business_Entity
 {
@@ -110,6 +111,19 @@ namespace DataAccessLibrary.Business_Entity
                 .Where(user => !user.IsDeleted && user.Id.Equals(id))
                 .FirstOrDefault();
         }
+        public async Task<User> GetUserAsyncByUsername(string username)
+        {
+            return (await work.Users.GetAllAsync())
+                .Where(user => !user.IsDeleted && user.Username.Equals(username))
+                .FirstOrDefault();
+        }
+        public async Task<User> GetUserAsyncByGmail(string gmail)
+        {
+            return (await work.Users.GetAllAsync())
+                .Where(user => !user.IsDeleted && user.Gmail.Equals(gmail))
+                .FirstOrDefault();
+        }
+
         public async Task<User> AddUser(User user)
         {
             user.Id = Guid.NewGuid();
@@ -168,43 +182,44 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<User> LoginMobile(string username, string password)
         {
             return (await work.Users.GetAllAsync())
-                .Where((user) => user.Username == username
+                .Where((user) => !user.IsDeleted && user.Username == username
                     && user.Password == password)
                 .FirstOrDefault();
         }
 
         public async Task<User> RegisterMember(string username, string password, string email)
         {
-            User u = (await work.Users.GetAllAsync())
-                .FirstOrDefault((user) => !user.IsDeleted && (user.Username == username
-                    || user.Gmail == email));
-
-            User user = new User();
-            if (u != null)
+            User user  = new User();
+            user.Id = Guid.NewGuid();
+            user.CreatedDate = DateTime.Now;
+            user.Username = username;
+            user.Password = password;
+            if (!string.IsNullOrEmpty(email))
             {
-                user.Id = Guid.NewGuid();
-                user.CreatedDate = DateTime.Now;
-                user.Username = username;
-                user.Password = password;
-                if (!string.IsNullOrEmpty(email))
-                {
-                    user.Gmail = email;
-                }
-                user.Role = (int)UserRoles.MEMBER;
-                user.Status = 5;
-                user.IsDeleted = false;
-                await work.Users.AddAsync(user);
-                await work.Save();
+                user.Gmail = email;
             }
+            user.Role = (int)UserRoles.MEMBER;
+            user.Status = 5;
+            user.IsDeleted = false;
+
+            await work.Users.AddAsync(user);
+            await work.Save();
 
             return user;
         }
 
         public async Task<User> LoginWithEmail(string email)
         {
-            return (await work.Users.GetAllAsync())
-                .Where((user) => user.Gmail == email)
+            User user = (await work.Users.GetAllAsync())
+                .Where((user) => !user.IsDeleted && user.Gmail == email)
                 .FirstOrDefault();
+            if (user == null)
+            {
+                string password = StringUtils.GenerateRandom(12);
+        
+                user = await RegisterMember(email, password, email);
+            }
+            return user;
         }
 
         public async Task<MemberByYearReportDTO> GetMemberByYearReport()
