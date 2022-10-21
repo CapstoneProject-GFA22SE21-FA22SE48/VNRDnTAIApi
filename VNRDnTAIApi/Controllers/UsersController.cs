@@ -265,12 +265,27 @@ namespace VNRDnTAIApi.Controllers
         [ProducesResponseType(500)]
         public async Task<ActionResult<User>> Register(LoginUserDTO loginUserDTO)
         {
+            User user;
             try
-            {
-                User user = await _entity
-                    .RegisterMember(loginUserDTO.Username, loginUserDTO.Password, loginUserDTO.Email);
-
-                return StatusCode(201,user);
+            {   
+                user = await _entity.GetUserAsyncByGmail(loginUserDTO.Email);
+                if (user == null)
+                {
+                    user = await _entity
+                        .GetUserAsyncByUsername(loginUserDTO.Username);
+                    if (user == null)
+                    {
+                        user = await _entity
+                            .RegisterMember(
+                                loginUserDTO.Username, 
+                                loginUserDTO.Password, 
+                                loginUserDTO.Email
+                            );
+                        return StatusCode(201, user);
+                    }
+                    return StatusCode(409, "This username has already registered.");
+                }
+                return StatusCode(409, "This email has already registered.");
             }
             catch (Exception ex)
             {
@@ -353,17 +368,22 @@ namespace VNRDnTAIApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> AppLogin(LoginUserDTO loginUserDTO)
         {
+            User user = null;
             try
             {
-                User user = await _entity
+                if (loginUserDTO.Username != null && loginUserDTO.Password != null
+                    && loginUserDTO.Username.Length > 0 && loginUserDTO.Password.Length > 0)
+                {
+                    user = await _entity
                     .LoginMobile(loginUserDTO.Username, loginUserDTO.Password);
+                }
                 // second chances
-                if (user == null)
+                if (user == null && loginUserDTO.Email != null && loginUserDTO.Email.Length > 0)
                 {
                     user = await _entity.LoginWithEmail(loginUserDTO.Email);
                 }
 
-                if (user != null && user.Username != "" && user.Password != "")
+                if (user != null && user.Username != "")
                 {
                     var authClaims = new List<Claim>
                     {
