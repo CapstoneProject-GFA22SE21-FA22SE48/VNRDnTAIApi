@@ -7,6 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BusinessObjectLibrary\BusinessObjectLibrary.csproj" />
     <ProjectReference Include="..\DTOsLibrary\DTOsLibrary.csproj" />
+    <ProjectReference Include="..\VNRDnTAILibrary\VNRDnTAILibrary.csproj" />
   </ItemGroup>
 
 </Project>
