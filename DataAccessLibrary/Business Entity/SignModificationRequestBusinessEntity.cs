@@ -1,4 +1,5 @@
 ﻿using BusinessObjectLibrary;
+using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -43,6 +44,8 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<SignModificationRequest> AddSignModificationRequest(SignModificationRequest signModificationRequest)
         {
             signModificationRequest.Id = Guid.NewGuid();
+            signModificationRequest.Status = (int)Status.Pending;
+            signModificationRequest.CreatedDate = DateTime.Now;
             signModificationRequest.IsDeleted = false;
             await work.SignModificationRequests.AddAsync(signModificationRequest);
             await work.Save();

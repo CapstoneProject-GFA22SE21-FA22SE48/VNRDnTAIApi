@@ -314,10 +314,6 @@ namespace BusinessObjectLibrary
 
                 entity.Property(e => e.ImageUrl).HasMaxLength(500);
 
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasMaxLength(10);
-
                 entity.HasOne(d => d.QuestionCategory)
                     .WithMany(p => p.Questions)
                     .HasForeignKey(d => d.QuestionCategoryId)
