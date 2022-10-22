@@ -37,7 +37,6 @@ namespace DataAccessLibrary.Business_Entity
                                                     select new QuestionDTO
                                                     {
                                                         Id = question.Id,
-                                                        Name = question.Name,
                                                         Content = question.Content,
                                                         ImageUrl = question.ImageUrl,
                                                         TestCategoryId = question.TestCategoryId,
@@ -66,7 +65,7 @@ namespace DataAccessLibrary.Business_Entity
                         && question.Status == (int)Status.Active
                         && question.TestCategoryId.ToString().Equals(testCatId.ToString())
                         && question.QuestionCategoryId.ToString().Equals(questionCategoryId.ToString())
-                        ).OrderBy(u => int.Parse(u.Name.Split(" ")[1]))
+                        )
                         //.Skip(25 * separator).Take(25)
                         ;
             return res;
