@@ -1,5 +1,6 @@
 ﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +16,21 @@ namespace DataAccessLibrary.Business_Entity
             this.work = work;
         }
 
-        public async Task<IEnumerable<QuestionCategory>> GetQuestionCategoriesByTestCategoryId(Guid testCategoryId)
+        public async Task<IEnumerable<QuestionCategoryDTO>> GetQuestionCategoriesByTestCategoryId(Guid testCategoryId)
         {
-            return (await work.QuestionCategories.GetAllAsync()).Where(q => !q.IsDeleted && q.TestCategoryId == testCategoryId);
+            List<QuestionCategoryDTO> res = new List<QuestionCategoryDTO>();
+            await work.Questions.GetAllAsync();
+            List<QuestionCategory> qcs = (await work.QuestionCategories.GetAllAsync()).Where(q => !q.IsDeleted && q.TestCategoryId == testCategoryId).ToList();
+            foreach (var qc in qcs)
+            {
+                QuestionCategoryDTO dto = new QuestionCategoryDTO();
+                dto.Id = qc.Id;
+                dto.Name = qc.Name;
+                dto.TestCategoryId = qc.TestCategoryId;
+                dto.NoOfQuestion = qc.Questions.ToList().Count;
+                res.Add(dto);
+            }
+            return res;
         }
     }
 }

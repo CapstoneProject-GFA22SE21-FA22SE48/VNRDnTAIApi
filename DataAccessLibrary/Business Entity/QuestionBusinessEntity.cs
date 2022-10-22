@@ -12,6 +12,7 @@ namespace DataAccessLibrary.Business_Entity
     public class QuestionBusinessEntity
     {
         private IUnitOfWork work;
+        public static Random RandomGen = new Random();
         public QuestionBusinessEntity(IUnitOfWork work)
         {
             this.work = work;
@@ -58,22 +59,58 @@ namespace DataAccessLibrary.Business_Entity
         //    return res;
         //}
 
-        public async Task<IEnumerable<Question>> GetStudySetByCategoryAndSeparator(string testCatId, int separator)
+        public async Task<IEnumerable<Question>> GetStudySetByCategoryAndSeparator(string testCatId, string questionCategoryId, int separator)
         {
             var res = (await work.Questions.GetAllAsync(nameof(Question.Answers)))
                 .Where(question => !question.IsDeleted
                         && question.Status == (int)Status.Active
-                        && question.TestCategoryId.ToString().Equals(testCatId.ToString())).OrderBy(u => int.Parse(u.Name.Split(" ")[1])).Skip(25 * separator).Take(25);
+                        && question.TestCategoryId.ToString().Equals(testCatId.ToString())
+                        && question.QuestionCategoryId.ToString().Equals(questionCategoryId.ToString())
+                        ).OrderBy(u => int.Parse(u.Name.Split(" ")[1]))
+                        //.Skip(25 * separator).Take(25)
+                        ;
             return res;
         }
 
         //***
         public async Task<IEnumerable<Question>> GetRandomTestSetByCategory(string testCatId)
         {
-            var res = (await work.Questions.GetAllAsync(nameof(Question.Answers)))
-                .Where(question => !question.IsDeleted
-                        && question.Status == (int)Status.Active
-                        && question.TestCategoryId.ToString().Equals(testCatId.ToString())).OrderBy(r => Guid.NewGuid()).Take(25);
+            List<Question> res = new List<Question>();
+
+            var noOfQuestionCat = 7;
+
+            //Get noOfQuestionCat by testCat
+
+            double rate = 25 / noOfQuestionCat;
+            var qs = (await work.Questions.GetAllAsync(nameof(Question.Answers)))
+                .Where(question => !question.IsDeleted);
+            var qcs = (await work.QuestionCategories.GetAllAsync()).Where(qc => !qc.IsDeleted);
+
+            foreach (var qc in qcs)
+            {
+                if (RandomGen.NextDouble() < (double)(4 / noOfQuestionCat))
+                {
+                    rate = Math.Ceiling(rate);
+                }
+                else
+                {
+                    rate = Math.Floor(rate);
+                }
+                res.AddRange(qc.Questions.OrderBy(x => Guid.NewGuid()).Take((int)rate));
+            }
+
+            if (res.Count > 25)
+            {
+                while (res.Count > 25) res.RemoveAt(res.Count - 1);
+            }
+            else if (res.Count < 25)
+            {
+                res.AddRange(qs.Where(q => !q.IsDeleted && !res.Contains(q)).OrderBy(x => Guid.NewGuid()).Take(25 - res.Count));
+            }
+            foreach (var question in res)
+            {
+                question.QuestionCategory = null;
+            }
             return res;
         }
         public async Task<Question> GetQuestionAsync(Guid id)

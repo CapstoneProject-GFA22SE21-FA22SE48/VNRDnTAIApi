@@ -1,6 +1,7 @@
 ﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -22,9 +23,9 @@ namespace VNRDnTAIApi.Controllers
         }
 
         [HttpGet("GetQuestionCategoriesByTestCategoryId/{testCategoryId}")]
-        [ProducesResponseType(typeof(IEnumerable<QuestionCategory>), 200)]
+        [ProducesResponseType(typeof(IEnumerable<QuestionCategoryDTO>), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<QuestionCategory>>> GetQuestionCategoriesByTestCategoryId(Guid testCategoryId)
+        public async Task<ActionResult<IEnumerable<QuestionCategoryDTO>>> GetQuestionCategoriesByTestCategoryId(Guid testCategoryId)
         {
             try
             {

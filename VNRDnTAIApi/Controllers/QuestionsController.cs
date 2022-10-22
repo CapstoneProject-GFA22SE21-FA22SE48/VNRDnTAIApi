@@ -41,11 +41,11 @@ namespace VNRDnTAIApi.Controllers
         [HttpGet("GetStudySetByCategoryAndSeparator")]
         [ProducesResponseType(typeof(IEnumerable<Question>), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<Question>>> GetStudySetByCategoryAndSeparator([FromQuery] string categoryId, [FromQuery] int separator)
+        public async Task<ActionResult<IEnumerable<Question>>> GetStudySetByCategoryAndSeparator([FromQuery] string categoryId, [FromQuery] string questionCategoryId,[FromQuery] int separator)
         {
             try
             {
-                return StatusCode(200, await _entity.GetStudySetByCategoryAndSeparator(categoryId, separator));
+                return StatusCode(200, await _entity.GetStudySetByCategoryAndSeparator(categoryId, questionCategoryId, separator));
             }
             catch (Exception ex)
             {
