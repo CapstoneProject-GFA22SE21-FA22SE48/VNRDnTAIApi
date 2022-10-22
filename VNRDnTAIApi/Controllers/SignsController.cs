@@ -53,6 +53,22 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
+        // GET: api/Signs/AssignedSigns/Scribes/5
+        [HttpGet("AssignedSigns/Scribes/{scribeId}")]
+        [ProducesResponseType(typeof(IEnumerable<Sign>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<Sign>>> GetScribeAssignedSigns(Guid scribeId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetScribeAssignedSignsAsync(scribeId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         // GET: api/Signs/5
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Sign), 200)]
@@ -99,7 +115,7 @@ namespace VNRDnTAIApi.Controllers
         {
             try
             {
-                return StatusCode(201, await _entity.AddSign(sign));
+                return StatusCode(201, await _entity.AddSignForROM(sign));
             }
             catch (Exception ex)
             {

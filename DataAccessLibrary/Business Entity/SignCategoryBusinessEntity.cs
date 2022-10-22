@@ -3,7 +3,6 @@ using DataAccessLibrary.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Business_Entity
@@ -26,6 +25,21 @@ namespace DataAccessLibrary.Business_Entity
                 .Where(signCategory => !signCategory.IsDeleted && signCategory.Id.Equals(id))
                 .FirstOrDefault();
         }
+
+        public async Task<IEnumerable<SignCategory>> GetScribeAssignedSignCategoriesAsync(Guid scribeId)
+        {
+            IEnumerable<SignCategory> signCategorys = from assignedSignCategory in
+                                          (await work.AssignedSignCategories.GetAllAsync())
+                                          .Where(asc => !asc.IsDeleted && asc.ScribeId == scribeId)
+                                                      join signCategory in (await work.SignCategories.GetAllAsync())
+                                                                                   .Where(sc => !sc.IsDeleted)
+                                                      on assignedSignCategory.SignCategoryId equals signCategory.Id
+
+                                                      select signCategory;
+
+            return signCategorys;
+        }
+
         public async Task<SignCategory> AddSignCategory(SignCategory signCategory)
         {
             signCategory.Id = Guid.NewGuid();
