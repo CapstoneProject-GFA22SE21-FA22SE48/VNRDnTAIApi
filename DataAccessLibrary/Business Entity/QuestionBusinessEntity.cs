@@ -51,14 +51,19 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<IEnumerable<Question>> GetRandomTestSetByCategory(string testCatId)
         {
             List<Question> res = new List<Question>();
-            double rate = 25 / 7;
+
+            var noOfQuestionCat = 7;
+
+            //Get noOfQuestionCat by testCat
+
+            double rate = 25 / noOfQuestionCat;
             var qs = (await work.Questions.GetAllAsync(nameof(Question.Answers)))
                 .Where(question => !question.IsDeleted);
             var qcs = (await work.QuestionCategories.GetAllAsync()).Where(qc => !qc.IsDeleted);
 
             foreach (var qc in qcs)
             {
-                if (RandomGen.NextDouble() < (double)(4 / 7))
+                if (RandomGen.NextDouble() < (double)(4 / noOfQuestionCat))
                 {
                     rate = Math.Ceiling(rate);
                 }
