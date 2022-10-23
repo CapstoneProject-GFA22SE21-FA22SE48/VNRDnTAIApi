@@ -22,29 +22,30 @@ namespace DataAccessLibrary.Business_Entity
             //return (await work.Questions.GetAllAsync(nameof(Question.Answers)))
             //    .Where(question => !question.IsDeleted && question.Status == (int)Status.Active)
             //    .OrderBy(u => int.Parse(u.Name.Split(" ")[1]));
-            IEnumerable<QuestionDTO> questionDTOs = from assignedQuestionCategory in (await work.AssignedQuestionCategories.GetAllAsync())
+            IEnumerable<QuestionDTO> questionDTOs =
+                from assignedQuestionCategory in (await work.AssignedQuestionCategories.GetAllAsync())
                                                     .Where(aqc => !aqc.IsDeleted && aqc.ScribeId == scribeId)
-                                                    join questionCategory in (await work.QuestionCategories.GetAllAsync())
-                                                    .Where(qc => !qc.IsDeleted)
-                                                    on assignedQuestionCategory.QuestionCategoryId equals questionCategory.Id
-                                                    join question in (await work.Questions.GetAllAsync())
-                                                    .Where(question => !question.IsDeleted && question.Status == (int)Status.Active)
-                                                    on questionCategory.Id equals question.QuestionCategoryId
-                                                    join testCategory in (await work.TestCategories.GetAllAsync())
-                                                    .Where(tc => !tc.IsDeleted)
-                                                    on question.TestCategoryId equals testCategory.Id
+                join questionCategory in (await work.QuestionCategories.GetAllAsync())
+                .Where(qc => !qc.IsDeleted)
+                on assignedQuestionCategory.QuestionCategoryId equals questionCategory.Id
+                join question in (await work.Questions.GetAllAsync())
+                .Where(question => !question.IsDeleted && question.Status == (int)Status.Active)
+                on questionCategory.Id equals question.QuestionCategoryId
+                join testCategory in (await work.TestCategories.GetAllAsync())
+                .Where(tc => !tc.IsDeleted)
+                on question.TestCategoryId equals testCategory.Id
 
-                                                    select new QuestionDTO
-                                                    {
-                                                        Id = question.Id,
-                                                        Content = question.Content,
-                                                        ImageUrl = question.ImageUrl,
-                                                        TestCategoryId = question.TestCategoryId,
-                                                        TestCategoryName = testCategory.Name,
-                                                        QuestionCategoryId = question.QuestionCategoryId,
-                                                        QuestionCategoryName = questionCategory.Name
-                                                    };
-            return questionDTOs.OrderBy(u => int.Parse(u.Name.Split(" ")[1]));
+                select new QuestionDTO
+                {
+                    Id = question.Id,
+                    Content = question.Content,
+                    ImageUrl = question.ImageUrl,
+                    TestCategoryId = question.TestCategoryId,
+                    TestCategoryName = testCategory.Name,
+                    QuestionCategoryId = question.QuestionCategoryId,
+                    QuestionCategoryName = questionCategory.Name
+                };
+            return questionDTOs;
         }
 
         //public async Task<IEnumerable<Question> GetAllStudySets(string testCatId) //questioncate
