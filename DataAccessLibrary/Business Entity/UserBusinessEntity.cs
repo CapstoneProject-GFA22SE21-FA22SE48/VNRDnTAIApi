@@ -27,7 +27,7 @@ namespace DataAccessLibrary.Business_Entity
         {
             var user = (await work.Users.GetAllAsync())
                 .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.MEMBER);
-            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
+            return user.OrderBy(u => u.Username);
         }
 
         public async Task<IEnumerable<User>> GetMembersByUserNameAsync(string keywordUserName)
@@ -189,7 +189,7 @@ namespace DataAccessLibrary.Business_Entity
 
         public async Task<User> RegisterMember(string username, string password, string email)
         {
-            User user  = new User();
+            User user = new User();
             user.Id = Guid.NewGuid();
             user.CreatedDate = DateTime.Now;
             user.Username = username;
@@ -216,7 +216,7 @@ namespace DataAccessLibrary.Business_Entity
             if (user == null)
             {
                 string password = StringUtils.GenerateRandom(12);
-        
+
                 user = await RegisterMember(email, password, email);
             }
             return user;
