@@ -2,6 +2,7 @@
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
+using DTOsLibrary.SearchLaw;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -70,14 +71,14 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        [HttpGet("GetSectionListByQuery")]
-        [ProducesResponseType(typeof(Section), 200)]
+        [HttpGet("GetSearchListByQuery")]
+        [ProducesResponseType(typeof(SearchLawDTO), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<Section>> GetSectionListByQuery(string query)
+        public async Task<ActionResult<SearchLawDTO>> GetSearchListByQuery([FromQuery] string query)
         {
             try
             {
-                return StatusCode(200, await _entity.GetSectionListByQuery(query));
+                return StatusCode(200, await _entity.GetSearchListByQuery(query));
             }
             catch (Exception ex)
             {

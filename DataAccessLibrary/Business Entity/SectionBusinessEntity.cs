@@ -3,10 +3,12 @@ using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
 using DTOsLibrary.CreateNewLaw;
+using DTOsLibrary.SearchLaw;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static VNRDnTAILibrary.Utilities.StringUtils;
 
 namespace DataAccessLibrary.Business_Entity
 {
@@ -68,13 +70,55 @@ namespace DataAccessLibrary.Business_Entity
             section.Paragraphs = paragraphs;
             return section;
         }
-        public async Task<IEnumerable<Section>> GetSectionListByQuery(string query)
+
+        public async Task<IEnumerable<SearchLawDTO>> GetSearchListByQuery(string query)
         {
-            return (await work.Sections.GetAllAsync())
-                .Where(section => !section.IsDeleted
-                    && section.Description.ToLower().Contains(query.Trim().ToLower().Normalize())
-                    && section.Status == (int)Status.Active)
+            query = normaliseVietnamese(query);
+            var res = new List<SearchLawDTO>();
+
+            var paragraphList = (await work.Paragraphs.GetAllAsync(nameof(Paragraph.Section)))
+                .Where(paragraph => !paragraph.IsDeleted
+                    && (normaliseVietnamese(paragraph.Description).Contains(query) || normaliseVietnamese(paragraph.Name).Contains(query))
+                    && paragraph.Status == (int)Status.Active
+                    && !paragraph.IsDeleted)
                 .ToList();
+
+            foreach (var paragraph in paragraphList)
+            {
+                res.Add(new SearchLawDTO
+                {
+                    ParagraphDesc = paragraph.Description,
+                    SectionDesc = paragraph.Section.Description,
+                    MaxPenalty = paragraph.Section.MaxPenalty.ToString(),
+                    MinPenalty = paragraph.Section.MinPenalty.ToString(),
+                    AdditionalPenalty = paragraph.AdditionalPenalty != null ? paragraph.AdditionalPenalty.ToString() : "",
+                });
+            }
+
+            if (paragraphList.Count == 0)
+            {
+                var sectionsList = (await work.Sections.GetAllAsync())
+                .Where(section => !section.IsDeleted
+                    && (normaliseVietnamese(section.Description).Contains(query)
+                    || normaliseVietnamese(section.Name).Contains(query))
+                    && section.Status == (int)Status.Active
+                    && !section.IsDeleted)
+                .ToList();
+
+                foreach (var section in sectionsList)
+                {
+                    res.Add(new SearchLawDTO
+                    {
+                        ParagraphDesc = "",
+                        SectionDesc = section.Description,
+                        MaxPenalty = section.MaxPenalty.ToString(),
+                        MinPenalty = section.MinPenalty.ToString(),
+                        AdditionalPenalty = "",
+                    });
+                }
+            }
+
+            return res;
         }
 
         //This new section is created for ROM of update, delete 
