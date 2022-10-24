@@ -19,8 +19,8 @@ namespace BusinessObjectLibrary
         public Guid VehicleCategoryId { get; set; }
         public Guid StatueId { get; set; }
         public string Description { get; set; }
-        public decimal? MinPenalty { get; set; }
-        public decimal? MaxPenalty { get; set; }
+        public decimal MinPenalty { get; set; }
+        public decimal MaxPenalty { get; set; }
         public int Status { get; set; }
         public bool IsDeleted { get; set; }
 
