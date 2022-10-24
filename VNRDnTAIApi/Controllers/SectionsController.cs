@@ -74,11 +74,11 @@ namespace VNRDnTAIApi.Controllers
         [HttpGet("GetSearchListByQuery")]
         [ProducesResponseType(typeof(SearchLawDTO), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<SearchLawDTO>> GetSearchListByQuery([FromQuery] string query)
+        public async Task<ActionResult<SearchLawDTO>> GetSearchListByQuery([FromQuery] string query, [FromQuery] string vehicleCategory)
         {
             try
             {
-                return StatusCode(200, await _entity.GetSearchListByQuery(query));
+                return StatusCode(200, await _entity.GetSearchListByQuery(query, vehicleCategory));
             }
             catch (Exception ex)
             {
