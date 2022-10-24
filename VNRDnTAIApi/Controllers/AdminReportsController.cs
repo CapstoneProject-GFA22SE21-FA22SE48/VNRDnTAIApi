@@ -1,6 +1,6 @@
 ﻿using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
-using DTOsLibrary;
+using DTOsLibrary.AdminReport;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;

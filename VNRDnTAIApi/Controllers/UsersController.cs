@@ -92,20 +92,13 @@ namespace VNRDnTAIApi.Controllers
 
         // GET: api/Users/Admins
         [HttpGet("Admins")]
-        [ProducesResponseType(typeof(IEnumerable<User>), 200)]
+        [ProducesResponseType(typeof(IEnumerable<AdminDTO>), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<User>>> GetAdmins(string? keywordUsername)
+        public async Task<ActionResult<IEnumerable<AdminDTO>>> GetAdmins()
         {
             try
             {
-                if (string.IsNullOrEmpty(keywordUsername))
-                {
-                    return StatusCode(200, await _entity.GetAdminsAsync());
-                }
-                else
-                {
-                    return StatusCode(200, await _entity.GetAdminsByUserNameAsync(keywordUsername));
-                }
+                return StatusCode(200, await _entity.GetAdminsAsync());
             }
             catch (Exception ex)
             {
@@ -267,7 +260,7 @@ namespace VNRDnTAIApi.Controllers
         {
             User user;
             try
-            {   
+            {
                 user = await _entity.GetUserAsyncByGmail(loginUserDTO.Email);
                 if (user == null)
                 {
@@ -277,8 +270,8 @@ namespace VNRDnTAIApi.Controllers
                     {
                         user = await _entity
                             .RegisterMember(
-                                loginUserDTO.Username, 
-                                loginUserDTO.Password, 
+                                loginUserDTO.Username,
+                                loginUserDTO.Password,
                                 loginUserDTO.Email
                             );
                         return StatusCode(201, user);
