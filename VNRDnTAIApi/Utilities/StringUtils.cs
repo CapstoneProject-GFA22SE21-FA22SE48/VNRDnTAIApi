@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace VNRDnTAIApi.Utilities
 {
@@ -13,5 +14,7 @@ namespace VNRDnTAIApi.Utilities
             return new string(Enumerable.Repeat(chars, length)
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
+
+        
     }
 }
