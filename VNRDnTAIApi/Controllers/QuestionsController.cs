@@ -1,6 +1,7 @@
 ﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -21,15 +22,15 @@ namespace VNRDnTAIApi.Controllers
             _entity = new QuestionBusinessEntity(work);
         }
 
-        // GET: api/Questions
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<Question>), 200)]
+        // GET: api/Questions/AssignedQuestions/Scribes/5
+        [HttpGet("AssignedQuestions/Scribes/{scribeId}")]
+        [ProducesResponseType(typeof(IEnumerable<QuestionDTO>), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<Question>>> GetQuestions()
+        public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetAssignedQuestions(Guid scribeId)
         {
             try
             {
-                return StatusCode(200, await _entity.GetQuestionsAsync());
+                return StatusCode(200, await _entity.GetAssigedQuestionsAsync(scribeId));
             }
             catch (Exception ex)
             {

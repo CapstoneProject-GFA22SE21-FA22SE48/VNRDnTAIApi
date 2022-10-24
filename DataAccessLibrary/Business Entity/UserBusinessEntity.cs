@@ -2,6 +2,7 @@
 using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
+using DTOsLibrary.AdminReport;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace DataAccessLibrary.Business_Entity
         {
             var user = (await work.Users.GetAllAsync())
                 .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.MEMBER);
-            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
+            return user.OrderBy(u => u.Username);
         }
 
         public async Task<IEnumerable<User>> GetMembersByUserNameAsync(string keywordUserName)
@@ -87,22 +88,29 @@ namespace DataAccessLibrary.Business_Entity
             return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
         }
 
-        public async Task<IEnumerable<User>> GetAdminsAsync()
+        public async Task<IEnumerable<AdminDTO>> GetAdminsAsync()
         {
-            var user = (await work.Users.GetAllAsync())
-                .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.ADMIN);
-            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
-        }
+            List<AdminDTO> admins =
+                (from admin in (await work.Users.GetAllAsync())
+                        .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.ADMIN)
+                 select new AdminDTO
+                 {
+                     Id = admin.Id,
+                     Username = admin.Username,
+                     PendingRequests = ""
+                 }).ToList();
 
-        public async Task<IEnumerable<User>> GetAdminsByUserNameAsync(string keywordUserName)
-        {
-            var user = (await work.Users.GetAllAsync())
-                .Where(
-                    user => !user.IsDeleted &&
-                    user.Role == (int)UserRoles.ADMIN &&
-                    user.Username.ToLower().Contains(keywordUserName.ToLower())
-                 );
-            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
+            IEnumerable<LawModificationRequest> lm = (await work.LawModificationRequests.GetAllAsync()).Where(lm => !lm.IsDeleted);
+            IEnumerable<SignModificationRequest> sm = (await work.SignModificationRequests.GetAllAsync()).Where(lm => !lm.IsDeleted);
+            IEnumerable<QuestionModificationRequest> qm = (await work.QuestionModificationRequests.GetAllAsync()).Where(lm => !lm.IsDeleted);
+            foreach (AdminDTO admin in admins)
+            {
+                admin.PendingRequests = (lm.Where(lm => lm.AdminId == admin.Id).Count()
+                    + sm.Where(sm => sm.AdminId == admin.Id).Count()
+                    + qm.Where(qm => qm.AdminId == admin.Id).Count()) + " yêu cầu đang chờ duyệt";
+            }
+
+            return admins.OrderBy(a => a.Username);
         }
 
         public async Task<User> GetUserAsync(Guid id)
@@ -189,7 +197,7 @@ namespace DataAccessLibrary.Business_Entity
 
         public async Task<User> RegisterMember(string username, string password, string email)
         {
-            User user  = new User();
+            User user = new User();
             user.Id = Guid.NewGuid();
             user.CreatedDate = DateTime.Now;
             user.Username = username;
@@ -216,7 +224,7 @@ namespace DataAccessLibrary.Business_Entity
             if (user == null)
             {
                 string password = StringUtils.GenerateRandom(12);
-        
+
                 user = await RegisterMember(email, password, email);
             }
             return user;
