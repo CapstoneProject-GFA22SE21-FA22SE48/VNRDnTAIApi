@@ -80,6 +80,10 @@ namespace DataAccessLibrary.Business_Entity
             var noOfQuestionCat = 7;
 
             //Get noOfQuestionCat by testCat
+            noOfQuestionCat = (await work.Questions.GetAllAsync()).GroupBy(g => new { g.TestCategoryId })
+                         .Select(g => g.First())
+                         .ToList()
+                         .Count();
 
             double rate = 25 / noOfQuestionCat;
             var qs = (await work.Questions.GetAllAsync(nameof(Question.Answers)))

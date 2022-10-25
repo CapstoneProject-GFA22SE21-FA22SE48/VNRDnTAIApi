@@ -2,6 +2,7 @@
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
+using DTOsLibrary.SearchLaw;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -63,6 +64,21 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.GetParagraphAsync(id));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("GetSearchParagraphDTOAsync")]
+        [ProducesResponseType(typeof(SearchLawDTO), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<SearchLawDTO>> GetSearchParagraphDTOAsync([FromQuery] Guid paragraphId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetSearchParagraphDTOAsync(paragraphId));
             }
             catch (Exception ex)
             {

@@ -86,6 +86,22 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
+        //GetSearchListByKeywordId
+        [HttpGet("GetSearchListByKeywordId")]
+        [ProducesResponseType(typeof(SearchLawDTO), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<SearchLawDTO>> GetSearchListByKeywordId([FromQuery] Guid keywordId, [FromQuery] string vehicleCategory)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetSearchListByKeywordId(keywordId, vehicleCategory));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         // PUT: api/Sections/5
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(Section), 200)]

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BusinessObjectLibrary;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,11 +9,13 @@ namespace DTOsLibrary.SearchLaw
 {
     public class SearchLawDTO
     {
-        public String SectionDesc { get; set; }
-        public String? ParagraphDesc { get; set; }
-        public String MinPenalty { get; set; }
-        public String MaxPenalty { get; set; }
-        public String AdditionalPenalty { get; set; }
+        public string StatueDesc { get; set; }
+        public string SectionDesc { get; set; }
+        public string? ParagraphDesc { get; set; }
+        public string MinPenalty { get; set; }
+        public string MaxPenalty { get; set; }
+        public string AdditionalPenalty { get; set; }
+        public List<SearchParagraphDTO> ReferenceParagraph { get; set; }
 
     }
 }
