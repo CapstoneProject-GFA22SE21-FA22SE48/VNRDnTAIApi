@@ -4,7 +4,6 @@ namespace DTOsLibrary.ManageROM
 {
     public class QuestionRomDTO
     {
-        public Guid QuestionRomId { get; set; }
         public Guid ModifyingQuestionId { get; set; }
         public string ModifyingQuestionContent { get; set; }
         public Guid? ModifiedQuestionId { get; set; }
@@ -14,5 +13,7 @@ namespace DTOsLibrary.ManageROM
         public string Username { get; set; }
         public int OperationType { get; set; }
         public int Status { get; set; }
+        public DateTime CreatedDate { get; set; }
+
     }
 }
