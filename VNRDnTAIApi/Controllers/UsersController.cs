@@ -198,6 +198,50 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
+        // PUT: api/Users/Scribes/Deactivate
+        [HttpPut("Scribes/Deactivate/{id}")]
+        [ProducesResponseType(typeof(User), 200)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> DeactivateScribe(Guid id, User scribe)
+        {
+            if (id != scribe.Id)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                return StatusCode(200, await _entity.DeactivateScribe(scribe));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // PUT: api/Users/Scribes/ReEnable
+        [HttpPut("Scribes/ReEnable/{id}")]
+        [ProducesResponseType(typeof(User), 200)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> ReEnableScribe(Guid id, User scribe)
+        {
+            if (id != scribe.Id)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                return StatusCode(200, await _entity.ReEnableScribe(scribe));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         // PUT: api/Users/Members/ReEnable
         [HttpPut("Members/ReEnable/{id}")]
         [ProducesResponseType(typeof(User), 200)]
