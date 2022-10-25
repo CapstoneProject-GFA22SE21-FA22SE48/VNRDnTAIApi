@@ -120,7 +120,8 @@ namespace DataAccessLibrary.Business_Entity
                     Username = lawRom.Scribe != null ? lawRom.Scribe.Username :
                     (users.Where(u => u.Id == lawRom.ScribeId).FirstOrDefault().Username),
                     OperationType = lawRom.OperationType,
-                    Status = lawRom.Status
+                    Status = lawRom.Status,
+                    CreatedDate = lawRom.CreatedDate
                 });
             }
 
@@ -139,7 +140,7 @@ namespace DataAccessLibrary.Business_Entity
                     ModifyingSignName = signRom.ModifyingSignId != null ?
                     (signs.Where(s => s.Id == signRom.ModifyingSignId).FirstOrDefault()).Name : null,
                     ModifiedSignId = signRom.ModifiedSignId != null ? signRom.ModifiedSignId : null,
-                    ModifiedSignName = signRom.ModifiedSign != null ?
+                    ModifiedSignName = signRom.ModifiedSignId != null ?
                     (signs.Where(s => s.Id == signRom.ModifiedSignId).FirstOrDefault()).Name : null,
 
                     ModifyingGpssignId = signRom.ModifyingGpssignId != null ? signRom.ModifyingGpssignId : null,
@@ -157,7 +158,8 @@ namespace DataAccessLibrary.Business_Entity
                     (users.Where(u => u.Id == signRom.UserId).FirstOrDefault().Username) :
                     (users.Where(u => u.Id == signRom.ScribeId).FirstOrDefault().Username),
                     OperationType = signRom.OperationType,
-                    Status = signRom.Status
+                    Status = signRom.Status,
+                    CreatedDate = signRom.CreatedDate
                 });
             }
 
@@ -181,7 +183,8 @@ namespace DataAccessLibrary.Business_Entity
                     Username = questionRom.Scribe != null ? questionRom.Scribe.Username :
                     (users.Where(u => u.Id == questionRom.ScribeId).FirstOrDefault().Username),
                     OperationType = questionRom.OperationType,
-                    Status = questionRom.Status
+                    Status = questionRom.Status,
+                    CreatedDate = questionRom.CreatedDate
                 });
             }
 
@@ -201,7 +204,8 @@ namespace DataAccessLibrary.Business_Entity
                     PromotingAdminId = userRom.PromotingAdminId,
                     PromotingAdminUsername = userRom.PromotingAdmin != null ?
                     userRom.PromotingAdmin.Username : users.Where(u => u.Id == userRom.PromotingAdminId).FirstOrDefault().Username,
-                    Status = userRom.Status
+                    Status = userRom.Status,
+                    CreatedDate = userRom.CreatedDate
                 });
             }
 

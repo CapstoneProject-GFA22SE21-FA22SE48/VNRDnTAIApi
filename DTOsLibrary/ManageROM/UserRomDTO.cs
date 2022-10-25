@@ -11,5 +11,7 @@ namespace DTOsLibrary.ManageROM
         public string PromotingAdminUsername { get; set; }
         public int OperationType { get; set; }
         public int Status { get; set; }
+        public DateTime CreatedDate { get; set; }
+
     }
 }

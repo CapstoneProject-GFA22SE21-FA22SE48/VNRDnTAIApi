@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BusinessObjectLibrary.Predefined_constants
+﻿namespace BusinessObjectLibrary.Predefined_constants
 {
     public enum Status
     {
@@ -12,8 +6,9 @@ namespace BusinessObjectLibrary.Predefined_constants
         Unclaimed = 1,
         Claimed = 2,
         Confirmed = 3,
-        Denied = 4,
-        Active = 5,
-        Deactivated = 6
+        Approved = 4,
+        Denied = 5,
+        Active = 6,
+        Deactivated = 7
     }
 }
