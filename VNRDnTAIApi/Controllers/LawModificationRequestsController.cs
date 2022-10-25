@@ -1,10 +1,8 @@
 ﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary.ManageROM;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace VNRDnTAIApi.Controllers
 {
@@ -30,6 +28,22 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.GetLawModificationRequestsAsync());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // GET: api/LawModificationRequests/AdminROMList/5
+        [HttpGet("AdminROMList/{adminId}")]
+        [ProducesResponseType(typeof(AdminRomListDTO), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<AdminRomListDTO>> GetAdminRomList(Guid adminId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetAdminRomList(adminId));
             }
             catch (Exception ex)
             {
