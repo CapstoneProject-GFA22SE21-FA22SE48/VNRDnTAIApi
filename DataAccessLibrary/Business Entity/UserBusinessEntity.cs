@@ -60,7 +60,7 @@ namespace DataAccessLibrary.Business_Entity
         {
             var user = (await work.Users.GetAllAsync())
                 .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.SCRIBE);
-            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
+            return user.OrderBy(u => u.Username);
         }
 
         public async Task<IEnumerable<User>> GetScribesByUserNameAsync(string keywordUserName)
@@ -166,6 +166,26 @@ namespace DataAccessLibrary.Business_Entity
             }
             await work.Save();
             return deactivatingMember;
+
+        }
+
+        //Deactivate Scribe
+        public async Task<User> DeactivateScribe(User scribe)
+        {
+            User deactivatingScribe = await work.Users.GetAsync(scribe.Id);
+            deactivatingScribe.Status = (int)Status.Deactivated;
+            await work.Save();
+            return deactivatingScribe;
+
+        }
+
+        //Re Enable Scribe
+        public async Task<User> ReEnableScribe(User scribe)
+        {
+            User reEnablingScribe = await work.Users.GetAsync(scribe.Id);
+            reEnablingScribe.Status = (int)Status.Active;
+            await work.Save();
+            return reEnablingScribe;
 
         }
 
