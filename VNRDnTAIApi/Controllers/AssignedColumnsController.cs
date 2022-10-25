@@ -1,6 +1,7 @@
 ﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary.ManageTasks;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -45,6 +46,22 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.GetAssignedColumnsByScribeIdAsync(scribeId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        //-----------------------------------------
+        [HttpGet("Tasks")]
+        [ProducesResponseType(typeof(IEnumerable<TaskDTO>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<TaskDTO>>> GetTask()
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetTasksAsync());
             }
             catch (Exception ex)
             {
