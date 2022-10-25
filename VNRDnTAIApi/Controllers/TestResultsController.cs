@@ -141,5 +141,22 @@ namespace VNRDnTAIApi.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        // DELETE: api/TestResults/5
+        [HttpGet("{userId}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetIncorrectQuestionsOfTestResults(Guid id)
+        {
+            try
+            {
+                await _entity.RemoveTestResult(id);
+                return StatusCode(204);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }

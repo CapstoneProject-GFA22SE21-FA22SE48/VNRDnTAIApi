@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using VNRDnTAILibrary;
 
 namespace VNRDnTAIApi.Controllers
@@ -274,15 +275,27 @@ namespace VNRDnTAIApi.Controllers
                                 loginUserDTO.Password,
                                 loginUserDTO.Email
                             );
-                        return StatusCode(201, user);
+
+                        if (user != null)
+                        {
+                            return StatusCode(201, user);
+                        }
+                        else
+                        {
+                            return StatusCode(400, "Có lỗi xảy ra.");
+                        }
                     }
-                    return StatusCode(409, "This username has already registered.");
+                    return StatusCode(409, "Username đã được đăng ký.");
                 }
-                return StatusCode(409, "This email has already registered.");
+                return StatusCode(409, "Email đã được đăng ký.");
+            }
+            catch (ArgumentException ae)
+            {
+                return StatusCode(400,"Có lỗi xảy ra.\n" + ae.Message);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, "Có lỗi xảy ra. Vui lòng thử lại sau.\n"+ ex.Message);
             }
         }
 
@@ -364,24 +377,25 @@ namespace VNRDnTAIApi.Controllers
             User user = null;
             try
             {
-                if (loginUserDTO.Username != null && loginUserDTO.Password != null
+                if (loginUserDTO.Username != null && loginUserDTO.Password != null 
                     && loginUserDTO.Username.Length > 0 && loginUserDTO.Password.Length > 0)
                 {
                     user = await _entity
                     .LoginMobile(loginUserDTO.Username, loginUserDTO.Password);
                 }
                 // second chances
-                if (user == null && loginUserDTO.Email != null && loginUserDTO.Email.Length > 0)
+                else if (loginUserDTO.Email != null && loginUserDTO.Email.Length > 0)
                 {
-                    user = await _entity.LoginWithEmail(loginUserDTO.Email);
+                    user = await _entity.LoginWithGmail(loginUserDTO.Email);
                 }
 
-                if (user != null && user.Username != "")
+                if (user != null)
                 {
                     var authClaims = new List<Claim>
                     {
                         new Claim("Id", user.Id.ToString()),
-                        new Claim("Username", user.Username),
+                        new Claim("Username", String.IsNullOrEmpty(user.Username) ? "" : user.Username),
+                        new Claim("Email", String.IsNullOrEmpty(user.Gmail) ? "" : user.Gmail),
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                     };
 
@@ -419,6 +433,140 @@ namespace VNRDnTAIApi.Controllers
             catch
             {
                 return Unauthorized("Có lỗi xảy ra. Vui lòng thử lại sau.");
+            }
+        }
+
+        //PUT api/Users/5/ChangePassword
+        [HttpPut("{id}/ChangePassword")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [AllowAnonymous]
+        public async Task<IActionResult> ChangePassword(Guid id, string oldPassword, string newPassword)
+        {
+            User user = null;
+            try
+            {
+                user = await _entity.GetUserAsync(id);
+                if (user == null)
+                {
+                    return StatusCode(404, "Không tim thấy người dùng.");
+                }
+                else if (!oldPassword.Equals(user.Password))
+                {
+                    return StatusCode(403, "Mật khẩu hiện tại không đúng.");
+                } 
+                else
+                {
+                    user.Password = newPassword;
+                    user = await _entity.UpdateUser(user);
+                    if (user != null)
+                    {
+                        var authClaims = new List<Claim>
+                        {
+                            new Claim("Id", user.Id.ToString()),
+                            new Claim("Username", String.IsNullOrEmpty(user.Username) ? "": user.Username),
+                            new Claim("Email", String.IsNullOrEmpty(user.Gmail)? "": user.Gmail),
+                            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                        };
+
+                        var authSignature = new SymmetricSecurityKey(
+                                Encoding.UTF8.GetBytes(VNRDnTAIConfiguration.Secret)
+                            );
+
+                        //Token generate
+                        var token = new JwtSecurityToken(
+                            issuer: VNRDnTAIConfiguration.JwtIssuer,
+                            audience: VNRDnTAIConfiguration.JwtAudience,
+                            //expires: DateTime.Now.AddHours(2),
+                            expires: DateTime.MaxValue,
+                            claims: authClaims,
+                            signingCredentials:
+                                new SigningCredentials(authSignature, SecurityAlgorithms.HmacSha256)
+                            );
+
+                        return StatusCode(200, new
+                        {
+                            token = new JwtSecurityTokenHandler().WriteToken(token),
+                        });
+                    }
+                    else
+                    {
+                        return StatusCode(405, "Cập nhật mật thất bại.");
+                    }
+                }
+            }
+            catch (ArgumentException ae)
+            {
+                return StatusCode(400, ae.Message);
+            }
+            catch (ApplicationException ae)
+            {
+                return StatusCode(500,ae.Message);
+            }
+        }
+
+        //PUT api/Users/ForgotPassword
+        [HttpPut("ForgotPassword")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(200)]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgotPassword([FromBody]LoginUserDTO newInfo)
+        {
+            User user = null;
+            try
+            {
+                user = await _entity.GetUserAsyncByGmail(newInfo.Email);
+                if (user == null)
+                {
+                    return StatusCode(404, "Không tim thấy người dùng.");
+                }
+                else
+                {
+                    user.Password = newInfo.Password;
+                    user = await _entity.UpdateUser(user);
+                    if (user != null)
+                    {
+                        var authClaims = new List<Claim>
+                        {
+                            new Claim("Id", user.Id.ToString()),
+                            new Claim("Username", String.IsNullOrEmpty(user.Username) ? "": user.Username),
+                            new Claim("Email", String.IsNullOrEmpty(user.Gmail)? "": user.Gmail),
+                            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                        };
+
+                        var authSignature = new SymmetricSecurityKey(
+                                Encoding.UTF8.GetBytes(VNRDnTAIConfiguration.Secret)
+                            );
+
+                        //Token generate
+                        var token = new JwtSecurityToken(
+                            issuer: VNRDnTAIConfiguration.JwtIssuer,
+                            audience: VNRDnTAIConfiguration.JwtAudience,
+                            //expires: DateTime.Now.AddHours(2),
+                            expires: DateTime.MaxValue,
+                            claims: authClaims,
+                            signingCredentials:
+                                new SigningCredentials(authSignature, SecurityAlgorithms.HmacSha256)
+                            );
+
+                        return StatusCode(200, new
+                        {
+                            token = new JwtSecurityTokenHandler().WriteToken(token),
+                        });
+                    }
+                    else
+                    {
+                        return StatusCode(405, "Cập nhật mật khẩu thất bại.");
+                    }
+                }
+            }
+            catch (ArgumentException ae)
+            {
+                return StatusCode(400, ae.Message);
+            }
+            catch (ApplicationException ae)
+            {
+                return StatusCode(500, ae.Message);
             }
         }
     }

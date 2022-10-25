@@ -122,14 +122,25 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<User> GetUserAsyncByUsername(string username)
         {
             return (await work.Users.GetAllAsync())
-                .Where(user => !user.IsDeleted && user.Username.Equals(username))
+                .Where(user => user.Username != null
+                    && (!user.IsDeleted && user.Username.Equals(username)))
                 .FirstOrDefault();
         }
         public async Task<User> GetUserAsyncByGmail(string gmail)
         {
             return (await work.Users.GetAllAsync())
-                .Where(user => !user.IsDeleted && user.Gmail.Equals(gmail))
+                .Where(user => user.Gmail != null
+                    && (!user.IsDeleted && user.Gmail.Equals(gmail)))
                 .FirstOrDefault();
+        }
+
+        public async Task<User> GetUserAsyncByInfo(string username, string gmail)
+        {
+            return (await work.Users.GetAllAsync())
+                .Where(user => 
+                    (user.Username != null && !user.IsDeleted && user.Username.Equals(username))
+                    || (user.Gmail != null && !user.IsDeleted && user.Gmail.Equals(gmail))
+                 ).FirstOrDefault();
         }
 
         public async Task<User> AddUser(User user)
@@ -195,19 +206,16 @@ namespace DataAccessLibrary.Business_Entity
                 .FirstOrDefault();
         }
 
-        public async Task<User> RegisterMember(string username, string password, string email)
+        public async Task<User> RegisterMember(string username, string password, string? email)
         {
             User user = new User();
             user.Id = Guid.NewGuid();
             user.CreatedDate = DateTime.Now;
             user.Username = username;
             user.Password = password;
-            if (!string.IsNullOrEmpty(email))
-            {
-                user.Gmail = email;
-            }
-            user.Role = (int)UserRoles.MEMBER;
+            user.Gmail = email;
             user.Status = 5;
+            user.Role = (int)UserRoles.MEMBER;
             user.IsDeleted = false;
 
             await work.Users.AddAsync(user);
@@ -216,16 +224,15 @@ namespace DataAccessLibrary.Business_Entity
             return user;
         }
 
-        public async Task<User> LoginWithEmail(string email)
+        public async Task<User> LoginWithGmail(string gmail)
         {
             User user = (await work.Users.GetAllAsync())
-                .Where((user) => !user.IsDeleted && user.Gmail == email)
+                .Where((user) => !user.IsDeleted && user.Gmail != null && user.Gmail == gmail)
                 .FirstOrDefault();
             if (user == null)
             {
-                string password = StringUtils.GenerateRandom(12);
-
-                user = await RegisterMember(email, password, email);
+                //string password = StringUtils.GenerateRandom(12);
+                return await RegisterMember(null, null, gmail);
             }
             return user;
         }
