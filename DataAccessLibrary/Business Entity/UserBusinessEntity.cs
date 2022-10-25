@@ -60,7 +60,7 @@ namespace DataAccessLibrary.Business_Entity
         {
             var user = (await work.Users.GetAllAsync())
                 .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.SCRIBE);
-            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
+            return user.OrderBy(u => u.Username);
         }
 
         public async Task<IEnumerable<User>> GetScribesByUserNameAsync(string keywordUserName)
