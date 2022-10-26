@@ -1,6 +1,7 @@
 ﻿using BusinessObjectLibrary;
 using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary;
 using DTOsLibrary.ManageROM;
 using System;
 using System.Collections.Generic;
@@ -220,11 +221,9 @@ namespace DataAccessLibrary.Business_Entity
             return adminRomListDTO;
         }
 
-        public async Task<dynamic> GetLawRomDetail(Guid lawRomId)
+        public async Task<LawModificationRequest> GetLawRomDetail(Guid lawRomId)
         {
             LawModificationRequest lawRom = (await work.LawModificationRequests.GetAsync(lawRomId));
-
-            IEnumerable<VehicleCategory> vehicleCategories = (await work.VehicleCategories.GetAllAsync());
 
             if (lawRom.ModifyingStatueId != null)
             {
@@ -239,6 +238,8 @@ namespace DataAccessLibrary.Business_Entity
             }
             else if (lawRom.ModifyingSectionId != null)
             {
+                IEnumerable<VehicleCategory> vehicleCategories = (await work.VehicleCategories.GetAllAsync());
+
                 lawRom.ModifyingSection = (await work.Sections.GetAllAsync())
                     .Where(s => s.Id == lawRom.ModifyingSectionId).FirstOrDefault();
 
@@ -249,7 +250,6 @@ namespace DataAccessLibrary.Business_Entity
                 //check if section rom create a section with paragraphs
                 List<Paragraph> sectionParagraphs = (await work.Paragraphs.GetAllAsync())
                     .Where(p => p.SectionId == lawRom.ModifyingSectionId).ToList();
-
                 if (sectionParagraphs != null && sectionParagraphs.Count() > 0)
                 {
                     lawRom.ModifyingSection.Paragraphs = sectionParagraphs;
@@ -270,13 +270,166 @@ namespace DataAccessLibrary.Business_Entity
                 lawRom.ModifyingParagraph = (await work.Paragraphs.GetAllAsync())
                     .Where(s => s.Id == lawRom.ModifyingParagraphId).FirstOrDefault();
 
+                //lawRom = (await GetParagraphROMDetailReference(lawRom.ModifyingParagraphId));
+
                 if (lawRom.ModifiedParagraphId != null)
                 {
                     lawRom.ModifiedParagraph = (await work.Paragraphs.GetAllAsync())
                     .Where(s => s.Id == lawRom.ModifiedParagraphId).FirstOrDefault();
+
+                    //lawRom.ModifiedParagraphReferences = (await GetParagraphROMDetailReference(lawRom.ModifiedParagraphId)).ReferenceParagraphs;
                 }
             }
             return lawRom;
+        }
+
+        public async Task<IEnumerable<ReferenceDTO>> GetParagraphROMDetailReference(Guid paragraphId)
+        {
+            IEnumerable<Paragraph> paragraphs = (await work.Paragraphs.GetAllAsync())
+                .Where(p => p.Id == paragraphId);
+            var tmpData1 = paragraphs.Join(
+                    (await work.References.GetAllAsync()),
+                    paragraph => paragraph.Id,
+                    reference => reference.ParagraphId,
+                    (paragraph, reference) => new
+                    {
+                        Id = paragraph.Id,
+                        SectionId = paragraph.SectionId,
+                        Name = paragraph.Name,
+                        Description = paragraph.Description,
+                        Status = paragraph.Status,
+                        AdditionalPenalty = paragraph.AdditionalPenalty,
+                        IsDeleted = paragraph.IsDeleted,
+                        ReferenceParagraphId = reference.ReferenceParagraphId,
+                        ReferenceParagraphIsExcluded = reference.IsExcluded
+                    }
+                    );
+
+            //Paragraph with reference
+            var tmpData2 = tmpData1.Join(
+                (await work.Paragraphs.GetAllAsync())
+                .Where(paragraph => !paragraph.IsDeleted
+                        && paragraph.Status == (int)Status.Active),
+                tmp1 => tmp1.ReferenceParagraphId,
+                paragraph => paragraph.Id,
+                (tmp1, paragraph) => new
+                {
+                    Id = tmp1.Id,
+                    SectionId = tmp1.SectionId,
+                    Name = tmp1.Name,
+                    Description = tmp1.Description,
+                    Status = tmp1.Status,
+                    AdditionalPenalty = tmp1.AdditionalPenalty,
+                    IsDeleted = tmp1.IsDeleted,
+
+                    ReferenceParagraphId = tmp1.ReferenceParagraphId,
+                    ReferenceParagraphName = paragraph.Name,
+                    ReferenceParagraphDesc = paragraph.Description,
+                    ReferenceParagraphIsExcluded = tmp1.ReferenceParagraphIsExcluded,
+
+                    ReferenceParagraphSectionId = paragraph.SectionId
+                }
+            );
+
+            //With section
+            var tmpData3 = tmpData2.Join(
+                (await work.Sections.GetAllAsync())
+                .Where(sc => !sc.IsDeleted && sc.Status == (int)Status.Active),
+                tmp2 => tmp2.ReferenceParagraphSectionId,
+                section => section.Id,
+                (tmp2, section) => new
+                {
+                    Id = tmp2.Id,
+                    SectionId = tmp2.SectionId,
+                    Name = tmp2.Name,
+                    Description = tmp2.Description,
+                    Status = tmp2.Status,
+                    AdditionalPenalty = tmp2.AdditionalPenalty,
+                    IsDeleted = tmp2.IsDeleted,
+
+                    ReferenceParagraphId = tmp2.ReferenceParagraphId,
+                    ReferenceParagraphName = tmp2.ReferenceParagraphName,
+                    ReferenceParagraphDesc = tmp2.ReferenceParagraphDesc,
+                    ReferenceParagraphIsExcluded = tmp2.ReferenceParagraphIsExcluded,
+
+                    ReferenceParagraphSectionId = tmp2.SectionId,
+                    ReferenceParagraphSectionName = section.Name,
+
+                    ReferenceParagraphSectionStatueId = section.StatueId
+                }
+                );
+
+            //With statue
+            var tmpData4 = tmpData3.Join(
+                (await work.Statues.GetAllAsync())
+                .Where(st => !st.IsDeleted && st.Status == (int)Status.Active),
+                tmp3 => tmp3.ReferenceParagraphSectionStatueId,
+                statue => statue.Id,
+                (tmp3, statue) => new
+                {
+                    Id = tmp3.Id,
+                    SectionId = tmp3.SectionId,
+                    Name = tmp3.Name,
+                    Description = tmp3.Description,
+                    Status = tmp3.Status,
+                    AdditionalPenalty = tmp3.AdditionalPenalty,
+                    IsDeleted = tmp3.IsDeleted,
+
+                    ReferenceParagraphId = tmp3.ReferenceParagraphId,
+                    ReferenceParagraphName = tmp3.ReferenceParagraphName,
+                    ReferenceParagraphDesc = tmp3.ReferenceParagraphDesc,
+                    ReferenceParagraphIsExcluded = tmp3.ReferenceParagraphIsExcluded,
+
+                    ReferenceParagraphSectionId = tmp3.SectionId,
+                    ReferenceParagraphSectionName = tmp3.ReferenceParagraphSectionName,
+
+                    ReferenceParagraphSectionStatueId = tmp3.ReferenceParagraphSectionStatueId,
+                    ReferenceParagraphSectionStatueName = statue.Name
+                }
+                );
+
+            ParagraphDTO paragraphDTO = null;
+            List<ReferenceDTO> referenceList = null;
+
+            foreach (var paragraph in paragraphs)
+            {
+                referenceList = new List<ReferenceDTO>();
+                foreach (var data in tmpData4)
+                {
+                    if (data.Id == paragraph.Id)
+                    {
+                        referenceList.Add(new ReferenceDTO
+                        {
+                            ReferenceParagraphId = data.ReferenceParagraphId,
+                            ReferenceParagraphName = data.ReferenceParagraphName,
+                            ReferenceParagraphDesc = data.ReferenceParagraphDesc,
+
+                            ReferenceParagraphSectionId = data.ReferenceParagraphSectionId,
+                            ReferenceParagraphSectionName = data.ReferenceParagraphSectionName,
+
+                            ReferenceParagraphSectionStatueId = data.ReferenceParagraphSectionStatueId,
+                            ReferenceParagraphSectionStatueName = data.ReferenceParagraphSectionStatueName,
+                            ReferenceParagraphIsExcluded = data.ReferenceParagraphIsExcluded,
+                        });
+                    }
+                }
+                paragraphDTO = new ParagraphDTO
+                {
+                    Id = paragraph.Id,
+                    SectionId = paragraph.SectionId,
+                    Name = paragraph.Name,
+                    Description = paragraph.Description,
+                    Status = paragraph.Status,
+                    AdditionalPenalty = paragraph.AdditionalPenalty,
+                    IsDeleted = paragraph.IsDeleted,
+
+                    ReferenceParagraphs = referenceList.OrderBy(r => int.Parse(r.ReferenceParagraphSectionStatueName.Split(" ")[1]))
+                    .ThenBy(r => int.Parse(r.ReferenceParagraphSectionName.Split(" ")[1]))
+                    .ThenBy(r => r.ReferenceParagraphName).ToList()
+                };
+            }
+
+            return paragraphDTO.ReferenceParagraphs;
         }
     }
 }
