@@ -220,5 +220,63 @@ namespace DataAccessLibrary.Business_Entity
             return adminRomListDTO;
         }
 
+        public async Task<dynamic> GetLawRomDetail(Guid lawRomId)
+        {
+            LawModificationRequest lawRom = (await work.LawModificationRequests.GetAsync(lawRomId));
+
+            IEnumerable<VehicleCategory> vehicleCategories = (await work.VehicleCategories.GetAllAsync());
+
+            if (lawRom.ModifyingStatueId != null)
+            {
+                lawRom.ModifyingStatue = (await work.Statues.GetAllAsync())
+                    .Where(s => s.Id == lawRom.ModifyingStatueId).FirstOrDefault();
+
+                if (lawRom.ModifiedStatueId != null)
+                {
+                    lawRom.ModifiedStatue = (await work.Statues.GetAllAsync())
+                    .Where(s => s.Id == lawRom.ModifiedStatueId).FirstOrDefault();
+                }
+            }
+            else if (lawRom.ModifyingSectionId != null)
+            {
+                lawRom.ModifyingSection = (await work.Sections.GetAllAsync())
+                    .Where(s => s.Id == lawRom.ModifyingSectionId).FirstOrDefault();
+
+                lawRom.ModifyingSection.VehicleCategory = vehicleCategories
+                    .Where(v => v.Id == lawRom.ModifyingSection.VehicleCategoryId).FirstOrDefault();
+                lawRom.ModifyingSection.VehicleCategory.Sections = null;
+
+                //check if section rom create a section with paragraphs
+                List<Paragraph> sectionParagraphs = (await work.Paragraphs.GetAllAsync())
+                    .Where(p => p.SectionId == lawRom.ModifyingSectionId).ToList();
+
+                if (sectionParagraphs != null && sectionParagraphs.Count() > 0)
+                {
+                    lawRom.ModifyingSection.Paragraphs = sectionParagraphs;
+                }
+
+                if (lawRom.ModifiedSectionId != null)
+                {
+                    lawRom.ModifiedSection = (await work.Sections.GetAllAsync())
+                    .Where(s => s.Id == lawRom.ModifiedSectionId).FirstOrDefault();
+
+                    lawRom.ModifiedSection.VehicleCategory = vehicleCategories
+                    .Where(v => v.Id == lawRom.ModifiedSection.VehicleCategoryId).FirstOrDefault();
+                    lawRom.ModifyingSection.VehicleCategory.Sections = null;
+                }
+            }
+            else if (lawRom.ModifyingParagraphId != null)
+            {
+                lawRom.ModifyingParagraph = (await work.Paragraphs.GetAllAsync())
+                    .Where(s => s.Id == lawRom.ModifyingParagraphId).FirstOrDefault();
+
+                if (lawRom.ModifiedParagraphId != null)
+                {
+                    lawRom.ModifiedParagraph = (await work.Paragraphs.GetAllAsync())
+                    .Where(s => s.Id == lawRom.ModifiedParagraphId).FirstOrDefault();
+                }
+            }
+            return lawRom;
+        }
     }
 }
