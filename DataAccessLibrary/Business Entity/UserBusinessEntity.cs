@@ -60,7 +60,7 @@ namespace DataAccessLibrary.Business_Entity
         {
             var user = (await work.Users.GetAllAsync())
                 .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.SCRIBE);
-            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
+            return user.OrderBy(u => u.Username);
         }
 
         public async Task<IEnumerable<User>> GetScribesByUserNameAsync(string keywordUserName)
@@ -100,14 +100,20 @@ namespace DataAccessLibrary.Business_Entity
                      PendingRequests = ""
                  }).ToList();
 
-            IEnumerable<LawModificationRequest> lm = (await work.LawModificationRequests.GetAllAsync()).Where(lm => !lm.IsDeleted);
-            IEnumerable<SignModificationRequest> sm = (await work.SignModificationRequests.GetAllAsync()).Where(lm => !lm.IsDeleted);
-            IEnumerable<QuestionModificationRequest> qm = (await work.QuestionModificationRequests.GetAllAsync()).Where(lm => !lm.IsDeleted);
+            IEnumerable<LawModificationRequest> lm =
+                (await work.LawModificationRequests.GetAllAsync()).Where(lm => !lm.IsDeleted && lm.Status == (int)Status.Pending);
+            IEnumerable<SignModificationRequest> sm =
+                (await work.SignModificationRequests.GetAllAsync()).Where(sm => !sm.IsDeleted && sm.Status == (int)Status.Pending);
+            IEnumerable<QuestionModificationRequest> qm =
+                (await work.QuestionModificationRequests.GetAllAsync()).Where(qm => !qm.IsDeleted && qm.Status == (int)Status.Pending);
+            IEnumerable<UserModificationRequest> um =
+                (await work.UserModificationRequests.GetAllAsync()).Where(um => !um.IsDeleted && um.Status == (int)Status.Pending);
             foreach (AdminDTO admin in admins)
             {
                 admin.PendingRequests = (lm.Where(lm => lm.AdminId == admin.Id).Count()
                     + sm.Where(sm => sm.AdminId == admin.Id).Count()
-                    + qm.Where(qm => qm.AdminId == admin.Id).Count()) + " yêu cầu đang chờ duyệt";
+                    + qm.Where(qm => qm.AdminId == admin.Id).Count()
+                    + um.Where(um => um.ArbitratingAdminId == admin.Id).Count()) + " yêu cầu đang chờ duyệt";
             }
 
             return admins.OrderBy(a => a.Username);
@@ -160,6 +166,26 @@ namespace DataAccessLibrary.Business_Entity
             }
             await work.Save();
             return deactivatingMember;
+
+        }
+
+        //Deactivate Scribe
+        public async Task<User> DeactivateScribe(User scribe)
+        {
+            User deactivatingScribe = await work.Users.GetAsync(scribe.Id);
+            deactivatingScribe.Status = (int)Status.Deactivated;
+            await work.Save();
+            return deactivatingScribe;
+
+        }
+
+        //Re Enable Scribe
+        public async Task<User> ReEnableScribe(User scribe)
+        {
+            User reEnablingScribe = await work.Users.GetAsync(scribe.Id);
+            reEnablingScribe.Status = (int)Status.Active;
+            await work.Save();
+            return reEnablingScribe;
 
         }
 
