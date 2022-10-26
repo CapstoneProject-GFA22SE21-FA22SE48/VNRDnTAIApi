@@ -159,5 +159,23 @@ namespace VNRDnTAIApi.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        //---------------------------------------------------
+        // GET: api/LawModificationRequests/ROMDetail/5
+        [HttpGet("ROMDetail/{lawRomId}")]
+        [ProducesResponseType(typeof(AdminRomListDTO), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<AdminRomListDTO>> GetLawRomDetail(Guid lawRomId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetLawRomDetail(lawRomId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
     }
 }
