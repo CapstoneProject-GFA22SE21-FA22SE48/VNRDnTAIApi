@@ -1,6 +1,7 @@
 ﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary;
 using DTOsLibrary.ManageROM;
 using Microsoft.AspNetCore.Mvc;
 
@@ -163,13 +164,29 @@ namespace VNRDnTAIApi.Controllers
         //---------------------------------------------------
         // GET: api/LawModificationRequests/ROMDetail/5
         [HttpGet("ROMDetail/{lawRomId}")]
-        [ProducesResponseType(typeof(AdminRomListDTO), 200)]
+        [ProducesResponseType(typeof(LawModificationRequest), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<AdminRomListDTO>> GetLawRomDetail(Guid lawRomId)
+        public async Task<ActionResult<LawModificationRequest>> GetLawRomDetail(Guid lawRomId)
         {
             try
             {
                 return StatusCode(200, await _entity.GetLawRomDetail(lawRomId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        //GET: api/LawModificationRequests/ParagraphROMDetail/References/5
+        [HttpGet("ParagraphROMDetail/References/{paragraphRomId}")]
+        [ProducesResponseType(typeof(IEnumerable<ReferenceDTO>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<ReferenceDTO>>> ParagraphROMDetailReferences(Guid paragraphRomId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetParagraphROMDetailReference(paragraphRomId));
             }
             catch (Exception ex)
             {
