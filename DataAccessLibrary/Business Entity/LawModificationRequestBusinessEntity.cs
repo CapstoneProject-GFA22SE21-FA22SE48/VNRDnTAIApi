@@ -244,6 +244,7 @@ namespace DataAccessLibrary.Business_Entity
 
                 lawRom.ModifyingSection.VehicleCategory = vehicleCategories
                     .Where(v => v.Id == lawRom.ModifyingSection.VehicleCategoryId).FirstOrDefault();
+                lawRom.ModifyingSection.VehicleCategory.Sections = null;
 
                 //check if section rom create a section with paragraphs
                 List<Paragraph> sectionParagraphs = (await work.Paragraphs.GetAllAsync())
@@ -261,6 +262,7 @@ namespace DataAccessLibrary.Business_Entity
 
                     lawRom.ModifiedSection.VehicleCategory = vehicleCategories
                     .Where(v => v.Id == lawRom.ModifiedSection.VehicleCategoryId).FirstOrDefault();
+                    lawRom.ModifyingSection.VehicleCategory.Sections = null;
                 }
             }
             else if (lawRom.ModifyingParagraphId != null)
