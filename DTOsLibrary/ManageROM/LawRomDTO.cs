@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace DTOsLibrary.ManageROM
 {
@@ -25,5 +26,7 @@ namespace DTOsLibrary.ManageROM
         public int OperationType { get; set; }
         public int Status { get; set; }
         public DateTime CreatedDate { get; set; }
+
+        public List<ReferenceDTO> ParagraphReferenceList { get; set; }
     }
 }
