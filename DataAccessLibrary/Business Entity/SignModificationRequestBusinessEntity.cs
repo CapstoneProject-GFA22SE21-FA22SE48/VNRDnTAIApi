@@ -1,6 +1,7 @@
 ﻿using BusinessObjectLibrary;
 using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,7 +70,13 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<SignModificationRequest> GetSignRomDetail(Guid modifyingSignId)
         {
             SignModificationRequest signRom =
-                (await work.SignModificationRequests.GetAllAsync(nameof(SignModificationRequest.ModifyingSign), nameof(SignModificationRequest.ModifiedSign)))
+                (await work.SignModificationRequests.GetAllMultiIncludeAsync(
+                    include: signRom => signRom
+                    .Include(s => s.ModifyingSign)
+                    .ThenInclude(s => s.SignCategory)
+                    .Include(s => s.ModifiedSign)
+                    .ThenInclude(s => s.SignCategory)
+                    ))
                 .Where(s => s.ModifyingSignId == modifyingSignId).FirstOrDefault();
             return signRom;
         }
