@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace BusinessObjectLibrary
 {
     public partial class SignModificationRequest
@@ -18,6 +16,7 @@ namespace BusinessObjectLibrary
         public int OperationType { get; set; }
         public string ImageUrl { get; set; }
         public int Status { get; set; }
+        public string DeniedReason { get; set; }
         public DateTime CreatedDate { get; set; }
         public bool IsDeleted { get; set; }
 

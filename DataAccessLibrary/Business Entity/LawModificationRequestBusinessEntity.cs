@@ -129,7 +129,8 @@ namespace DataAccessLibrary.Business_Entity
 
             // 2. Sign Roms
             List<SignModificationRequest> signRoms = (await work.SignModificationRequests.GetAllAsync())
-                .Where(s => !s.IsDeleted && s.AdminId == adminId).ToList();
+                .Where(s => !s.IsDeleted && s.AdminId == adminId
+                && s.ScribeId != null & s.UserId == null).ToList();  //admin only handle ROM from scribe, ROM from handle will be handled by scribe
 
             List<SignRomDTO> signRomDTOs = new List<SignRomDTO>();
             foreach (SignModificationRequest signRom in signRoms)
@@ -153,7 +154,8 @@ namespace DataAccessLibrary.Business_Entity
                     (signs.Where(s => s.Id == (gpssigns.Where(g => g.Id == signRom.ModifiedGpssignId).FirstOrDefault().SignId)))
                     .FirstOrDefault().Name : null,
 
-                    UserId = signRom.UserId != null ? signRom.UserId : null,
+                    //admin only handle ROM from scribe, ROM from handle will be handled by scribe
+                    //UserId = signRom.UserId != null ? signRom.UserId : null,
                     ScribeId = signRom.ScribeId != null ? signRom.ScribeId : null,
                     Username = signRom.UserId != null ?
                     (users.Where(u => u.Id == signRom.UserId).FirstOrDefault().Username) :

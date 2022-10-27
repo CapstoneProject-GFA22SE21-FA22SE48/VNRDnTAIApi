@@ -100,5 +100,109 @@ namespace DataAccessLibrary.Business_Entity
             return questionRom;
         }
         //--------------------------------------------------
+        public async Task<QuestionModificationRequest> ApproveQuestionRom(Guid modifyingQuestionId)
+        {
+            QuestionModificationRequest questionRom = (await work.QuestionModificationRequests.GetAsync(modifyingQuestionId));
+
+            if (questionRom != null)
+            {
+                Question modifyingQuestion = await work.Questions.GetAsync(questionRom.ModifyingQuestionId);
+                Question modifiedQuestion = null;
+                if (questionRom.ModifiedQuestionId != null)
+                {
+                    modifiedQuestion = await work.Questions.GetAsync((Guid)questionRom.ModifiedQuestionId);
+                }
+
+                if (questionRom.OperationType == (int)OperationType.Add)
+                {
+                    questionRom.Status = (int)Status.Approved;
+                    if (modifyingQuestion != null)
+                    {
+                        modifyingQuestion.Status = (int)Status.Active;
+                    }
+                }
+                else if (questionRom.OperationType == (int)OperationType.Update)
+                {
+                    questionRom.Status = (int)Status.Approved;
+                    if (modifyingQuestion != null)
+                    {
+                        modifyingQuestion.Status = (int)Status.Active;
+                    }
+                    if (modifiedQuestion != null)
+                    {
+                        modifiedQuestion.IsDeleted = true;
+
+                        //Reference all Pending Rom of the modifiedQuestionId to the new modifyingQuestionId
+                        IEnumerable<QuestionModificationRequest> questionRomsRefModifiedQuestion =
+                            (await work.QuestionModificationRequests.GetAllAsync())
+                            .Where(q => q.Status == (int)Status.Pending
+                                    && q.ModifiedQuestionId == modifiedQuestion.Id);
+                        foreach (QuestionModificationRequest questionMod in questionRomsRefModifiedQuestion)
+                        {
+                            questionMod.ModifiedQuestionId = modifyingQuestion.Id;
+                        }
+                    }
+                }
+                else if (questionRom.OperationType == (int)OperationType.Delete)
+                {
+                    questionRom.Status = (int)Status.Approved;
+                    if (modifyingQuestion != null)
+                    {
+                        modifyingQuestion.Status = (int)Status.Active;
+                    }
+                    if (modifiedQuestion != null)
+                    {
+                        modifiedQuestion.IsDeleted = true;
+
+                        //Set status of all Pending ROM reference to the modifiedQuestion to Confirmed
+                        IEnumerable<QuestionModificationRequest> questionRomsRefModifiedQuestion =
+                            (await work.QuestionModificationRequests.GetAllAsync())
+                            .Where(q => q.Status == (int)Status.Pending
+                                    && q.ModifiedQuestionId == modifiedQuestion.Id);
+
+                        foreach (QuestionModificationRequest questionMod in questionRomsRefModifiedQuestion)
+                        {
+                            questionMod.Status = (int)Status.Confirmed;
+                        }
+                    }
+                }
+            }
+            await work.Save();
+            return questionRom;
+        }
+        //----------------------------------------------------
+        public async Task<QuestionModificationRequest> DenyQuestionRom(Guid modifyingQuestionId, string deniedReason)
+        {
+            QuestionModificationRequest questionRom = (await work.QuestionModificationRequests.GetAsync(modifyingQuestionId));
+            if (questionRom != null)
+            {
+                questionRom.Status = (int)Status.Denied;
+                questionRom.DeniedReason = deniedReason;
+
+                //Calculate approval rate
+                double approvalRate = 1 - ((double)((await work.LawModificationRequests.GetAllAsync())
+                    .Where(l => l.ScribeId == questionRom.ScribeId && l.Status == (int)Status.Denied).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                    .Where(s => s.ScribeId == questionRom.ScribeId && s.Status == (int)Status.Denied).Count()
+                + (await work.QuestionModificationRequests.GetAllAsync())
+                .Where(q => q.ScribeId == questionRom.ScribeId && q.Status == (int)Status.Denied).Count())
+                    /
+                ((await work.LawModificationRequests.GetAllAsync())
+                    .Where(l => l.ScribeId == questionRom.ScribeId).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                    .Where(s => s.ScribeId == questionRom.ScribeId).Count()
+                + (await work.QuestionModificationRequests.GetAllAsync())
+                .Where(q => q.ScribeId == questionRom.ScribeId).Count()));
+                if (approvalRate < 0.65)
+                {
+                    User scribe = await work.Users.GetAsync(questionRom.ScribeId);
+                    scribe.Status = (int)Status.Deactivated;
+                }
+            }
+
+            await work.Save();
+            return questionRom;
+        }
+
     }
 }
