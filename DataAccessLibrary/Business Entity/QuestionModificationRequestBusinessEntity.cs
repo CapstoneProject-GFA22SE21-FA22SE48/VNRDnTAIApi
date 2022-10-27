@@ -1,6 +1,7 @@
 ﻿using BusinessObjectLibrary;
 using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,5 +72,20 @@ namespace DataAccessLibrary.Business_Entity
             await work.Save();
             return questionModificationRequest;
         }
+        //--------------------------------------------------
+        public async Task<QuestionModificationRequest> GetQuestionRomDetail(Guid modifyingQuestionId)
+        {
+            QuestionModificationRequest questionRom =
+                (await work.QuestionModificationRequests.GetAllMultiIncludeAsync(
+                    include: questionRom => questionRom
+                    .Include(q => q.ModifyingQuestion)
+                    .ThenInclude(q => q.Answers)
+                    .Include(q => q.ModifiedQuestion)
+                    .ThenInclude(q => q.Answers)
+                    ))
+                .Where(q => q.ModifyingQuestionId == modifyingQuestionId).FirstOrDefault();
+            return questionRom;
+        }
+        //--------------------------------------------------
     }
 }

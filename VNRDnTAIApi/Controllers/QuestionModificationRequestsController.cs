@@ -2,9 +2,6 @@
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace VNRDnTAIApi.Controllers
 {
@@ -140,6 +137,22 @@ namespace VNRDnTAIApi.Controllers
             {
                 await _entity.RemoveQuestionModificationRequest(modifyingQuestionId);
                 return StatusCode(204);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        //---------------------------------------------------
+        // GET: api/QuestionModificationRequests/QuestionROMDetail/5
+        [HttpGet("QuestionROMDetail/{modifyingQuestionId}")]
+        [ProducesResponseType(typeof(QuestionModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<SignModificationRequest>> GetQuestionRomDetail(Guid modifyingQuestionId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetQuestionRomDetail(modifyingQuestionId));
             }
             catch (Exception ex)
             {
