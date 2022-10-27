@@ -3,6 +3,7 @@ using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
 using DTOsLibrary.ManageROM;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -226,7 +227,7 @@ namespace DataAccessLibrary.Business_Entity
 
             return adminRomListDTO;
         }
-
+        //--------------------------------------------------
         public async Task<LawModificationRequest> GetLawRomDetail(Guid lawRomId)
         {
             LawModificationRequest lawRom = (await work.LawModificationRequests.GetAsync(lawRomId));
@@ -288,6 +289,7 @@ namespace DataAccessLibrary.Business_Entity
             }
             return lawRom;
         }
+        //--------------------------------------------------
 
         public async Task<IEnumerable<ReferenceDTO>> GetParagraphROMDetailReference(Guid paragraphId)
         {
@@ -436,6 +438,136 @@ namespace DataAccessLibrary.Business_Entity
             }
 
             return paragraphDTO.ReferenceParagraphs;
+        }
+
+        //--------------------------------------------------
+        public async Task<LawModificationRequest> ApproveStatueRom(Guid modifyingStatueId)
+        {
+            LawModificationRequest statueRom = (await work.LawModificationRequests.GetAllAsync())
+                .Where(l => l.ModifyingStatueId == modifyingStatueId).FirstOrDefault();
+
+            if (statueRom != null)
+            {
+                Statue modifyingStatue = await work.Statues.GetAsync((Guid)statueRom.ModifyingStatueId);
+                Statue modifiedStatue = null;
+                if (statueRom.ModifiedStatueId != null)
+                {
+                    modifiedStatue = (await work.Statues.GetAllMultiIncludeAsync(
+                                include: statue => statue
+                                .Include(s => s.Sections)
+                                .ThenInclude(sc => sc.Paragraphs)
+                                ))
+                                .Where(st => st.Id == statueRom.ModifiedStatueId)
+                                .FirstOrDefault();
+                }
+
+                //Scribe cannot create ROM of add statue
+                if (statueRom.OperationType == (int)OperationType.Update)
+                {
+                    statueRom.Status = (int)Status.Approved;
+                    if (modifyingStatue != null)
+                    {
+                        modifyingStatue.Status = (int)Status.Active;
+                    }
+                    if (modifiedStatue != null)
+                    {
+                        modifiedStatue.IsDeleted = true;
+
+                        //All section ref to modifiedStatue -> now ref to modifyingStatue
+                        foreach (Section section in modifiedStatue.Sections)
+                        {
+                            section.StatueId = (Guid)statueRom.ModifyingStatueId;
+                        }
+
+                        //Reference all Pending Rom of the modifiedStatueId to the new modifyingStatueId
+                        IEnumerable<LawModificationRequest> statueRomsRefModifiedQuestion =
+                            (await work.LawModificationRequests.GetAllAsync())
+                            .Where(l => l.Status == (int)Status.Pending
+                                    && l.ModifiedStatueId == statueRom.ModifiedStatueId);
+                        foreach (LawModificationRequest statueMod in statueRomsRefModifiedQuestion)
+                        {
+                            statueMod.ModifiedStatueId = statueRom.ModifyingStatueId;
+                        }
+                    }
+                }
+                else if (statueRom.OperationType == (int)OperationType.Delete)
+                {
+                    statueRom.Status = (int)Status.Approved;
+                    if (modifyingStatue != null)
+                    {
+                        modifyingStatue.Status = (int)Status.Active;
+                    }
+                    if (modifiedStatue != null)
+                    {
+                        modifiedStatue.IsDeleted = true;
+
+                        //all law roms
+                        IEnumerable<LawModificationRequest> allLawRoms = (await work.LawModificationRequests.GetAllAsync())
+                            .Where(l => !l.IsDeleted);
+
+                        List<LawModificationRequest> relatedlawRoms = new List<LawModificationRequest>();
+
+                        //Set IsDeleted to all sections ref to modifiedStatueId, then all paragraph ref to each section
+                        foreach (Section section in modifiedStatue.Sections)
+                        {
+                            section.IsDeleted = true;
+
+                            relatedlawRoms.AddRange(allLawRoms.Where(l => l.ModifiedSectionId == section.Id));
+
+                            foreach (Paragraph paragraph in section.Paragraphs)
+                            {
+                                paragraph.IsDeleted = true;
+
+                                relatedlawRoms.AddRange(allLawRoms.Where(l => l.ModifiedParagraphId == paragraph.Id));
+                            }
+                        }
+
+                        //Set status -> confirmed for all pending ROM of section that ref to modifiedStatueId,
+                        //And pending ROM of parargaphs ref to each section
+                        foreach (LawModificationRequest relatedlawRom in relatedlawRoms)
+                        {
+                            relatedlawRom.Status = (int)Status.Confirmed;
+                        }
+
+                    }
+                }
+            }
+            await work.Save();
+            return statueRom;
+        }
+        //--------------------------------------------------
+        public async Task<LawModificationRequest> DenyStatueRom(Guid modifyingStatueId, string deniedReason)
+        {
+            LawModificationRequest statueRom = (await work.LawModificationRequests.GetAllAsync())
+               .Where(l => l.ModifyingStatueId == modifyingStatueId).FirstOrDefault();
+            if (statueRom != null)
+            {
+                statueRom.Status = (int)Status.Denied;
+                statueRom.DeniedReason = deniedReason;
+
+                //Calculate approval rate
+                double approvalRate = 1 - ((double)((await work.LawModificationRequests.GetAllAsync())
+                    .Where(l => l.ScribeId == statueRom.ScribeId && l.Status == (int)Status.Denied).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                    .Where(s => s.ScribeId == statueRom.ScribeId && s.Status == (int)Status.Denied).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                .Where(s => s.ScribeId == statueRom.ScribeId && s.Status == (int)Status.Denied).Count())
+                    /
+                ((await work.LawModificationRequests.GetAllAsync())
+                    .Where(l => l.ScribeId == statueRom.ScribeId).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                    .Where(s => s.ScribeId == statueRom.ScribeId).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                .Where(s => s.ScribeId == statueRom.ScribeId).Count()));
+                if (approvalRate < 0.65)
+                {
+                    User scribe = await work.Users.GetAsync((Guid)statueRom.ScribeId);
+                    scribe.Status = (int)Status.Deactivated;
+                }
+            }
+
+            await work.Save();
+            return statueRom;
         }
     }
 }
