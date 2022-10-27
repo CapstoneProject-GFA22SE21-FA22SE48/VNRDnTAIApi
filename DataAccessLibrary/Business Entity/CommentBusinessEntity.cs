@@ -36,7 +36,7 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<Comment> AddComment(Comment comment)
         {
             comment.Id = Guid.NewGuid();
-            comment.CreatedDate = DateTime.Now;
+            //comment.CreatedDate = DateTime.Now;
             comment.IsDeleted = false;
             await work.Comments.AddAsync(comment);
             await work.Save();
