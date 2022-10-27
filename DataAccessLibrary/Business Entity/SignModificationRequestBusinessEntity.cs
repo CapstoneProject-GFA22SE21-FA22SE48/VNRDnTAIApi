@@ -88,5 +88,111 @@ namespace DataAccessLibrary.Business_Entity
                 .Where(s => s.ModifyingGpssignId == modifyingGpssignId).FirstOrDefault();
             return gpssignRom;
         }
+        //--------------------------------------------------
+        public async Task<SignModificationRequest> ApproveSignRom(Guid modifyingSignId)
+        {
+            SignModificationRequest signRom = (await work.SignModificationRequests.GetAllAsync())
+                .Where(s => s.ModifyingSignId == modifyingSignId).FirstOrDefault();
+
+            if (signRom != null)
+            {
+                Sign modifyingSign = await work.Signs.GetAsync((Guid)signRom.ModifyingSignId);
+                Sign modifiedSign = null;
+                if (signRom.ModifiedSignId != null)
+                {
+                    modifiedSign = await work.Signs.GetAsync((Guid)signRom.ModifiedSignId);
+                }
+
+                if (signRom.OperationType == (int)OperationType.Add)
+                {
+                    signRom.Status = (int)Status.Approved;
+                    if (modifyingSign != null)
+                    {
+                        modifyingSign.Status = (int)Status.Active;
+                    }
+                }
+                else if (signRom.OperationType == (int)OperationType.Update)
+                {
+                    signRom.Status = (int)Status.Approved;
+                    if (modifyingSign != null)
+                    {
+                        modifyingSign.Status = (int)Status.Active;
+                    }
+                    if (modifiedSign != null)
+                    {
+                        modifiedSign.IsDeleted = true;
+
+                        //Reference all Pending Rom of the modifiedSignId to the new modifyingSignId
+                        IEnumerable<SignModificationRequest> signRomsRefModifiedSign =
+                            (await work.SignModificationRequests.GetAllAsync())
+                            .Where(s => s.Status == (int)Status.Pending
+                                    && s.ModifiedSignId == modifiedSign.Id);
+                        foreach (SignModificationRequest signMod in signRomsRefModifiedSign)
+                        {
+                            signMod.ModifiedSignId = modifyingSign.Id;
+                        }
+                    }
+                }
+                else if (signRom.OperationType == (int)OperationType.Delete)
+                {
+                    signRom.Status = (int)Status.Approved;
+                    if (modifyingSign != null)
+                    {
+                        modifyingSign.Status = (int)Status.Active;
+                    }
+                    if (modifiedSign != null)
+                    {
+                        modifiedSign.IsDeleted = true;
+
+                        //Set status of all Pending ROM reference to the modifiedSignId to Confirmed
+                        IEnumerable<SignModificationRequest> signRomsRefModifiedSign =
+                            (await work.SignModificationRequests.GetAllAsync())
+                            .Where(s => s.Status == (int)Status.Pending
+                                    && s.ModifiedSignId == modifiedSign.Id);
+
+                        foreach (SignModificationRequest signMod in signRomsRefModifiedSign)
+                        {
+                            signMod.Status = (int)Status.Confirmed;
+                        }
+                    }
+                }
+            }
+            await work.Save();
+            return signRom;
+        }
+        //----------------------------------------------------
+        public async Task<SignModificationRequest> DenySignRom(Guid modifyingSignId, string deniedReason)
+        {
+            SignModificationRequest signRom = (await work.SignModificationRequests.GetAllAsync())
+                .Where(s => s.ModifyingSignId == modifyingSignId).FirstOrDefault();
+            if (signRom != null)
+            {
+                signRom.Status = (int)Status.Denied;
+                signRom.DeniedReason = deniedReason;
+
+                //Calculate approval rate
+                double approvalRate = 1 - ((double)((await work.LawModificationRequests.GetAllAsync())
+                    .Where(l => l.ScribeId == signRom.ScribeId && l.Status == (int)Status.Denied).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                    .Where(s => s.ScribeId == signRom.ScribeId && s.Status == (int)Status.Denied).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                .Where(s => s.ScribeId == signRom.ScribeId && s.Status == (int)Status.Denied).Count())
+                    /
+                ((await work.LawModificationRequests.GetAllAsync())
+                    .Where(l => l.ScribeId == signRom.ScribeId).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                    .Where(s => s.ScribeId == signRom.ScribeId).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                .Where(s => s.ScribeId == signRom.ScribeId).Count()));
+                if (approvalRate < 0.65)
+                {
+                    User scribe = await work.Users.GetAsync((Guid)signRom.ScribeId);
+                    scribe.Status = (int)Status.Deactivated;
+                }
+            }
+
+            await work.Save();
+            return signRom;
+        }
     }
 }
