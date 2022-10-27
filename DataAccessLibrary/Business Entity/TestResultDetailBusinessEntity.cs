@@ -47,5 +47,15 @@ namespace DataAccessLibrary.Business_Entity
             work.TestResultDetails.Update(testResultDetail);
             await work.Save();
         }
+
+        public async Task<IEnumerable<dynamic>> GetIncorrectQuestionsOfTestResults(Guid userId, Guid testCategoryId)
+        {
+            List<TestResultDetail> testResultDetails = (await work.TestResultDetails.GetAllAsync())
+                .Where(trd => !trd.IsDeleted && !trd.IsCorrect 
+                            && trd.TestResult.TestCategoryId == testCategoryId
+                            && trd.TestResult.UserId == userId)
+                .ToList();
+            return testResultDetails;
+        }
     }
 }
