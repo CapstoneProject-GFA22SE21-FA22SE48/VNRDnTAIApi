@@ -14,6 +14,8 @@ namespace DTOsLibrary.ManageROM
         public int OperationType { get; set; }
         public int Status { get; set; }
         public DateTime CreatedDate { get; set; }
+        public string DeniedReason { get; set; }
+
 
     }
 }

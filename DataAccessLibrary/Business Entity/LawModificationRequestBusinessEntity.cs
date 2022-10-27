@@ -1,7 +1,9 @@
 ﻿using BusinessObjectLibrary;
 using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary;
 using DTOsLibrary.ManageROM;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -121,14 +123,16 @@ namespace DataAccessLibrary.Business_Entity
                     (users.Where(u => u.Id == lawRom.ScribeId).FirstOrDefault().Username),
                     OperationType = lawRom.OperationType,
                     Status = lawRom.Status,
-                    CreatedDate = lawRom.CreatedDate
+                    CreatedDate = lawRom.CreatedDate,
+                    DeniedReason = lawRom.DeniedReason,
                 });
             }
 
 
             // 2. Sign Roms
             List<SignModificationRequest> signRoms = (await work.SignModificationRequests.GetAllAsync())
-                .Where(s => !s.IsDeleted && s.AdminId == adminId).ToList();
+                .Where(s => !s.IsDeleted && s.AdminId == adminId
+                && s.ScribeId != null & s.UserId == null).ToList();  //admin only handle ROM from scribe, ROM from handle will be handled by scribe
 
             List<SignRomDTO> signRomDTOs = new List<SignRomDTO>();
             foreach (SignModificationRequest signRom in signRoms)
@@ -152,14 +156,16 @@ namespace DataAccessLibrary.Business_Entity
                     (signs.Where(s => s.Id == (gpssigns.Where(g => g.Id == signRom.ModifiedGpssignId).FirstOrDefault().SignId)))
                     .FirstOrDefault().Name : null,
 
-                    UserId = signRom.UserId != null ? signRom.UserId : null,
+                    //admin only handle ROM from scribe, ROM from handle will be handled by scribe
+                    //UserId = signRom.UserId != null ? signRom.UserId : null,
                     ScribeId = signRom.ScribeId != null ? signRom.ScribeId : null,
                     Username = signRom.UserId != null ?
                     (users.Where(u => u.Id == signRom.UserId).FirstOrDefault().Username) :
                     (users.Where(u => u.Id == signRom.ScribeId).FirstOrDefault().Username),
                     OperationType = signRom.OperationType,
                     Status = signRom.Status,
-                    CreatedDate = signRom.CreatedDate
+                    CreatedDate = signRom.CreatedDate,
+                    DeniedReason = signRom.DeniedReason,
                 });
             }
 
@@ -184,7 +190,8 @@ namespace DataAccessLibrary.Business_Entity
                     (users.Where(u => u.Id == questionRom.ScribeId).FirstOrDefault().Username),
                     OperationType = questionRom.OperationType,
                     Status = questionRom.Status,
-                    CreatedDate = questionRom.CreatedDate
+                    CreatedDate = questionRom.CreatedDate,
+                    DeniedReason = questionRom.DeniedReason
                 });
             }
 
@@ -205,7 +212,8 @@ namespace DataAccessLibrary.Business_Entity
                     PromotingAdminUsername = userRom.PromotingAdmin != null ?
                     userRom.PromotingAdmin.Username : users.Where(u => u.Id == userRom.PromotingAdminId).FirstOrDefault().Username,
                     Status = userRom.Status,
-                    CreatedDate = userRom.CreatedDate
+                    CreatedDate = userRom.CreatedDate,
+                    DeniedReason = userRom.DeniedReason
                 });
             }
 
@@ -219,12 +227,10 @@ namespace DataAccessLibrary.Business_Entity
 
             return adminRomListDTO;
         }
-
-        public async Task<dynamic> GetLawRomDetail(Guid lawRomId)
+        //--------------------------------------------------
+        public async Task<LawModificationRequest> GetLawRomDetail(Guid lawRomId)
         {
             LawModificationRequest lawRom = (await work.LawModificationRequests.GetAsync(lawRomId));
-
-            IEnumerable<VehicleCategory> vehicleCategories = (await work.VehicleCategories.GetAllAsync());
 
             if (lawRom.ModifyingStatueId != null)
             {
@@ -239,6 +245,8 @@ namespace DataAccessLibrary.Business_Entity
             }
             else if (lawRom.ModifyingSectionId != null)
             {
+                IEnumerable<VehicleCategory> vehicleCategories = (await work.VehicleCategories.GetAllAsync());
+
                 lawRom.ModifyingSection = (await work.Sections.GetAllAsync())
                     .Where(s => s.Id == lawRom.ModifyingSectionId).FirstOrDefault();
 
@@ -249,7 +257,6 @@ namespace DataAccessLibrary.Business_Entity
                 //check if section rom create a section with paragraphs
                 List<Paragraph> sectionParagraphs = (await work.Paragraphs.GetAllAsync())
                     .Where(p => p.SectionId == lawRom.ModifyingSectionId).ToList();
-
                 if (sectionParagraphs != null && sectionParagraphs.Count() > 0)
                 {
                     lawRom.ModifyingSection.Paragraphs = sectionParagraphs;
@@ -270,13 +277,297 @@ namespace DataAccessLibrary.Business_Entity
                 lawRom.ModifyingParagraph = (await work.Paragraphs.GetAllAsync())
                     .Where(s => s.Id == lawRom.ModifyingParagraphId).FirstOrDefault();
 
+                //lawRom = (await GetParagraphROMDetailReference(lawRom.ModifyingParagraphId));
+
                 if (lawRom.ModifiedParagraphId != null)
                 {
                     lawRom.ModifiedParagraph = (await work.Paragraphs.GetAllAsync())
                     .Where(s => s.Id == lawRom.ModifiedParagraphId).FirstOrDefault();
+
+                    //lawRom.ModifiedParagraphReferences = (await GetParagraphROMDetailReference(lawRom.ModifiedParagraphId)).ReferenceParagraphs;
                 }
             }
             return lawRom;
+        }
+        //--------------------------------------------------
+
+        public async Task<IEnumerable<ReferenceDTO>> GetParagraphROMDetailReference(Guid paragraphId)
+        {
+            IEnumerable<Paragraph> paragraphs = (await work.Paragraphs.GetAllAsync())
+                .Where(p => p.Id == paragraphId);
+            var tmpData1 = paragraphs.Join(
+                    (await work.References.GetAllAsync()),
+                    paragraph => paragraph.Id,
+                    reference => reference.ParagraphId,
+                    (paragraph, reference) => new
+                    {
+                        Id = paragraph.Id,
+                        SectionId = paragraph.SectionId,
+                        Name = paragraph.Name,
+                        Description = paragraph.Description,
+                        Status = paragraph.Status,
+                        AdditionalPenalty = paragraph.AdditionalPenalty,
+                        IsDeleted = paragraph.IsDeleted,
+                        ReferenceParagraphId = reference.ReferenceParagraphId,
+                        ReferenceParagraphIsExcluded = reference.IsExcluded
+                    }
+                    );
+
+            //Paragraph with reference
+            var tmpData2 = tmpData1.Join(
+                (await work.Paragraphs.GetAllAsync())
+                .Where(paragraph => !paragraph.IsDeleted
+                        && paragraph.Status == (int)Status.Active),
+                tmp1 => tmp1.ReferenceParagraphId,
+                paragraph => paragraph.Id,
+                (tmp1, paragraph) => new
+                {
+                    Id = tmp1.Id,
+                    SectionId = tmp1.SectionId,
+                    Name = tmp1.Name,
+                    Description = tmp1.Description,
+                    Status = tmp1.Status,
+                    AdditionalPenalty = tmp1.AdditionalPenalty,
+                    IsDeleted = tmp1.IsDeleted,
+
+                    ReferenceParagraphId = tmp1.ReferenceParagraphId,
+                    ReferenceParagraphName = paragraph.Name,
+                    ReferenceParagraphDesc = paragraph.Description,
+                    ReferenceParagraphIsExcluded = tmp1.ReferenceParagraphIsExcluded,
+
+                    ReferenceParagraphSectionId = paragraph.SectionId
+                }
+            );
+
+            //With section
+            var tmpData3 = tmpData2.Join(
+                (await work.Sections.GetAllAsync())
+                .Where(sc => !sc.IsDeleted && sc.Status == (int)Status.Active),
+                tmp2 => tmp2.ReferenceParagraphSectionId,
+                section => section.Id,
+                (tmp2, section) => new
+                {
+                    Id = tmp2.Id,
+                    SectionId = tmp2.SectionId,
+                    Name = tmp2.Name,
+                    Description = tmp2.Description,
+                    Status = tmp2.Status,
+                    AdditionalPenalty = tmp2.AdditionalPenalty,
+                    IsDeleted = tmp2.IsDeleted,
+
+                    ReferenceParagraphId = tmp2.ReferenceParagraphId,
+                    ReferenceParagraphName = tmp2.ReferenceParagraphName,
+                    ReferenceParagraphDesc = tmp2.ReferenceParagraphDesc,
+                    ReferenceParagraphIsExcluded = tmp2.ReferenceParagraphIsExcluded,
+
+                    ReferenceParagraphSectionId = tmp2.SectionId,
+                    ReferenceParagraphSectionName = section.Name,
+
+                    ReferenceParagraphSectionStatueId = section.StatueId
+                }
+                );
+
+            //With statue
+            var tmpData4 = tmpData3.Join(
+                (await work.Statues.GetAllAsync())
+                .Where(st => !st.IsDeleted && st.Status == (int)Status.Active),
+                tmp3 => tmp3.ReferenceParagraphSectionStatueId,
+                statue => statue.Id,
+                (tmp3, statue) => new
+                {
+                    Id = tmp3.Id,
+                    SectionId = tmp3.SectionId,
+                    Name = tmp3.Name,
+                    Description = tmp3.Description,
+                    Status = tmp3.Status,
+                    AdditionalPenalty = tmp3.AdditionalPenalty,
+                    IsDeleted = tmp3.IsDeleted,
+
+                    ReferenceParagraphId = tmp3.ReferenceParagraphId,
+                    ReferenceParagraphName = tmp3.ReferenceParagraphName,
+                    ReferenceParagraphDesc = tmp3.ReferenceParagraphDesc,
+                    ReferenceParagraphIsExcluded = tmp3.ReferenceParagraphIsExcluded,
+
+                    ReferenceParagraphSectionId = tmp3.SectionId,
+                    ReferenceParagraphSectionName = tmp3.ReferenceParagraphSectionName,
+
+                    ReferenceParagraphSectionStatueId = tmp3.ReferenceParagraphSectionStatueId,
+                    ReferenceParagraphSectionStatueName = statue.Name
+                }
+                );
+
+            ParagraphDTO paragraphDTO = null;
+            List<ReferenceDTO> referenceList = null;
+
+            foreach (var paragraph in paragraphs)
+            {
+                referenceList = new List<ReferenceDTO>();
+                foreach (var data in tmpData4)
+                {
+                    if (data.Id == paragraph.Id)
+                    {
+                        referenceList.Add(new ReferenceDTO
+                        {
+                            ReferenceParagraphId = data.ReferenceParagraphId,
+                            ReferenceParagraphName = data.ReferenceParagraphName,
+                            ReferenceParagraphDesc = data.ReferenceParagraphDesc,
+
+                            ReferenceParagraphSectionId = data.ReferenceParagraphSectionId,
+                            ReferenceParagraphSectionName = data.ReferenceParagraphSectionName,
+
+                            ReferenceParagraphSectionStatueId = data.ReferenceParagraphSectionStatueId,
+                            ReferenceParagraphSectionStatueName = data.ReferenceParagraphSectionStatueName,
+                            ReferenceParagraphIsExcluded = data.ReferenceParagraphIsExcluded,
+                        });
+                    }
+                }
+                paragraphDTO = new ParagraphDTO
+                {
+                    Id = paragraph.Id,
+                    SectionId = paragraph.SectionId,
+                    Name = paragraph.Name,
+                    Description = paragraph.Description,
+                    Status = paragraph.Status,
+                    AdditionalPenalty = paragraph.AdditionalPenalty,
+                    IsDeleted = paragraph.IsDeleted,
+
+                    ReferenceParagraphs = referenceList.OrderBy(r => int.Parse(r.ReferenceParagraphSectionStatueName.Split(" ")[1]))
+                    .ThenBy(r => int.Parse(r.ReferenceParagraphSectionName.Split(" ")[1]))
+                    .ThenBy(r => r.ReferenceParagraphName).ToList()
+                };
+            }
+
+            return paragraphDTO.ReferenceParagraphs;
+        }
+
+        //--------------------------------------------------
+        public async Task<LawModificationRequest> ApproveStatueRom(Guid modifyingStatueId)
+        {
+            LawModificationRequest statueRom = (await work.LawModificationRequests.GetAllAsync())
+                .Where(l => l.ModifyingStatueId == modifyingStatueId).FirstOrDefault();
+
+            if (statueRom != null)
+            {
+                Statue modifyingStatue = await work.Statues.GetAsync((Guid)statueRom.ModifyingStatueId);
+                Statue modifiedStatue = null;
+                if (statueRom.ModifiedStatueId != null)
+                {
+                    modifiedStatue = (await work.Statues.GetAllMultiIncludeAsync(
+                                include: statue => statue
+                                .Include(s => s.Sections)
+                                .ThenInclude(sc => sc.Paragraphs)
+                                ))
+                                .Where(st => st.Id == statueRom.ModifiedStatueId)
+                                .FirstOrDefault();
+                }
+
+                //Scribe cannot create ROM of add statue
+                if (statueRom.OperationType == (int)OperationType.Update)
+                {
+                    statueRom.Status = (int)Status.Approved;
+                    if (modifyingStatue != null)
+                    {
+                        modifyingStatue.Status = (int)Status.Active;
+                    }
+                    if (modifiedStatue != null)
+                    {
+                        modifiedStatue.IsDeleted = true;
+
+                        //All section ref to modifiedStatue -> now ref to modifyingStatue
+                        foreach (Section section in modifiedStatue.Sections)
+                        {
+                            section.StatueId = (Guid)statueRom.ModifyingStatueId;
+                        }
+
+                        //Reference all Pending Rom of the modifiedStatueId to the new modifyingStatueId
+                        IEnumerable<LawModificationRequest> statueRomsRefModifiedQuestion =
+                            (await work.LawModificationRequests.GetAllAsync())
+                            .Where(l => l.Status == (int)Status.Pending
+                                    && l.ModifiedStatueId == statueRom.ModifiedStatueId);
+                        foreach (LawModificationRequest statueMod in statueRomsRefModifiedQuestion)
+                        {
+                            statueMod.ModifiedStatueId = statueRom.ModifyingStatueId;
+                        }
+                    }
+                }
+                else if (statueRom.OperationType == (int)OperationType.Delete)
+                {
+                    statueRom.Status = (int)Status.Approved;
+                    if (modifyingStatue != null)
+                    {
+                        modifyingStatue.Status = (int)Status.Active;
+                    }
+                    if (modifiedStatue != null)
+                    {
+                        modifiedStatue.IsDeleted = true;
+
+                        //all law roms
+                        IEnumerable<LawModificationRequest> allLawRoms = (await work.LawModificationRequests.GetAllAsync())
+                            .Where(l => !l.IsDeleted);
+
+                        List<LawModificationRequest> relatedlawRoms = new List<LawModificationRequest>();
+
+                        //Set IsDeleted to all sections ref to modifiedStatueId, then all paragraph ref to each section
+                        foreach (Section section in modifiedStatue.Sections)
+                        {
+                            section.IsDeleted = true;
+
+                            relatedlawRoms.AddRange(allLawRoms.Where(l => l.ModifiedSectionId == section.Id));
+
+                            foreach (Paragraph paragraph in section.Paragraphs)
+                            {
+                                paragraph.IsDeleted = true;
+
+                                relatedlawRoms.AddRange(allLawRoms.Where(l => l.ModifiedParagraphId == paragraph.Id));
+                            }
+                        }
+
+                        //Set status -> confirmed for all pending ROM of section that ref to modifiedStatueId,
+                        //And pending ROM of parargaphs ref to each section
+                        foreach (LawModificationRequest relatedlawRom in relatedlawRoms)
+                        {
+                            relatedlawRom.Status = (int)Status.Confirmed;
+                        }
+
+                    }
+                }
+            }
+            await work.Save();
+            return statueRom;
+        }
+        //--------------------------------------------------
+        public async Task<LawModificationRequest> DenyStatueRom(Guid modifyingStatueId, string deniedReason)
+        {
+            LawModificationRequest statueRom = (await work.LawModificationRequests.GetAllAsync())
+               .Where(l => l.ModifyingStatueId == modifyingStatueId).FirstOrDefault();
+            if (statueRom != null)
+            {
+                statueRom.Status = (int)Status.Denied;
+                statueRom.DeniedReason = deniedReason;
+
+                //Calculate approval rate
+                double approvalRate = 1 - ((double)((await work.LawModificationRequests.GetAllAsync())
+                    .Where(l => l.ScribeId == statueRom.ScribeId && l.Status == (int)Status.Denied).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                    .Where(s => s.ScribeId == statueRom.ScribeId && s.Status == (int)Status.Denied).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                .Where(s => s.ScribeId == statueRom.ScribeId && s.Status == (int)Status.Denied).Count())
+                    /
+                ((await work.LawModificationRequests.GetAllAsync())
+                    .Where(l => l.ScribeId == statueRom.ScribeId).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                    .Where(s => s.ScribeId == statueRom.ScribeId).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                .Where(s => s.ScribeId == statueRom.ScribeId).Count()));
+                if (approvalRate < 0.65)
+                {
+                    User scribe = await work.Users.GetAsync((Guid)statueRom.ScribeId);
+                    scribe.Status = (int)Status.Deactivated;
+                }
+            }
+
+            await work.Save();
+            return statueRom;
         }
     }
 }

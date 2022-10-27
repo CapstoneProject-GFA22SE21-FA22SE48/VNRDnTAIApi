@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-
-#nullable disable
 
 namespace BusinessObjectLibrary
 {
@@ -12,6 +9,7 @@ namespace BusinessObjectLibrary
         public Guid PromotingAdminId { get; set; }
         public Guid ArbitratingAdminId { get; set; }
         public int Status { get; set; }
+        public string DeniedReason { get; set; }
         public DateTime CreatedDate { get; set; }
         public bool IsDeleted { get; set; }
 
