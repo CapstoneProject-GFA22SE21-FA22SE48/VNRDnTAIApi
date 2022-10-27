@@ -28,5 +28,6 @@ namespace DTOsLibrary.ManageROM
         public DateTime CreatedDate { get; set; }
 
         public List<ReferenceDTO> ParagraphReferenceList { get; set; }
+        public string DeniedReason { get; set; }
     }
 }
