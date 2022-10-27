@@ -159,5 +159,37 @@ namespace VNRDnTAIApi.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+        //---------------------------------------------------
+        // POST: api/QuestionModificationRequests/Approve/5
+        [HttpPost("Approve/{modifyingQuestionId}")]
+        [ProducesResponseType(typeof(QuestionModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<SignModificationRequest>> ApproveQuestionROM(Guid modifyingQuestionId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.ApproveQuestionRom(modifyingQuestionId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        //---------------------------------------------------
+        // POST: api/QuestionModificationRequests/Deny/5
+        [HttpPost("Deny/{modifyingQuestionId}")]
+        [ProducesResponseType(typeof(QuestionModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<SignModificationRequest>> DenyQuestionROM(Guid modifyingQuestionId, [FromBody] string deniedReason)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.DenyQuestionRom(modifyingQuestionId, deniedReason));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }
