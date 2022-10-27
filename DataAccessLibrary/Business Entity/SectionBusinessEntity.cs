@@ -78,12 +78,15 @@ namespace DataAccessLibrary.Business_Entity
             var vehicleCategoryId = (await work.VehicleCategories.GetAllAsync()).FirstOrDefault(vc => normaliseVietnamese(vehicleCategory) == normaliseVietnamese(vc.Name)).Id;
             query = normaliseVietnamese(query);
             var res = new List<SearchLawDTO>();
-            var paragraphList = (await work.Paragraphs.GetAllAsync(nameof(Paragraph.Section)))
-                .Where(paragraph =>
-                (normaliseVietnamese(paragraph.Description).Contains(query) || normaliseVietnamese(paragraph.Name).Contains(query))
-                    && paragraph.Status == (int)Status.Active
+            await work.Statues.GetAllAsync();
+            var allPars = (await work.Paragraphs.GetAllAsync(nameof(Paragraph.Section), nameof(Paragraph.ReferenceParagraphs)))
+                .Where(paragraph => paragraph.Status == (int)Status.Active
                     && paragraph.Section.VehicleCategoryId == vehicleCategoryId
                     && !paragraph.IsDeleted)
+                .ToList();
+            var paragraphList = allPars
+                .Where(paragraph =>
+                (normaliseVietnamese(paragraph.Description).Contains(query) || normaliseVietnamese(paragraph.Name).Contains(query)))
                 .ToList();
 
 
@@ -91,11 +94,26 @@ namespace DataAccessLibrary.Business_Entity
             {
                 res.Add(new SearchLawDTO
                 {
-                    ParagraphDesc = paragraph.Description,
+                    StatueDesc = char.ToUpper(paragraph.Section.Statue.Description.Remove(0, 8)[0]) + paragraph.Section.Statue.Description.Remove(0, 8).Substring(1),
+                    ParagraphDesc = paragraph.Description.Replace(":", ":\\\n").Replace(";", ";\\\n \\\n"),
                     SectionDesc = paragraph.Section.Description,
                     MaxPenalty = paragraph.Section.MaxPenalty.ToString(),
                     MinPenalty = paragraph.Section.MinPenalty.ToString(),
-                    AdditionalPenalty = paragraph.AdditionalPenalty != null ? paragraph.AdditionalPenalty.ToString() : "",
+                    AdditionalPenalty = paragraph.AdditionalPenalty != null ? " " + paragraph.AdditionalPenalty.ToString().Replace(".", ". \\\n") : "",
+                    ReferenceParagraph = allPars.Where(par => paragraph.ReferenceReferenceParagraphs.Any(rp => rp.ParagraphId == par.Id)).
+                    Select(p => new SearchParagraphDTO
+                    {
+                        Id = p.Id,
+                        AdditionalPenalty = p.AdditionalPenalty,
+                        Description = p.Description,
+                        IsDeleted = false,
+                        MaxPenalty = p.Section.MaxPenalty.ToString(),
+                        MinPenalty = p.Section.MinPenalty.ToString(),
+                        Name = p.Name,
+                        SectionId = p.SectionId,
+                        Status = p.Status,
+                    })
+                    .ToList()
                 });
             }
 
@@ -112,11 +130,81 @@ namespace DataAccessLibrary.Business_Entity
             {
                 res.Add(new SearchLawDTO
                 {
+                    StatueDesc = char.ToUpper(section.Statue.Description.Remove(0, 8)[0]) + section.Statue.Description.Remove(0, 8).Substring(1),
                     ParagraphDesc = "",
                     SectionDesc = section.Description,
                     MaxPenalty = section.MaxPenalty.ToString(),
                     MinPenalty = section.MinPenalty.ToString(),
-                    AdditionalPenalty = section.Paragraphs.FirstOrDefault(p => p.SectionId == section.Id).AdditionalPenalty != null ? section.Paragraphs.FirstOrDefault(p => p.SectionId == section.Id).AdditionalPenalty.ToString() : "",
+                    AdditionalPenalty = section.Paragraphs.FirstOrDefault(p => p.SectionId == section.Id).AdditionalPenalty != null ? " " + section.Paragraphs.FirstOrDefault(p => p.SectionId == section.Id).AdditionalPenalty.ToString().Replace(".", ". \\\n") : "",
+                    ReferenceParagraph = allPars.Where(par => section.Paragraphs.FirstOrDefault(p => p.SectionId == section.Id).ReferenceReferenceParagraphs.Any(rp => rp.ParagraphId == par.Id)).
+                    Select(p => new SearchParagraphDTO
+                    {
+                        Id = p.Id,
+                        AdditionalPenalty = p.AdditionalPenalty,
+                        Description = p.Description,
+                        IsDeleted = false,
+                        MaxPenalty = p.Section.MaxPenalty.ToString(),
+                        MinPenalty = p.Section.MinPenalty.ToString(),
+                        Name = p.Name,
+                        SectionId = p.SectionId,
+                        Status = p.Status,
+                    })
+                    .ToList()
+                });
+            }
+
+            return res;
+
+        }
+
+
+        public async Task<IEnumerable<SearchLawDTO>> GetSearchListByKeywordId(Guid keywordId, string vehicleCategory)
+        {
+
+            var vehicleCategoryId = (await work.VehicleCategories.GetAllAsync()).FirstOrDefault(vc => normaliseVietnamese(vehicleCategory) == normaliseVietnamese(vc.Name)).Id;
+            var res = new List<SearchLawDTO>();
+            await work.Statues.GetAllAsync();
+            var allPars = (await work.Paragraphs.GetAllAsync(nameof(Paragraph.Section), nameof(Paragraph.ReferenceParagraphs)))
+                .Where(paragraph => paragraph.Status == (int)Status.Active
+                    && paragraph.Section.VehicleCategoryId == vehicleCategoryId
+                    && !paragraph.IsDeleted)
+                .ToList();
+
+            var paragraphsInKeywordList = (await work.KeywordParagraphs.GetAllAsync()).Where(k => k.KeywordId == keywordId).ToList();
+
+            var paragraphList = allPars
+                .Where(paragraph =>
+                  paragraphsInKeywordList.Any(pk => pk.ParagraphId == paragraph.Id)
+                  && paragraph.Status == (int)Status.Active
+                  && paragraph.Section.VehicleCategoryId == vehicleCategoryId
+                  && !paragraph.IsDeleted)
+                .ToList();
+
+
+            foreach (var paragraph in paragraphList)
+            {
+                res.Add(new SearchLawDTO
+                {
+                    StatueDesc = char.ToUpper(paragraph.Section.Statue.Description.Remove(0, 8)[0]) + paragraph.Section.Statue.Description.Remove(0, 8).Substring(1),
+                    ParagraphDesc = paragraph.Description,
+                    SectionDesc = paragraph.Section.Description,
+                    MaxPenalty = paragraph.Section.MaxPenalty.ToString(),
+                    MinPenalty = paragraph.Section.MinPenalty.ToString(),
+                    AdditionalPenalty = paragraph.AdditionalPenalty != null ? " " + paragraph.AdditionalPenalty.ToString().Replace(".", ". \\\n") : "",
+                    ReferenceParagraph = allPars.Where(par => paragraph.ReferenceReferenceParagraphs.Any(rp => rp.ParagraphId == par.Id)).
+                    Select(p => new SearchParagraphDTO
+                    {
+                        Id = p.Id,
+                        AdditionalPenalty = p.AdditionalPenalty,
+                        Description = p.Description,
+                        IsDeleted = false,
+                        MaxPenalty = p.Section.MaxPenalty.ToString(),
+                        MinPenalty = p.Section.MinPenalty.ToString(),
+                        Name = p.Name,
+                        SectionId = p.SectionId,
+                        Status = p.Status,
+                    })
+                    .ToList()
                 });
             }
             return res;

@@ -2,6 +2,7 @@
 using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
+using DTOsLibrary.SearchLaw;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,42 @@ namespace DataAccessLibrary.Business_Entity
                         && paragraph.Status == (int)Status.Active
                         && paragraph.Id.Equals(id))
                 .FirstOrDefault();
+        }
+
+        public async Task<SearchLawDTO> GetSearchParagraphDTOAsync(Guid id)
+        {
+            var res = new SearchLawDTO();
+            await work.Statues.GetAllAsync();
+            var allPars = (await work.Paragraphs.GetAllAsync(nameof(Paragraph.Section), nameof(Paragraph.ReferenceReferenceParagraphs)))
+                .Where(paragraph => paragraph.Status == (int)Status.Active
+                    && !paragraph.IsDeleted)
+                .ToList();
+            var paragraph = allPars
+               .Where(paragraph => !paragraph.IsDeleted
+                       && paragraph.Status == (int)Status.Active
+                       && paragraph.Id.Equals(id))
+               .FirstOrDefault();
+
+            res.StatueDesc = char.ToUpper(paragraph.Section.Statue.Description.Remove(0, 8)[0]) + paragraph.Section.Statue.Description.Remove(0, 8).Substring(1);
+            res.ParagraphDesc = paragraph.Description;
+            res.SectionDesc = paragraph.Section.Description;
+            res.MaxPenalty = paragraph.Section.MaxPenalty.ToString();
+            res.MinPenalty = paragraph.Section.MinPenalty.ToString();
+            res.AdditionalPenalty = paragraph.AdditionalPenalty != null ? " " + paragraph.AdditionalPenalty.ToString().Replace(".", ". \\\n") : "";
+            res.ReferenceParagraph = paragraph.ReferenceReferenceParagraphs != null ? allPars.Where(par => paragraph.ReferenceReferenceParagraphs.Any(rp => rp.ParagraphId == par.Id)).
+                Select(p => new SearchParagraphDTO
+                {
+                    Id = p.Id,
+                    AdditionalPenalty = p.AdditionalPenalty,
+                    Description = p.Description,
+                    IsDeleted = false,
+                    MaxPenalty = paragraph.Section.MaxPenalty.ToString(),
+                    MinPenalty = paragraph.Section.MinPenalty.ToString(),
+                    Name = p.Name,
+                    SectionId = p.SectionId,
+                    Status = p.Status,
+                }).ToList() : null;
+            return res;
         }
 
         public async Task<IEnumerable<ParagraphDTO>> GetParagraphsBySectionIdAsync(Guid sectionId)
