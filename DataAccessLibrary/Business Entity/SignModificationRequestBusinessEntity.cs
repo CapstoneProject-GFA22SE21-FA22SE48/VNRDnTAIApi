@@ -64,5 +64,22 @@ namespace DataAccessLibrary.Business_Entity
             work.SignModificationRequests.Update(signModificationRequest);
             await work.Save();
         }
+
+        //--------------------------------------------------
+        public async Task<SignModificationRequest> GetSignRomDetail(Guid modifyingSignId)
+        {
+            SignModificationRequest signRom =
+                (await work.SignModificationRequests.GetAllAsync(nameof(SignModificationRequest.ModifyingSign), nameof(SignModificationRequest.ModifiedSign)))
+                .Where(s => s.ModifyingSignId == modifyingSignId).FirstOrDefault();
+            return signRom;
+        }
+        //--------------------------------------------------
+        public async Task<SignModificationRequest> GetGpssignRomDetail(Guid modifyingGpssignId)
+        {
+            SignModificationRequest gpssignRom =
+                (await work.SignModificationRequests.GetAllAsync(nameof(SignModificationRequest.ModifyingGpssign), nameof(SignModificationRequest.ModifiedGpssign)))
+                .Where(s => s.ModifyingGpssignId == modifyingGpssignId).FirstOrDefault();
+            return gpssignRom;
+        }
     }
 }
