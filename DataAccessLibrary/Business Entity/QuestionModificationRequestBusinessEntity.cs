@@ -79,7 +79,20 @@ namespace DataAccessLibrary.Business_Entity
                 (await work.QuestionModificationRequests.GetAllMultiIncludeAsync(
                     include: questionRom => questionRom
                     .Include(q => q.ModifyingQuestion)
+                    .ThenInclude(q => q.TestCategory)
+
+                    .Include(q => q.ModifyingQuestion)
+                    .ThenInclude(q => q.QuestionCategory)
+
+                    .Include(q => q.ModifyingQuestion)
                     .ThenInclude(q => q.Answers)
+
+                    .Include(q => q.ModifiedQuestion)
+                    .ThenInclude(q => q.TestCategory)
+
+                    .Include(q => q.ModifiedQuestion)
+                    .ThenInclude(q => q.QuestionCategory)
+
                     .Include(q => q.ModifiedQuestion)
                     .ThenInclude(q => q.Answers)
                     ))
