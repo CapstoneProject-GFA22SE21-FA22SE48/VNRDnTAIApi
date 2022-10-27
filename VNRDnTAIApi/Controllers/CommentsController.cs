@@ -81,6 +81,12 @@ namespace VNRDnTAIApi.Controllers
                 return BadRequest();
             }
 
+            Comment existed = await _entity.GetCommentAsync(id);
+            if (comment.UserId != existed.UserId)
+            {
+                return BadRequest();
+            }
+
             try
             {
                 return StatusCode(200, await _entity.UpdateComment(comment));

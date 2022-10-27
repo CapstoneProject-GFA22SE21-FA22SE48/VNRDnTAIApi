@@ -306,11 +306,11 @@ namespace VNRDnTAIApi.Controllers
             User user;
             try
             {
-                user = await _entity.GetUserAsyncByGmail(loginUserDTO.Email);
+                user = await _entity.GetUserAsyncByGmail(loginUserDTO.Email.Trim());
                 if (user == null)
                 {
                     user = await _entity
-                        .GetUserAsyncByUsername(loginUserDTO.Username);
+                        .GetUserAsyncByUsername(loginUserDTO.Username.Trim());
                     if (user == null)
                     {
                         user = await _entity
@@ -329,9 +329,15 @@ namespace VNRDnTAIApi.Controllers
                             return StatusCode(400, "Có lỗi xảy ra.");
                         }
                     }
-                    return StatusCode(409, "Username đã được đăng ký.");
+                    else
+                    {
+                        return StatusCode(409, "Username đã được đăng ký.");
+                    }
                 }
-                return StatusCode(409, "Email đã được đăng ký.");
+                else
+                {
+                    return StatusCode(409, "Email đã được đăng ký.");
+                }
             }
             catch (ArgumentException ae)
             {
@@ -546,6 +552,37 @@ namespace VNRDnTAIApi.Controllers
             catch (ApplicationException ae)
             {
                 return StatusCode(500,ae.Message);
+            }
+        }
+
+        //POST api/Users/GetUserByEmail
+        [HttpPost("GetUserByEmail")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(200)]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetUserByEmail(string email)
+        {
+            User user;
+            try
+            {
+                user = await _entity.GetUserAsyncByGmail(email);
+
+                if (user != null)
+                {
+                    return StatusCode(200, true);
+                }
+                else
+                {
+                    return StatusCode(404, "Email không tồn tại");
+                }
+            }
+            catch (ArgumentException ae)
+            {
+                return BadRequest("Có lỗi xảy ra.\n" + ae.Message);
+            }
+            catch
+            {
+                return StatusCode(500, "Có lỗi xảy ra.\nVui lòng thử lại sau.");
             }
         }
 
