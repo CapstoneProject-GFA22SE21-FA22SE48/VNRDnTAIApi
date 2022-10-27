@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BusinessObjectLibrary;
+﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace VNRDnTAIApi.Controllers
 {
@@ -97,7 +90,7 @@ namespace VNRDnTAIApi.Controllers
         [ProducesResponseType(typeof(SignModificationRequest), 200)]
         [ProducesResponseType(500)]
         [ProducesResponseType(400)]
-        public async Task<IActionResult> 
+        public async Task<IActionResult>
             PutSignModificationRequest(Guid modifyingSignId, Guid scribeId, SignModificationRequest signModificationRequest)
         {
             if (modifyingSignId != signModificationRequest.ModifyingSignId || scribeId != signModificationRequest.ScribeId)
@@ -141,6 +134,40 @@ namespace VNRDnTAIApi.Controllers
             {
                 await _entity.RemoveSignModificationRequest(modifyingSignId);
                 return StatusCode(204);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        //---------------------------------------------------
+        // GET: api/SignModificationRequests/SignROMDetail/5
+        [HttpGet("SignROMDetail/{modifyingSignId}")]
+        [ProducesResponseType(typeof(SignModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<SignModificationRequest>> GetSignRomDetail(Guid modifyingSignId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetSignRomDetail(modifyingSignId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        //---------------------------------------------------
+        // GET: api/SignModificationRequests/GpssignROMDetail/5
+        [HttpGet("GpssignROMDetail/{modifyingGpssignId}")]
+        [ProducesResponseType(typeof(SignModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<SignModificationRequest>> GetGpssignRomDetail(Guid modifyingGpssignId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetGpssignRomDetail(modifyingGpssignId));
             }
             catch (Exception ex)
             {
