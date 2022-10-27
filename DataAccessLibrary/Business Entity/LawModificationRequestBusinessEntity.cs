@@ -122,7 +122,8 @@ namespace DataAccessLibrary.Business_Entity
                     (users.Where(u => u.Id == lawRom.ScribeId).FirstOrDefault().Username),
                     OperationType = lawRom.OperationType,
                     Status = lawRom.Status,
-                    CreatedDate = lawRom.CreatedDate
+                    CreatedDate = lawRom.CreatedDate,
+                    DeniedReason = lawRom.DeniedReason,
                 });
             }
 
@@ -162,7 +163,8 @@ namespace DataAccessLibrary.Business_Entity
                     (users.Where(u => u.Id == signRom.ScribeId).FirstOrDefault().Username),
                     OperationType = signRom.OperationType,
                     Status = signRom.Status,
-                    CreatedDate = signRom.CreatedDate
+                    CreatedDate = signRom.CreatedDate,
+                    DeniedReason = signRom.DeniedReason,
                 });
             }
 
@@ -187,7 +189,8 @@ namespace DataAccessLibrary.Business_Entity
                     (users.Where(u => u.Id == questionRom.ScribeId).FirstOrDefault().Username),
                     OperationType = questionRom.OperationType,
                     Status = questionRom.Status,
-                    CreatedDate = questionRom.CreatedDate
+                    CreatedDate = questionRom.CreatedDate,
+                    DeniedReason = questionRom.DeniedReason
                 });
             }
 
@@ -208,7 +211,8 @@ namespace DataAccessLibrary.Business_Entity
                     PromotingAdminUsername = userRom.PromotingAdmin != null ?
                     userRom.PromotingAdmin.Username : users.Where(u => u.Id == userRom.PromotingAdminId).FirstOrDefault().Username,
                     Status = userRom.Status,
-                    CreatedDate = userRom.CreatedDate
+                    CreatedDate = userRom.CreatedDate,
+                    DeniedReason = userRom.DeniedReason
                 });
             }
 
