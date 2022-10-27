@@ -1,6 +1,7 @@
 ﻿using BusinessObjectLibrary;
 using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary.SearchLaw;
 using DTOsLibrary.SearchSign;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,16 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<IEnumerable<SignCategoryDTO>> GetSignCategoriesDTOList()
         {
             var res = new List<SignCategoryDTO>();
+            await work.SignParagraphs.GetAllAsync();
+            await work.Statues.GetAllAsync();
+            await work.Paragraphs.GetAllAsync(nameof(Paragraph.Section));
+            await work.References.GetAllAsync();
+
+            var allPars = (await work.Paragraphs.GetAllAsync())
+                  .Where(paragraph => paragraph.Status == (int)Status.Active
+                      && !paragraph.IsDeleted)
+                  .ToList();
+
             var signCatList = (await work.SignCategories.GetAllAsync(nameof(SignCategory.Signs)))
                .Where(signCategory => !signCategory.IsDeleted);
 
@@ -33,7 +44,28 @@ namespace DataAccessLibrary.Business_Entity
                     {
                         Name = s.Name,
                         Description = s.Description,
-                        ImageUrl = s.ImageUrl
+                        ImageUrl = s.ImageUrl,
+                        searchLawDTOs = s.SignParagraphs.Where(sp => !sp.IsDeleted).Select(sp => new SearchLawDTO
+                        {
+                            StatueDesc = sp.Paragraph.Section.Statue.Description,
+                            SectionDesc = sp.Paragraph.Section.Description,
+                            ParagraphDesc = sp.Paragraph.Description,
+                            MaxPenalty = sp.Paragraph.Section.MaxPenalty.ToString(),
+                            MinPenalty = sp.Paragraph.Section.MinPenalty.ToString(),
+                            AdditionalPenalty = sp.Paragraph.AdditionalPenalty.ToString(),
+                            ReferenceParagraph = allPars.Where(par => sp.Paragraph.ReferenceReferenceParagraphs.Any(rp => rp.ParagraphId == par.Id)).Select(p => new SearchParagraphDTO
+                            {
+                                Id = sp.Paragraph.Id,
+                                AdditionalPenalty = p.AdditionalPenalty,
+                                Description = p.Description,
+                                IsDeleted = false,
+                                MaxPenalty = p.Section.MaxPenalty.ToString(),
+                                MinPenalty = p.Section.MinPenalty.ToString(),
+                                Name = p.Name,
+                                SectionId = p.SectionId,
+                                Status = p.Status,
+                            }).ToList()
+                        }).ToList()
                     }).ToList()
                 });
             }
