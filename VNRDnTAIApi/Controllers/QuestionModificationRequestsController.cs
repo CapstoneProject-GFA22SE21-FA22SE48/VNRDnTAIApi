@@ -164,7 +164,7 @@ namespace VNRDnTAIApi.Controllers
         [HttpPost("Approve/{modifyingQuestionId}")]
         [ProducesResponseType(typeof(QuestionModificationRequest), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<SignModificationRequest>> ApproveQuestionROM(Guid modifyingQuestionId)
+        public async Task<ActionResult<QuestionModificationRequest>> ApproveQuestionROM(Guid modifyingQuestionId)
         {
             try
             {
@@ -180,7 +180,7 @@ namespace VNRDnTAIApi.Controllers
         [HttpPost("Deny/{modifyingQuestionId}")]
         [ProducesResponseType(typeof(QuestionModificationRequest), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<SignModificationRequest>> DenyQuestionROM(Guid modifyingQuestionId, [FromBody] string deniedReason)
+        public async Task<ActionResult<QuestionModificationRequest>> DenyQuestionROM(Guid modifyingQuestionId, [FromBody] string deniedReason)
         {
             try
             {
