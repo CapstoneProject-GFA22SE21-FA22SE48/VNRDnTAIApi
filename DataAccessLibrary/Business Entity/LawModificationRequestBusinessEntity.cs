@@ -569,5 +569,111 @@ namespace DataAccessLibrary.Business_Entity
             await work.Save();
             return statueRom;
         }
+        //--------------------------------------------------
+        public async Task<LawModificationRequest> ApproveParagraphRom(Guid modifyingParagraphId)
+        {
+            LawModificationRequest paraRom = (await work.LawModificationRequests.GetAllAsync())
+                .Where(p => p.ModifyingParagraphId == modifyingParagraphId).FirstOrDefault();
+
+            if (paraRom != null)
+            {
+                Paragraph modifyingParagraph = await work.Paragraphs.GetAsync((Guid)paraRom.ModifyingParagraphId);
+                Paragraph modifiedPargraph = null;
+                if (paraRom.ModifiedParagraphId != null)
+                {
+                    modifiedPargraph = await work.Paragraphs.GetAsync((Guid)paraRom.ModifiedParagraphId);
+                }
+
+                if (paraRom.OperationType == (int)OperationType.Add)
+                {
+                    paraRom.Status = (int)Status.Approved;
+                    if (modifyingParagraph != null)
+                    {
+                        modifyingParagraph.Status = (int)Status.Active;
+                    }
+                }
+                else if (paraRom.OperationType == (int)OperationType.Update)
+                {
+                    paraRom.Status = (int)Status.Approved;
+                    if (modifyingParagraph != null)
+                    {
+                        modifyingParagraph.Status = (int)Status.Active;
+                    }
+                    if (modifiedPargraph != null)
+                    {
+                        modifiedPargraph.IsDeleted = true;
+
+                        //Reference all Pending Rom of the modifiedParagraphId to the new modifyingParagraphId
+                        IEnumerable<LawModificationRequest> paraRomsRefModifiedParagraph =
+                            (await work.LawModificationRequests.GetAllAsync())
+                            .Where(l => l.Status == (int)Status.Pending
+                                    && l.ModifiedParagraphId == modifiedPargraph.Id);
+                        foreach (LawModificationRequest lawMod in paraRomsRefModifiedParagraph)
+                        {
+                            lawMod.ModifiedParagraphId = modifyingParagraph.Id;
+                        }
+                    }
+                }
+                else if (paraRom.OperationType == (int)OperationType.Delete)
+                {
+                    paraRom.Status = (int)Status.Approved;
+                    if (modifyingParagraph != null)
+                    {
+                        modifyingParagraph.Status = (int)Status.Active;
+                    }
+                    if (modifiedPargraph != null)
+                    {
+                        modifiedPargraph.IsDeleted = true;
+
+                        //Set status of all Pending ROM reference to the modifiedParagraphId to Confirmed
+                        IEnumerable<LawModificationRequest> paraRomsRefModifiedParagraph =
+                            (await work.LawModificationRequests.GetAllAsync())
+                            .Where(l => l.Status == (int)Status.Pending
+                                    && l.ModifiedParagraphId == modifiedPargraph.Id);
+
+                        foreach (LawModificationRequest lawMod in paraRomsRefModifiedParagraph)
+                        {
+                            lawMod.Status = (int)Status.Confirmed;
+                        }
+                    }
+                }
+            }
+            await work.Save();
+            return paraRom;
+        }
+        //--------------------------------------------------
+        public async Task<LawModificationRequest> DenyParagraphRom(Guid modifyingParagraphId, string deniedReason)
+        {
+            LawModificationRequest paraRom = (await work.LawModificationRequests.GetAllAsync())
+               .Where(l => l.ModifyingParagraphId == modifyingParagraphId).FirstOrDefault();
+            if (paraRom != null)
+            {
+                paraRom.Status = (int)Status.Denied;
+                paraRom.DeniedReason = deniedReason;
+
+                //Calculate approval rate
+                double approvalRate = 1 - ((double)((await work.LawModificationRequests.GetAllAsync())
+                    .Where(l => l.ScribeId == paraRom.ScribeId && l.Status == (int)Status.Denied).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                    .Where(s => s.ScribeId == paraRom.ScribeId && s.Status == (int)Status.Denied).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                .Where(s => s.ScribeId == paraRom.ScribeId && s.Status == (int)Status.Denied).Count())
+                    /
+                ((await work.LawModificationRequests.GetAllAsync())
+                    .Where(l => l.ScribeId == paraRom.ScribeId).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                    .Where(s => s.ScribeId == paraRom.ScribeId).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                .Where(s => s.ScribeId == paraRom.ScribeId).Count()));
+                if (approvalRate < 0.65)
+                {
+                    User scribe = await work.Users.GetAsync((Guid)paraRom.ScribeId);
+                    scribe.Status = (int)Status.Deactivated;
+                }
+            }
+
+            await work.Save();
+            return paraRom;
+        }
     }
 }
