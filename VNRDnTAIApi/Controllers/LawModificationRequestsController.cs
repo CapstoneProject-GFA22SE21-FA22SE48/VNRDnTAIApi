@@ -226,6 +226,37 @@ namespace VNRDnTAIApi.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-
+        //---------------------------------------------------
+        // POST: api/LawModificationRequests/Paragraph/Approve/5
+        [HttpPost("Paragraph/Approve/{modifyingParagraphId}")]
+        [ProducesResponseType(typeof(LawModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<LawModificationRequest>> ApproveParagraphROM(Guid modifyingParagraphId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.ApproveParagraphRom(modifyingParagraphId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        //---------------------------------------------------
+        // POST: api/LawModificationRequests/Paragraph/Deny/5
+        [HttpPost("Paragraph/Deny/{modifyingParagraphId}")]
+        [ProducesResponseType(typeof(LawModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<LawModificationRequest>> DenyParagraphROM(Guid modifyingParagraphId, [FromBody] string deniedReason)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.DenyParagraphRom(modifyingParagraphId, deniedReason));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }
