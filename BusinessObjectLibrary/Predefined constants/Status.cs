@@ -10,5 +10,6 @@
         Active = 5,
         Deactivated = 6,
         Approved = 7,
+        Cancelled = 8
     }
 }
