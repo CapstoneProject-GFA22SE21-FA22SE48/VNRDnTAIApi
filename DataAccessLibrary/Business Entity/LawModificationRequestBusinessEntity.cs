@@ -491,11 +491,11 @@ namespace DataAccessLibrary.Business_Entity
                         }
 
                         //Reference all Pending Rom of the modifiedStatueId to the new modifyingStatueId
-                        IEnumerable<LawModificationRequest> statueRomsRefModifiedQuestion =
+                        IEnumerable<LawModificationRequest> statueRomsRefModifiedStatue =
                             (await work.LawModificationRequests.GetAllAsync())
                             .Where(l => l.Status == (int)Status.Pending
                                     && l.ModifiedStatueId == statueRom.ModifiedStatueId);
-                        foreach (LawModificationRequest statueMod in statueRomsRefModifiedQuestion)
+                        foreach (LawModificationRequest statueMod in statueRomsRefModifiedStatue)
                         {
                             statueMod.ModifiedStatueId = statueRom.ModifyingStatueId;
                         }
@@ -520,7 +520,7 @@ namespace DataAccessLibrary.Business_Entity
                         List<LawModificationRequest> relatedlawRoms = new List<LawModificationRequest>();
 
                         //Set IsDeleted to all sections ref to modifiedStatueId, then all paragraph ref to each section
-                        //And add all related pending ROM of statue, section, paragraph related to modifiedStatueId
+                        //And add all related pending ROM of statue, section, paragraph that related to modifiedStatueId to a list
                         relatedlawRoms.AddRange(allLawRoms.Where(l => l.ModifiedStatueId == statueRom.ModifiedStatueId));
                         foreach (Section section in relatedSections)
                         {
@@ -582,6 +582,150 @@ namespace DataAccessLibrary.Business_Entity
 
             await work.Save();
             return statueRom;
+        }
+        //--------------------------------------------------
+        public async Task<LawModificationRequest> ApproveSectionRom(Guid modifyingSectionId)
+        {
+            LawModificationRequest sectionRom = (await work.LawModificationRequests.GetAllAsync())
+                .Where(l => l.ModifyingSectionId == modifyingSectionId).FirstOrDefault();
+
+            if (sectionRom != null)
+            {
+                Section modifyingSection = await work.Sections.GetAsync((Guid)sectionRom.ModifyingSectionId);
+                Section modifiedSection = null;
+
+                List<Paragraph> relatedParagraphsOfModifiedSection =
+                        new List<Paragraph>();
+
+                if (sectionRom.ModifiedSectionId != null)
+                {
+                    modifiedSection = (await work.Sections.GetAsync((Guid)sectionRom.ModifiedSectionId));
+
+                    relatedParagraphsOfModifiedSection
+                        .AddRange((await work.Paragraphs.GetAllAsync())
+                        .Where(p => !p.IsDeleted && p.SectionId == sectionRom.ModifiedSectionId));
+                }
+
+                if (sectionRom.OperationType == (int)OperationType.Add)
+                {
+                    sectionRom.Status = (int)Status.Approved;
+                    if (modifyingSection != null)
+                    {
+                        modifyingSection.Status = (int)Status.Active;
+                    }
+                    IEnumerable<Paragraph> relatedParagraphsOfNewSection =
+                        (await work.Paragraphs.GetAllAsync())
+                        .Where(p => !p.IsDeleted && p.SectionId == modifyingSection.Id);
+                    if (relatedParagraphsOfNewSection != null)
+                    {
+                        foreach (Paragraph paragraph in relatedParagraphsOfNewSection)
+                        {
+                            paragraph.Status = (int)Status.Active;
+                        }
+                    }
+                }
+                else if (sectionRom.OperationType == (int)OperationType.Update)
+                {
+                    sectionRom.Status = (int)Status.Approved;
+                    if (modifyingSection != null)
+                    {
+                        modifyingSection.Status = (int)Status.Active;
+                    }
+                    if (modifiedSection != null)
+                    {
+                        modifiedSection.IsDeleted = true;
+
+                        //All paragraph ref to modifiedSection -> now ref to modifyingSection
+                        foreach (Paragraph paragraph in relatedParagraphsOfModifiedSection)
+                        {
+                            paragraph.SectionId = (Guid)sectionRom.ModifyingSectionId;
+                        }
+
+                        //Reference all Pending Rom of the modifiedSectionId to the new modifyingSectionId
+                        IEnumerable<LawModificationRequest> sectionRomsRefModifiedSection =
+                            (await work.LawModificationRequests.GetAllAsync())
+                            .Where(l => l.Status == (int)Status.Pending
+                                    && l.ModifiedSectionId == sectionRom.ModifiedSectionId);
+                        foreach (LawModificationRequest sectionMod in sectionRomsRefModifiedSection)
+                        {
+                            sectionMod.ModifiedSectionId = sectionRom.ModifyingSectionId;
+                        }
+                    }
+                }
+                else if (sectionRom.OperationType == (int)OperationType.Delete)
+                {
+                    sectionRom.Status = (int)Status.Approved;
+                    if (modifyingSection != null)
+                    {
+                        modifyingSection.Status = (int)Status.Active;
+                    }
+                    if (modifiedSection != null)
+                    {
+                        modifiedSection.IsDeleted = true;
+
+                        //All PENDING law roms
+                        IEnumerable<LawModificationRequest> allLawRoms = (await work.LawModificationRequests.GetAllAsync())
+                            .Where(l => l.Status == (int)Status.Pending && !l.IsDeleted);
+
+                        //Will be used to contain all PENDING sectionRom, paragraphRom related to modifiedStatueId
+                        List<LawModificationRequest> relatedlawRoms = new List<LawModificationRequest>();
+
+                        //Set IsDeleted to all paragraph ref to each modifiedSectionId
+                        //And add all related pending ROM of section, paragraph that related to modifiedSectionId to a list
+                        relatedlawRoms.AddRange(allLawRoms.Where(l => l.ModifiedSectionId == sectionRom.ModifiedSectionId));
+                        foreach (Paragraph paragraph in relatedParagraphsOfModifiedSection)
+                        {
+                            paragraph.IsDeleted = true;
+
+                            relatedlawRoms.AddRange(allLawRoms.Where(l => l.ModifiedParagraphId == paragraph.Id));
+                        }
+
+                        //Set status -> confirmed for all pending ROM of section that related to modifiedSectionId
+                        //And pending ROM of parargaphs related to section
+                        foreach (LawModificationRequest relatedlawRom in relatedlawRoms)
+                        {
+                            relatedlawRom.Status = (int)Status.Confirmed;
+                        }
+
+                    }
+                }
+            }
+            await work.Save();
+            return sectionRom;
+        }
+        //--------------------------------------------------
+        public async Task<LawModificationRequest> DenySectionRom(Guid modifyingSectionId, string deniedReason)
+        {
+            LawModificationRequest sectionRom = (await work.LawModificationRequests.GetAllAsync())
+               .Where(l => l.ModifyingSectionId == modifyingSectionId).FirstOrDefault();
+            if (sectionRom != null)
+            {
+                sectionRom.Status = (int)Status.Denied;
+                sectionRom.DeniedReason = deniedReason;
+
+                //Calculate approval rate
+                double approvalRate = 1 - ((double)((await work.LawModificationRequests.GetAllAsync())
+                    .Where(l => l.ScribeId == sectionRom.ScribeId && l.Status == (int)Status.Denied).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                    .Where(s => s.ScribeId == sectionRom.ScribeId && s.Status == (int)Status.Denied).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                .Where(s => s.ScribeId == sectionRom.ScribeId && s.Status == (int)Status.Denied).Count())
+                    /
+                ((await work.LawModificationRequests.GetAllAsync())
+                    .Where(l => l.ScribeId == sectionRom.ScribeId).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                    .Where(s => s.ScribeId == sectionRom.ScribeId).Count()
+                + (await work.SignModificationRequests.GetAllAsync())
+                .Where(s => s.ScribeId == sectionRom.ScribeId).Count()));
+                if (approvalRate < 0.65)
+                {
+                    User scribe = await work.Users.GetAsync((Guid)sectionRom.ScribeId);
+                    scribe.Status = (int)Status.Deactivated;
+                }
+            }
+
+            await work.Save();
+            return sectionRom;
         }
         //--------------------------------------------------
         public async Task<LawModificationRequest> ApproveParagraphRom(Guid modifyingParagraphId)

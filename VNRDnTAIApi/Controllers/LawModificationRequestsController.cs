@@ -106,7 +106,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // PUT: api/LawModificationRequests/Paragraphs/5/Users/5
-        [HttpPut("Paragraphs/{paragraphId}/Users/{userid}")]
+        [HttpPut("Paragraphs/{sectionId}/Users/{userid}")]
         [ProducesResponseType(typeof(LawModificationRequest), 200)]
         [ProducesResponseType(500)]
         [ProducesResponseType(400)]
@@ -179,14 +179,14 @@ namespace VNRDnTAIApi.Controllers
         }
 
         //GET: api/LawModificationRequests/ParagraphROMDetail/References/5
-        [HttpGet("ParagraphROMDetail/References/{paragraphRomId}")]
+        [HttpGet("ParagraphROMDetail/References/{sectionRomId}")]
         [ProducesResponseType(typeof(IEnumerable<ReferenceDTO>), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<ReferenceDTO>>> ParagraphROMDetailReferences(Guid paragraphRomId)
+        public async Task<ActionResult<IEnumerable<ReferenceDTO>>> ParagraphROMDetailReferences(Guid sectionRomId)
         {
             try
             {
-                return StatusCode(200, await _entity.GetParagraphROMDetailReference(paragraphRomId));
+                return StatusCode(200, await _entity.GetParagraphROMDetailReference(sectionRomId));
             }
             catch (Exception ex)
             {
@@ -220,6 +220,38 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.DenyStatueRom(modifyingStatueId, deniedReason));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        //---------------------------------------------------
+        // POST: api/LawModificationRequests/Section/Approve/5
+        [HttpPost("Section/Approve/{modifyingSectionId}")]
+        [ProducesResponseType(typeof(LawModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<LawModificationRequest>> ApproveSectionROM(Guid modifyingSectionId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.ApproveSectionRom(modifyingSectionId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        //---------------------------------------------------
+        // POST: api/LawModificationRequests/Section/Deny/5
+        [HttpPost("Section/Deny/{modifyingSectionId}")]
+        [ProducesResponseType(typeof(LawModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<LawModificationRequest>> DenySectionROM(Guid modifyingSectionId, [FromBody] string deniedReason)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.DenySectionRom(modifyingSectionId, deniedReason));
             }
             catch (Exception ex)
             {
