@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using VNRDnTAILibrary.Utilities;
 
 namespace DataAccessLibrary.Business_Entity
 {
@@ -143,7 +142,7 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<User> GetUserAsyncByInfo(string username, string gmail)
         {
             return (await work.Users.GetAllAsync())
-                .Where(user => 
+                .Where(user =>
                     (user.Username != null && !user.IsDeleted && user.Username.Equals(username))
                     || (user.Gmail != null && !user.IsDeleted && user.Gmail.Equals(gmail))
                  ).FirstOrDefault();
@@ -295,6 +294,20 @@ namespace DataAccessLibrary.Business_Entity
             newMember.NewMembersByDay = listNumberNewMemberByDay;
             return newMember;
         }
+        //--------------------------------------------------
+        public async Task<ScribeReportDTO> GetAdminScribeReportDTO(int month, int year)
+        {
+            IEnumerable<User> scribes = (await work.Users.GetAllAsync())
+                .Where(u => !u.IsDeleted && u.Role == (int)UserRoles.SCRIBE);
 
+            ScribeReportDTO scribeReportDTO = new ScribeReportDTO
+            {
+                TotalScribeCount = scribes.Count(),
+                NewScribeByMonthYearCount = scribes.Where(s => s.CreatedDate.Month == month && s.CreatedDate.Year == year).Count(),
+                ActiveScribeCount = scribes.Where(s => s.Status == (int)Status.Active).Count(),
+                DeactivatedScribeCount = scribes.Where(s => s.Status == (int)Status.Deactivated).Count()
+            };
+            return scribeReportDTO;
+        }
     }
 }

@@ -2,6 +2,7 @@
 using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
+using DTOsLibrary.AdminReport;
 using DTOsLibrary.ManageROM;
 using System;
 using System.Collections.Generic;
@@ -289,7 +290,6 @@ namespace DataAccessLibrary.Business_Entity
             return lawRom;
         }
         //--------------------------------------------------
-
         public async Task<IEnumerable<ReferenceDTO>> GetParagraphROMDetailReference(Guid paragraphId)
         {
             IEnumerable<Paragraph> paragraphs = (await work.Paragraphs.GetAllAsync())
@@ -832,6 +832,49 @@ namespace DataAccessLibrary.Business_Entity
 
             await work.Save();
             return paraRom;
+        }
+        //--------------------------------------------------
+        public async Task<RomReportDTO> GetAdminRomReportDTO(int month, int year, Guid adminId)
+        {
+            IEnumerable<LawModificationRequest> lawRoms = (await work.LawModificationRequests.GetAllAsync())
+                .Where(l => !l.IsDeleted && l.AdminId == adminId && l.CreatedDate.Month == month && l.CreatedDate.Year == year);
+            IEnumerable<SignModificationRequest> signRoms = (await work.SignModificationRequests.GetAllAsync())
+                .Where(l => !l.IsDeleted && l.AdminId == adminId && l.CreatedDate.Month == month && l.CreatedDate.Year == year);
+            IEnumerable<QuestionModificationRequest> questionRoms = (await work.QuestionModificationRequests.GetAllAsync())
+                .Where(l => !l.IsDeleted && l.AdminId == adminId && l.CreatedDate.Month == month && l.CreatedDate.Year == year);
+            IEnumerable<UserModificationRequest> userRoms = (await work.UserModificationRequests.GetAllAsync())
+                .Where(l => !l.IsDeleted && l.ArbitratingAdminId == adminId && l.CreatedDate.Month == month && l.CreatedDate.Year == year);
+
+            RomReportDTO romReportDTO = new RomReportDTO
+            {
+                TotalRomCount = lawRoms.Count() + signRoms.Count() + questionRoms.Count() + userRoms.Count(),
+                PendingRomCount = lawRoms.Where(r => r.Status == (int)Status.Pending).Count()
+                + signRoms.Where(r => r.Status == (int)Status.Pending).Count()
+                + questionRoms.Where(r => r.Status == (int)Status.Pending).Count()
+                + userRoms.Where(r => r.Status == (int)Status.Pending).Count(),
+
+                ApprovedRomCount = lawRoms.Where(r => r.Status == (int)Status.Approved).Count()
+                + signRoms.Where(r => r.Status == (int)Status.Approved).Count()
+                + questionRoms.Where(r => r.Status == (int)Status.Approved).Count()
+                + userRoms.Where(r => r.Status == (int)Status.Approved).Count(),
+
+                DeniedRomCount = lawRoms.Where(r => r.Status == (int)Status.Denied).Count()
+                + signRoms.Where(r => r.Status == (int)Status.Denied).Count()
+                + questionRoms.Where(r => r.Status == (int)Status.Denied).Count()
+                + userRoms.Where(r => r.Status == (int)Status.Denied).Count(),
+
+                ConfirmedRomCount = lawRoms.Where(r => r.Status == (int)Status.Confirmed).Count()
+                + signRoms.Where(r => r.Status == (int)Status.Confirmed).Count()
+                + questionRoms.Where(r => r.Status == (int)Status.Confirmed).Count()
+                + userRoms.Where(r => r.Status == (int)Status.Confirmed).Count(),
+
+                CancelledRomCount = lawRoms.Where(r => r.Status == (int)Status.Cancelled).Count()
+                + signRoms.Where(r => r.Status == (int)Status.Cancelled).Count()
+                + questionRoms.Where(r => r.Status == (int)Status.Cancelled).Count()
+                + userRoms.Where(r => r.Status == (int)Status.Cancelled).Count(),
+            };
+
+            return romReportDTO;
         }
     }
 }
