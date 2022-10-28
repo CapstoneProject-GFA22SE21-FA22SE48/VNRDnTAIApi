@@ -303,10 +303,14 @@ namespace VNRDnTAIApi.Controllers
         [ProducesResponseType(500)]
         public async Task<ActionResult<User>> Register(LoginUserDTO loginUserDTO)
         {
-            User user;
+            User user = null;
             try
             {
-                user = await _entity.GetUserAsyncByGmail(loginUserDTO.Email.Trim());
+                if (loginUserDTO.Email != null)
+                {
+                    user = await _entity.GetUserAsyncByGmail(loginUserDTO.Email.Trim());
+                }
+
                 if (user == null)
                 {
                     user = await _entity
@@ -560,7 +564,7 @@ namespace VNRDnTAIApi.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(200)]
         [AllowAnonymous]
-        public async Task<IActionResult> GetUserByEmail(string email)
+        public async Task<IActionResult> GetUserByEmail([FromBody]string email)
         {
             User user;
             try
