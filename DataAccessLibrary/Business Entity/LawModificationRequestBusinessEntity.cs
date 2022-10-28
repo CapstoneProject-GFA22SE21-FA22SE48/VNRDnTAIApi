@@ -3,7 +3,6 @@ using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
 using DTOsLibrary.ManageROM;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -450,15 +449,27 @@ namespace DataAccessLibrary.Business_Entity
             {
                 Statue modifyingStatue = await work.Statues.GetAsync((Guid)statueRom.ModifyingStatueId);
                 Statue modifiedStatue = null;
+
+                List<Section> relatedSections = new List<Section>();
+                List<Paragraph> relatedParagraphsOfRelatedSections =
+                        new List<Paragraph>();
+
                 if (statueRom.ModifiedStatueId != null)
                 {
-                    modifiedStatue = (await work.Statues.GetAllMultiIncludeAsync(
-                                include: statue => statue
-                                .Include(s => s.Sections)
-                                .ThenInclude(sc => sc.Paragraphs)
-                                ))
-                                .Where(st => st.Id == statueRom.ModifiedStatueId)
-                                .FirstOrDefault();
+                    modifiedStatue = (await work.Statues.GetAsync((Guid)statueRom.ModifiedStatueId));
+
+                    relatedSections = (await work.Sections.GetAllAsync())
+                        .Where(s => !s.IsDeleted && s.StatueId == modifiedStatue.Id).ToList();
+
+                    IEnumerable<Paragraph> allParagraphs = (await work.Paragraphs.GetAllAsync())
+                        .Where(p => !p.IsDeleted);
+
+
+                    foreach (Section section in relatedSections)
+                    {
+                        relatedParagraphsOfRelatedSections
+                            .AddRange(allParagraphs.Where(p => p.SectionId == section.Id));
+                    }
                 }
 
                 //Scribe cannot create ROM of add statue
@@ -474,7 +485,7 @@ namespace DataAccessLibrary.Business_Entity
                         modifiedStatue.IsDeleted = true;
 
                         //All section ref to modifiedStatue -> now ref to modifyingStatue
-                        foreach (Section section in modifiedStatue.Sections)
+                        foreach (Section section in relatedSections)
                         {
                             section.StatueId = (Guid)statueRom.ModifyingStatueId;
                         }
@@ -501,29 +512,32 @@ namespace DataAccessLibrary.Business_Entity
                     {
                         modifiedStatue.IsDeleted = true;
 
-                        //all law roms
+                        //All PENDING law roms
                         IEnumerable<LawModificationRequest> allLawRoms = (await work.LawModificationRequests.GetAllAsync())
-                            .Where(l => !l.IsDeleted);
+                            .Where(l => l.Status == (int)Status.Pending && !l.IsDeleted);
 
+                        //Will be used to contain all PENDING sectionRom, paragraphRom related to modifiedStatueId
                         List<LawModificationRequest> relatedlawRoms = new List<LawModificationRequest>();
 
                         //Set IsDeleted to all sections ref to modifiedStatueId, then all paragraph ref to each section
-                        foreach (Section section in modifiedStatue.Sections)
+                        //And add all related pending ROM of statue, section, paragraph related to modifiedStatueId
+                        relatedlawRoms.AddRange(allLawRoms.Where(l => l.ModifiedStatueId == statueRom.ModifiedStatueId));
+                        foreach (Section section in relatedSections)
                         {
                             section.IsDeleted = true;
 
                             relatedlawRoms.AddRange(allLawRoms.Where(l => l.ModifiedSectionId == section.Id));
+                        }
+                        foreach (Paragraph paragraph in relatedParagraphsOfRelatedSections)
+                        {
+                            paragraph.IsDeleted = true;
 
-                            foreach (Paragraph paragraph in section.Paragraphs)
-                            {
-                                paragraph.IsDeleted = true;
-
-                                relatedlawRoms.AddRange(allLawRoms.Where(l => l.ModifiedParagraphId == paragraph.Id));
-                            }
+                            relatedlawRoms.AddRange(allLawRoms.Where(l => l.ModifiedParagraphId == paragraph.Id));
                         }
 
-                        //Set status -> confirmed for all pending ROM of section that ref to modifiedStatueId,
-                        //And pending ROM of parargaphs ref to each section
+                        //Set status -> confirmed for all pending ROM of statue that related to modifiedStatueId
+                        //And pending ROM of sections that related to modifiedStatueId,
+                        //And pending ROM of parargaphs related to each section
                         foreach (LawModificationRequest relatedlawRom in relatedlawRoms)
                         {
                             relatedlawRom.Status = (int)Status.Confirmed;
