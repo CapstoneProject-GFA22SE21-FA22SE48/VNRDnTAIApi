@@ -5,13 +5,9 @@ using DTOsLibrary;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using VNRDnTAILibrary;
 
 namespace VNRDnTAIApi.Controllers
@@ -84,6 +80,22 @@ namespace VNRDnTAIApi.Controllers
                 {
                     return StatusCode(200, await _entity.GetScribesByUserNameAsync(keywordUsername));
                 }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // GET: api/Users/Scribes/Detail/5
+        [HttpGet("Scribes/Detail/{month}/{year}/{scribeId}")]
+        [ProducesResponseType(typeof(ScribeDTO), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<ScribeDTO>> GetScribeDetail(int month, int year, Guid scribeId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetScribeDetail(month, year, scribeId));
             }
             catch (Exception ex)
             {
@@ -345,11 +357,11 @@ namespace VNRDnTAIApi.Controllers
             }
             catch (ArgumentException ae)
             {
-                return StatusCode(400,"Có lỗi xảy ra.\n" + ae.Message);
+                return StatusCode(400, "Có lỗi xảy ra.\n" + ae.Message);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Có lỗi xảy ra. Vui lòng thử lại sau.\n"+ ex.Message);
+                return StatusCode(500, "Có lỗi xảy ra. Vui lòng thử lại sau.\n" + ex.Message);
             }
         }
 
@@ -431,7 +443,7 @@ namespace VNRDnTAIApi.Controllers
             User user = null;
             try
             {
-                if (loginUserDTO.Username != null && loginUserDTO.Password != null 
+                if (loginUserDTO.Username != null && loginUserDTO.Password != null
                     && loginUserDTO.Username.Length > 0 && loginUserDTO.Password.Length > 0)
                 {
                     user = await _entity
@@ -508,7 +520,7 @@ namespace VNRDnTAIApi.Controllers
                 else if (!oldPassword.Equals(user.Password))
                 {
                     return StatusCode(403, "Mật khẩu hiện tại không đúng.");
-                } 
+                }
                 else
                 {
                     user.Password = newPassword;
@@ -555,7 +567,7 @@ namespace VNRDnTAIApi.Controllers
             }
             catch (ApplicationException ae)
             {
-                return StatusCode(500,ae.Message);
+                return StatusCode(500, ae.Message);
             }
         }
 
@@ -564,7 +576,7 @@ namespace VNRDnTAIApi.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(200)]
         [AllowAnonymous]
-        public async Task<IActionResult> GetUserByEmail([FromBody]string email)
+        public async Task<IActionResult> GetUserByEmail([FromBody] string email)
         {
             User user;
             try
@@ -595,7 +607,7 @@ namespace VNRDnTAIApi.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(200)]
         [AllowAnonymous]
-        public async Task<IActionResult> ForgotPassword([FromBody]LoginUserDTO newInfo)
+        public async Task<IActionResult> ForgotPassword([FromBody] LoginUserDTO newInfo)
         {
             User user = null;
             try

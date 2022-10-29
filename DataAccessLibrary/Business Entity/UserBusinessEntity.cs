@@ -57,9 +57,53 @@ namespace DataAccessLibrary.Business_Entity
 
         public async Task<IEnumerable<User>> GetScribesAsync()
         {
-            var user = (await work.Users.GetAllAsync())
+            IEnumerable<User> scribes = (await work.Users.GetAllAsync())
                 .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.SCRIBE);
-            return user.OrderBy(u => u.Username);
+            return scribes.OrderBy(u => u.Username);
+        }
+
+        public async Task<ScribeDTO> GetScribeDetail(int month, int year, Guid scribeId)
+        {
+            User scribe = await work.Users.GetAsync(scribeId);
+
+            IEnumerable<LawModificationRequest> lawRoms = (await work.LawModificationRequests.GetAllAsync())
+                .Where(l => !l.IsDeleted && l.ScribeId == scribeId && l.CreatedDate.Month == month && l.CreatedDate.Year == year);
+            IEnumerable<SignModificationRequest> signRoms = (await work.SignModificationRequests.GetAllAsync())
+                .Where(l => !l.IsDeleted && l.ScribeId == scribeId && l.CreatedDate.Month == month && l.CreatedDate.Year == year);
+            IEnumerable<QuestionModificationRequest> questionRoms = (await work.QuestionModificationRequests.GetAllAsync())
+                .Where(l => !l.IsDeleted && l.ScribeId == scribeId && l.CreatedDate.Month == month && l.CreatedDate.Year == year);
+
+            ScribeDTO scribeDTO = new ScribeDTO
+            {
+                Id = scribe.Id,
+                Username = scribe.Username,
+                Password = scribe.Password,
+                CreatedDate = scribe.CreatedDate,
+                Status = scribe.Status,
+
+                TotalRequestCountByMonthYear = lawRoms.Count() + signRoms.Count() + questionRoms.Count(),
+                PendingRequestCountByMonthYear = lawRoms.Where(r => r.Status == (int)Status.Pending).Count()
+                + signRoms.Where(r => r.Status == (int)Status.Pending).Count()
+                + questionRoms.Where(r => r.Status == (int)Status.Pending).Count(),
+
+                ApprovedRequestCountByMonthYear = lawRoms.Where(r => r.Status == (int)Status.Approved).Count()
+                + signRoms.Where(r => r.Status == (int)Status.Approved).Count()
+                + questionRoms.Where(r => r.Status == (int)Status.Approved).Count(),
+
+                DeniedRequestCountByMonthYear = lawRoms.Where(r => r.Status == (int)Status.Denied).Count()
+                + signRoms.Where(r => r.Status == (int)Status.Denied).Count()
+                + questionRoms.Where(r => r.Status == (int)Status.Denied).Count(),
+
+                ConfirmedRequestCountByMonthYear = lawRoms.Where(r => r.Status == (int)Status.Confirmed).Count()
+                + signRoms.Where(r => r.Status == (int)Status.Confirmed).Count()
+                + questionRoms.Where(r => r.Status == (int)Status.Confirmed).Count(),
+
+                CancelledRequestCountByMonthYear = lawRoms.Where(r => r.Status == (int)Status.Cancelled).Count()
+                + signRoms.Where(r => r.Status == (int)Status.Cancelled).Count()
+                + questionRoms.Where(r => r.Status == (int)Status.Cancelled).Count(),
+            };
+
+            return scribeDTO;
         }
 
         public async Task<IEnumerable<User>> GetScribesByUserNameAsync(string keywordUserName)
