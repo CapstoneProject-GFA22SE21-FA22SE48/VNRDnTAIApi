@@ -3,9 +3,6 @@ using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary.ManageTasks;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace VNRDnTAIApi.Controllers
 {
@@ -62,6 +59,21 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.GetTasksAsync());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        //-----------------------------------------
+        [HttpPost("TasksUpdate")]
+        [ProducesResponseType(typeof(IEnumerable<TaskDTO>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<TaskDTO>>> AdminUpdateTasks(IEnumerable<TaskDTO> taskDTOList)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.AdminUpdateAssignTasks(taskDTOList));
             }
             catch (Exception ex)
             {
