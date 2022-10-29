@@ -30,7 +30,7 @@ namespace DataAccessLibrary.Business_Entity
 
         public async Task<IEnumerable<TaskDTO>> GetTasksAsync()
         {
-           List<TaskDTO> taskList = new List<TaskDTO>();
+            List<TaskDTO> taskList = new List<TaskDTO>();
 
             List<Column> columns = (await work.Columns.GetAllAsync()).Where(c => !c.IsDeleted).ToList();
             IEnumerable<AssignedColumn> assignedColumns = (await work.AssignedColumns.GetAllAsync()).Where(a => !a.IsDeleted);
@@ -47,11 +47,11 @@ namespace DataAccessLibrary.Business_Entity
                 .Where(u => !u.IsDeleted && u.Status == (int)Status.Active && u.Role == (int)UserRoles.SCRIBE);
 
             AssignedColumn lastAssignedColumn = assignedColumns.Last();
-            foreach(Column cl in columns)
+            foreach (Column cl in columns)
             {
-                foreach(AssignedColumn ac in assignedColumns)
+                foreach (AssignedColumn ac in assignedColumns)
                 {
-                    if(ac.ColumnId == cl.Id)
+                    if (ac.ColumnId == cl.Id)
                     {
                         taskList.Add(new TaskDTO
                         {
@@ -122,10 +122,10 @@ namespace DataAccessLibrary.Business_Entity
                         taskList.Add(new TaskDTO
                         {
                             TaskId = aq.QuestionCategoryId,
-                            TaskName = "Câu hỏi " + 
+                            TaskName = "Câu hỏi " +
                                 testCategories.Where(t => t.Id == qc.TestCategoryId)
-                                .FirstOrDefault().Name 
-                                +  " > " + qc.Name,
+                                .FirstOrDefault().Name
+                                + " > " + qc.Name,
                             ScribeId = aq.ScribeId,
                             ScribeName = scribes.Where(s => s.Id == aq.ScribeId).FirstOrDefault().Username,
                             IsAssigned = true
@@ -137,7 +137,7 @@ namespace DataAccessLibrary.Business_Entity
                         taskList.Add(new TaskDTO
                         {
                             TaskId = qc.Id,
-                            TaskName = "Câu hỏi " + 
+                            TaskName = "Câu hỏi " +
                                 testCategories.Where(t => t.Id == qc.TestCategoryId)
                                 .FirstOrDefault().Name
                                 + " > " + qc.Name,
@@ -151,6 +151,72 @@ namespace DataAccessLibrary.Business_Entity
             }
 
             return taskList.OrderBy(t => t.TaskName);
+        }
+
+        public async Task<IEnumerable<TaskDTO>> AdminUpdateAssignTasks(IEnumerable<TaskDTO> taskDTOList)
+        {
+            //Remove old data
+            IEnumerable<AssignedColumn> assignedColumns = (await work.AssignedColumns.GetAllAsync());
+            foreach (AssignedColumn assignedColumn in assignedColumns)
+            {
+                work.AssignedColumns.Delete(assignedColumn);
+            }
+            IEnumerable<AssignedQuestionCategory> assignedQuestionCategories =
+                (await work.AssignedQuestionCategories.GetAllAsync());
+            foreach (AssignedQuestionCategory assignedQuestionCategory in assignedQuestionCategories)
+            {
+                work.AssignedQuestionCategories.Delete(assignedQuestionCategory);
+            }
+            IEnumerable<AssignedSignCategory> assignedSignCategories =
+                (await work.AssignedSignCategories.GetAllAsync());
+            foreach (AssignedSignCategory assignedSignCategory in assignedSignCategories)
+            {
+                work.AssignedSignCategories.Delete(assignedSignCategory);
+            }
+
+            //Add new data
+            if (taskDTOList != null)
+            {
+                IEnumerable<Column> columns = (await work.Columns.GetAllAsync())
+                    .Where(c => !c.IsDeleted);
+                IEnumerable<QuestionCategory> questionCategories = (await work.QuestionCategories.GetAllAsync())
+                    .Where(q => !q.IsDeleted);
+                IEnumerable<SignCategory> signCategories = (await work.SignCategories.GetAllAsync())
+                   .Where(s => !s.IsDeleted);
+
+                foreach (TaskDTO taskDTO in taskDTOList)
+                {
+                    if (columns.Where(s => s.Id == taskDTO.TaskId).FirstOrDefault() != null)
+                    {
+                        await work.AssignedColumns.AddAsync(new AssignedColumn
+                        {
+                            ColumnId = taskDTO.TaskId,
+                            ScribeId = (Guid)taskDTO.ScribeId,
+                            IsDeleted = false
+                        });
+                    }
+                    else if (questionCategories.Where(q => q.Id == taskDTO.TaskId).FirstOrDefault() != null)
+                    {
+                        await work.AssignedQuestionCategories.AddAsync(new AssignedQuestionCategory
+                        {
+                            QuestionCategoryId = taskDTO.TaskId,
+                            ScribeId = (Guid)taskDTO.ScribeId,
+                            IsDeleted = false
+                        });
+                    }
+                    else if (signCategories.Where(s => s.Id == taskDTO.TaskId).FirstOrDefault() != null)
+                    {
+                        await work.AssignedSignCategories.AddAsync(new AssignedSignCategory
+                        {
+                            SignCategoryId = taskDTO.TaskId,
+                            ScribeId = (Guid)taskDTO.ScribeId,
+                            IsDeleted = false
+                        });
+                    }
+                }
+            }
+            await work.Save();
+            return taskDTOList;
         }
     }
 }
