@@ -4,6 +4,7 @@ using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
 using DTOsLibrary.CreateNewLaw;
 using DTOsLibrary.SearchLaw;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -84,11 +85,26 @@ namespace DataAccessLibrary.Business_Entity
                     && paragraph.Section.VehicleCategoryId == vehicleCategoryId
                     && !paragraph.IsDeleted)
                 .ToList();
-            var paragraphList = allPars
-                .Where(paragraph =>
-                (normaliseVietnamese(paragraph.Description).Contains(query) || normaliseVietnamese(paragraph.Name).Contains(query)))
-                .ToList();
+            //var paragraphList = allPars
+            //    .Where(paragraph =>
+            //    (normaliseVietnamese(paragraph.Description).Contains(query) || normaliseVietnamese(paragraph.Name).Contains(query)))
+            //    .ToList();
 
+            var paragraphList = (await work.Paragraphs.ExecuteQueryAsync(
+                "select * FROM CONTAINSTABLE(Paragraph,Description, N\'\"" + query + "\"\') as r join Paragraph on Paragraph.Id = r.[KEY] ORDER BY RANK desc"))
+                .Where(paragraph => paragraph.Status == (int)Status.Active
+                    && paragraph.Section.VehicleCategoryId == vehicleCategoryId
+                    && !paragraph.IsDeleted)
+                .ToList();
+            if(paragraphList.Count == 0)
+            {
+                paragraphList = (await work.Paragraphs.ExecuteQueryAsync(
+                "select * FROM FREETEXTTABLE(Paragraph,Description, N\'\"" + query + "\"\') as r join Paragraph on Paragraph.Id = r.[KEY] ORDER BY RANK desc"))
+                .Where(paragraph => paragraph.Status == (int)Status.Active
+                    && paragraph.Section.VehicleCategoryId == vehicleCategoryId
+                    && !paragraph.IsDeleted)
+                .ToList();
+            }
 
             foreach (var paragraph in paragraphList)
             {
@@ -117,7 +133,17 @@ namespace DataAccessLibrary.Business_Entity
                 });
             }
 
-            var sectionsList = (await work.Sections.GetAllAsync())
+            //var sectionsList = (await work.Sections.GetAllAsync())
+            //.Where(section =>
+            //(normaliseVietnamese(section.Description).Contains(query)
+            //    || normaliseVietnamese(section.Name).Contains(query))
+            //    && section.Status == (int)Status.Active
+            //    && section.VehicleCategoryId == vehicleCategoryId
+            //    && !section.IsDeleted)
+            //.ToList();
+
+            var sectionsList = (await work.Sections.ExecuteQueryAsync(
+                "select * FROM CONTAINSTABLE(Section,Description, N\'\"" + query + "\"\') as r join Section on Section.Id = r.[KEY] ORDER BY RANK desc"))
             .Where(section =>
             (normaliseVietnamese(section.Description).Contains(query)
                 || normaliseVietnamese(section.Name).Contains(query))

@@ -87,7 +87,7 @@ namespace DataAccessLibrary.Business_Entity
 
             double rate = 25 / noOfQuestionCat;
             var qs = (await work.Questions.GetAllAsync(nameof(Question.Answers)))
-                .Where(question => !question.IsDeleted);
+                .Where(question => !question.IsDeleted && question.Status == (int)Status.Active);
             var qcs = (await work.QuestionCategories.GetAllAsync()).Where(qc => !qc.IsDeleted);
 
             foreach (var qc in qcs)
