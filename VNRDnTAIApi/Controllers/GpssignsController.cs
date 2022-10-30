@@ -9,6 +9,7 @@ using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using DTOsLibrary;
 
 namespace VNRDnTAIApi.Controllers
 {
@@ -95,6 +96,22 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
+        // POST: api/Gpssigns/AddGpsSignDTO
+        [HttpPost("AddGpsSignDTO")]
+        [ProducesResponseType(typeof(Gpssign), 201)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<Gpssign>> PostGpsSignDTO(GpsSignDTO gpsSignDTO)
+        {
+            try
+            {
+               return StatusCode(201, await _entity.AddGpsSignDTO(gpsSignDTO));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         // DELETE: api/Gpssigns/5
         [HttpDelete("{id}")]
         [ProducesResponseType(204)]
@@ -105,6 +122,22 @@ namespace VNRDnTAIApi.Controllers
             {
                 await _entity.RemoveGpssign(id);
                 return StatusCode(204);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // GET: api/Gpssigns/
+        [HttpGet("GetNearbyGpsSign")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetNearbyGpsSign(decimal latitude, decimal longtitude, decimal distance)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetGpssignsAsync());
             }
             catch (Exception ex)
             {

@@ -1,5 +1,6 @@
 ﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +34,20 @@ namespace DataAccessLibrary.Business_Entity
             await work.Save();
             return gpssign;
         }
+
+        public async Task<Gpssign> AddGpsSignDTO(GpsSignDTO gpsSignDTO)
+        {
+            Gpssign gpsSign = new Gpssign();
+            gpsSign.Id = Guid.NewGuid();
+            gpsSign.SignId = gpsSignDTO.SignId;
+            gpsSign.Latitude = gpsSignDTO.latitude;
+            gpsSign.Longtitude = gpsSignDTO.longtitude;
+            gpsSign.Status = 5;
+            gpsSign.IsDeleted = false;
+            await work.Gpssigns.AddAsync(gpsSign);
+            await work.Save();
+            return gpsSign;
+        }
         public async Task<Gpssign> UpdateGpssign(Gpssign gpssign)
         {
             work.Gpssigns.Update(gpssign);
@@ -46,5 +61,14 @@ namespace DataAccessLibrary.Business_Entity
             work.Gpssigns.Update(gpssign);
             await work.Save();
         }
+
+        //public async Task<IEnumerable<Gpssign>> GetGpssignsNearby(decimal latitude, decimal longtitude, decimal distance)
+        //{
+        //    IEnumerable<Gpssign> signs = (await work.Gpssigns.GetAllAsync())
+        //        .Where(gpssign => !gpssign.IsDeleted);
+
+
+        //    return new List<Gpssign>();
+        //}
     }
 }

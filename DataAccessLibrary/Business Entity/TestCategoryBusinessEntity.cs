@@ -1,4 +1,5 @@
 ﻿using BusinessObjectLibrary;
+using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -47,6 +48,16 @@ namespace DataAccessLibrary.Business_Entity
             testCategory.IsDeleted = true;
             work.TestCategories.Update(testCategory);
             await work.Save();
+        }
+
+        public async Task<int> CountQuestionsByTestCategoryId(Guid id)
+        {
+            var data = from testCategory in (await work.TestCategories.GetAllAsync()).Where(e => !e.IsDeleted)
+                       join question in (await work.Questions.GetAllAsync()).Where(q => !q.IsDeleted && q.Status == (int)Status.Active)
+                       on testCategory.Id equals question.TestCategoryId
+                       where testCategory.Id == id
+                       select question;
+            return data.Count();
         }
     }
 }
