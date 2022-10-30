@@ -9,7 +9,6 @@ namespace DTOsLibrary.ManageROM
 
         public Guid PromotingAdminId { get; set; }
         public string PromotingAdminUsername { get; set; }
-        public int OperationType { get; set; }
         public int Status { get; set; }
         public DateTime CreatedDate { get; set; }
         public string DeniedReason { get; set; }
