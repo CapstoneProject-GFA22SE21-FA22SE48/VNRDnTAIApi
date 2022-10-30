@@ -1,6 +1,7 @@
 ﻿using BusinessObjectLibrary;
 using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,14 +51,28 @@ namespace DataAccessLibrary.Business_Entity
             await work.Save();
         }
 
-        public async Task<int> CountQuestionsByTestCategoryId(Guid id)
+        public async Task<IEnumerable<TestCategoryCountDTO>> CountQuestionsByTestCategoryId()
         {
             var data = from testCategory in (await work.TestCategories.GetAllAsync()).Where(e => !e.IsDeleted)
                        join question in (await work.Questions.GetAllAsync()).Where(q => !q.IsDeleted && q.Status == (int)Status.Active)
                        on testCategory.Id equals question.TestCategoryId
-                       where testCategory.Id == id
-                       select question;
-            return data.Count();
+                       select new TestCategoryCountDTO
+                       {
+                           TestCategoryId = testCategory.Id,
+                           TestCategoryName = testCategory.Name,
+                       } into countData
+                       group countData by new
+                       {
+                           countData.TestCategoryId,
+                           countData.TestCategoryName
+                       } into groupQ
+                       select new TestCategoryCountDTO
+                       {
+                           TestCategoryId = groupQ.Key.TestCategoryId,
+                           TestCategoryName = groupQ.Key.TestCategoryName,
+                           QuestionsCount = groupQ.ToList().Count()
+                       };
+            return data.OrderBy(d => d.TestCategoryName);
         }
     }
 }
