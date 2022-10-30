@@ -207,6 +207,56 @@ namespace DataAccessLibrary.Business_Entity
             return user;
         }
 
+        public async Task<User> PromoteScribe(ScribePromotionDTO scribePromotionDTO)
+        {
+            UserModificationRequest existedUserRom =
+                (await work.UserModificationRequests.GetAllAsync())
+                .Where(rom => !rom.IsDeleted && rom.ModifiedUserId == scribePromotionDTO.ScribeId)
+                .FirstOrDefault();
+
+            if (existedUserRom != null)
+            {
+                throw new Exception("Đã tồn tại đề xuất trở thành Quản trị viên cho nhân viên này");
+            }
+
+            User existedScribe = await work.Users.GetAsync(scribePromotionDTO.ScribeId);
+            if (existedScribe.Status == (int)Status.Deactivated)
+            {
+                throw new Exception("Tài khoản nhân viên đã bị ngưng hoạt động bởi Quản trị viên khác");
+            }
+
+            User newScribe = null;
+            if (existedScribe != null)
+            {
+                newScribe = new User
+                {
+                    Id = Guid.NewGuid(),
+                    Username = existedScribe.Username,
+                    Password = existedScribe.Password,
+                    Role = (int)UserRoles.ADMIN,
+                    Status = 6,
+                    CreatedDate = DateTime.Now,
+                    IsDeleted = false
+                };
+
+                await work.Users.AddAsync(newScribe);
+
+                UserModificationRequest userRom = new UserModificationRequest
+                {
+                    ModifyingUserId = newScribe.Id,
+                    ModifiedUserId = existedScribe.Id,
+                    PromotingAdminId = scribePromotionDTO.PromotingAdminId,
+                    ArbitratingAdminId = scribePromotionDTO.ArbitratingAdminId,
+                    Status = (int)Status.Pending,
+                    CreatedDate = DateTime.Now,
+                    IsDeleted = false
+                };
+                await work.UserModificationRequests.AddAsync(userRom);
+            }
+            await work.Save();
+            return newScribe;
+        }
+
         //Deactivate Member: status (deactivated) + comment (isDeleted = true)
         public async Task<User> DeactivateMember(User member)
         {
@@ -263,7 +313,8 @@ namespace DataAccessLibrary.Business_Entity
         {
             return (await work.Users.GetAllAsync())
                 .Where((user) => user.Username == username
-                    && user.Password == password && user.Role != (int)UserRoles.MEMBER)
+                    && user.Password == password && user.Role != (int)UserRoles.MEMBER
+                    && user.Status == (int)Status.Active)
                 .FirstOrDefault();
         }
 
