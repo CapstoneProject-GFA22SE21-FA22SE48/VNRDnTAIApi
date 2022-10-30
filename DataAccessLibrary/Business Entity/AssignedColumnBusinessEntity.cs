@@ -33,121 +33,215 @@ namespace DataAccessLibrary.Business_Entity
             List<TaskDTO> taskList = new List<TaskDTO>();
 
             List<Column> columns = (await work.Columns.GetAllAsync()).Where(c => !c.IsDeleted).ToList();
-            IEnumerable<AssignedColumn> assignedColumns = (await work.AssignedColumns.GetAllAsync()).Where(a => !a.IsDeleted);
+            List<AssignedColumn> assignedColumns = (await work.AssignedColumns.GetAllAsync()).Where(a => !a.IsDeleted).ToList();
 
             List<QuestionCategory> questionCategories = (await work.QuestionCategories.GetAllAsync()).Where(q => !q.IsDeleted).ToList();
-            IEnumerable<AssignedQuestionCategory> assignedQuestionCategories = (await work.AssignedQuestionCategories.GetAllAsync())
-               .Where(a => !a.IsDeleted);
+            List<AssignedQuestionCategory> assignedQuestionCategories = (await work.AssignedQuestionCategories.GetAllAsync())
+               .Where(a => !a.IsDeleted).ToList();
 
             List<SignCategory> signCategories = (await work.SignCategories.GetAllAsync()).Where(s => !s.IsDeleted).ToList();
-            IEnumerable<AssignedSignCategory> assignedSignCategories = (await work.AssignedSignCategories.GetAllAsync())
-              .Where(a => !a.IsDeleted);
+            List<AssignedSignCategory> assignedSignCategories = (await work.AssignedSignCategories.GetAllAsync())
+              .Where(a => !a.IsDeleted).ToList();
 
             IEnumerable<User> scribes = (await work.Users.GetAllAsync())
                 .Where(u => !u.IsDeleted && u.Status == (int)Status.Active && u.Role == (int)UserRoles.SCRIBE);
 
-            AssignedColumn lastAssignedColumn = assignedColumns.Last();
             foreach (Column cl in columns)
             {
-                foreach (AssignedColumn ac in assignedColumns)
+                if (assignedColumns != null && assignedColumns.Count() > 0)
                 {
-                    if (ac.ColumnId == cl.Id)
+                    foreach (AssignedColumn ac in assignedColumns)
                     {
-                        taskList.Add(new TaskDTO
+                        if (ac.ColumnId == cl.Id)
                         {
-                            TaskId = ac.ColumnId,
-                            TaskName = "Mục > " + cl.Name,
-                            ScribeId = ac.ScribeId,
-                            ScribeName = scribes.Where(s => s.Id == ac.ScribeId).FirstOrDefault().Username,
-                            IsAssigned = true
-                        });
-                        break;
-                    }
-                    if (ac.Equals(lastAssignedColumn))
-                    {
-                        taskList.Add(new TaskDTO
+                            taskList.Add(new TaskDTO
+                            {
+                                TaskId = ac.ColumnId,
+                                TaskName = "Mục > " + cl.Name,
+                                ScribeId = ac.ScribeId,
+                                ScribeName = scribes.Where(s => s.Id == ac.ScribeId).FirstOrDefault().Username,
+                                IsAssigned = true
+                            });
+                            break;
+                        }
+                        if (ac.Equals(assignedColumns.LastOrDefault()))
                         {
-                            TaskId = cl.Id,
-                            TaskName = "Mục > " + cl.Name,
-                            ScribeId = null,
-                            ScribeName = null,
-                            IsAssigned = false
-                        });
-                        break;
+                            if (ac.ColumnId == cl.Id)
+                            {
+                                taskList.Add(new TaskDTO
+                                {
+                                    TaskId = ac.ColumnId,
+                                    TaskName = "Mục > " + cl.Name,
+                                    ScribeId = ac.ScribeId,
+                                    ScribeName = scribes.Where(s => s.Id == ac.ScribeId).FirstOrDefault().Username,
+                                    IsAssigned = true
+                                });
+                                break;
+                            }
+                            else
+                            {
+                                taskList.Add(new TaskDTO
+                                {
+                                    TaskId = cl.Id,
+                                    TaskName = "Mục > " + cl.Name,
+                                    ScribeId = null,
+                                    ScribeName = null,
+                                    IsAssigned = false
+                                });
+                                break;
+                            }
+                        }
                     }
                 }
+                else
+                {
+                    taskList.Add(new TaskDTO
+                    {
+                        TaskId = cl.Id,
+                        TaskName = "Mục > " + cl.Name,
+                        ScribeId = null,
+                        ScribeName = null,
+                        IsAssigned = false
+                    });
+                }
+
             }
 
-            AssignedSignCategory lastAssignedSignCategory = assignedSignCategories.Last();
             foreach (SignCategory sc in signCategories)
             {
-                foreach (AssignedSignCategory ac in assignedSignCategories)
+                if (assignedSignCategories != null && assignedSignCategories.Count() > 0)
                 {
-                    if (sc.Id == ac.SignCategoryId)
+                    foreach (AssignedSignCategory ac in assignedSignCategories)
                     {
-                        taskList.Add(new TaskDTO
+                        if (sc.Id == ac.SignCategoryId)
                         {
-                            TaskId = ac.SignCategoryId,
-                            TaskName = "Biển báo > " + sc.Name,
-                            ScribeId = ac.ScribeId,
-                            ScribeName = scribes.Where(s => s.Id == ac.ScribeId).FirstOrDefault().Username,
-                            IsAssigned = true
-                        });
-                        break;
+                            taskList.Add(new TaskDTO
+                            {
+                                TaskId = ac.SignCategoryId,
+                                TaskName = "Biển báo > " + sc.Name,
+                                ScribeId = ac.ScribeId,
+                                ScribeName = scribes.Where(s => s.Id == ac.ScribeId).FirstOrDefault().Username,
+                                IsAssigned = true
+                            });
+                            break;
+                        }
+                        if (ac.Equals(assignedSignCategories.LastOrDefault()))
+                        {
+                            if (sc.Id == ac.SignCategoryId)
+                            {
+                                taskList.Add(new TaskDTO
+                                {
+                                    TaskId = ac.SignCategoryId,
+                                    TaskName = "Biển báo > " + sc.Name,
+                                    ScribeId = ac.ScribeId,
+                                    ScribeName = scribes.Where(s => s.Id == ac.ScribeId).FirstOrDefault().Username,
+                                    IsAssigned = true
+                                });
+                                break;
+                            }
+                            else
+                            {
+                                taskList.Add(new TaskDTO
+                                {
+                                    TaskId = sc.Id,
+                                    TaskName = "Biển báo > " + sc.Name,
+                                    ScribeId = null,
+                                    ScribeName = null,
+                                    IsAssigned = false
+                                });
+                                break;
+                            }
+
+                        }
                     }
-                    if (ac.Equals(lastAssignedSignCategory))
+                }
+                else
+                {
+                    taskList.Add(new TaskDTO
                     {
-                        taskList.Add(new TaskDTO
-                        {
-                            TaskId = sc.Id,
-                            TaskName = "Biển báo > " + sc.Name,
-                            ScribeId = null,
-                            ScribeName = null,
-                            IsAssigned = false
-                        });
-                        break;
-                    }
+                        TaskId = sc.Id,
+                        TaskName = "Biển báo > " + sc.Name,
+                        ScribeId = null,
+                        ScribeName = null,
+                        IsAssigned = false
+                    });
                 }
             }
 
-            AssignedQuestionCategory lastAssignedQuestionCategory = assignedQuestionCategories.Last();
             List<TestCategory> testCategories = (await work.TestCategories.GetAllAsync())
                 .Where(t => !t.IsDeleted).ToList();
             foreach (QuestionCategory qc in questionCategories)
             {
-                foreach (AssignedQuestionCategory aq in assignedQuestionCategories)
+                if (assignedQuestionCategories != null && assignedQuestionCategories.Count() > 0)
                 {
-                    if (qc.Id == aq.QuestionCategoryId)
+                    foreach (AssignedQuestionCategory aq in assignedQuestionCategories)
                     {
-                        taskList.Add(new TaskDTO
+                        if (qc.Id == aq.QuestionCategoryId)
                         {
-                            TaskId = aq.QuestionCategoryId,
-                            TaskName = "Câu hỏi " +
-                                testCategories.Where(t => t.Id == qc.TestCategoryId)
-                                .FirstOrDefault().Name
-                                + " > " + qc.Name,
-                            ScribeId = aq.ScribeId,
-                            ScribeName = scribes.Where(s => s.Id == aq.ScribeId).FirstOrDefault().Username,
-                            IsAssigned = true
-                        });
-                        break;
-                    }
-                    if (aq.Equals(lastAssignedQuestionCategory))
-                    {
-                        taskList.Add(new TaskDTO
+                            taskList.Add(new TaskDTO
+                            {
+                                TaskId = aq.QuestionCategoryId,
+                                TaskName = "Câu hỏi " +
+                                    testCategories.Where(t => t.Id == qc.TestCategoryId)
+                                    .FirstOrDefault().Name
+                                    + " > " + qc.Name,
+                                ScribeId = aq.ScribeId,
+                                ScribeName = scribes.Where(s => s.Id == aq.ScribeId).FirstOrDefault().Username,
+                                IsAssigned = true
+                            });
+                            break;
+                        }
+                        if (aq.Equals(assignedQuestionCategories.LastOrDefault()))
                         {
-                            TaskId = qc.Id,
-                            TaskName = "Câu hỏi " +
-                                testCategories.Where(t => t.Id == qc.TestCategoryId)
-                                .FirstOrDefault().Name
-                                + " > " + qc.Name,
-                            ScribeId = null,
-                            ScribeName = null,
-                            IsAssigned = false
-                        });
-                        break;
+                            if (qc.Id == aq.QuestionCategoryId)
+                            {
+                                taskList.Add(new TaskDTO
+                                {
+                                    TaskId = aq.QuestionCategoryId,
+                                    TaskName = "Câu hỏi " +
+                                    testCategories.Where(t => t.Id == qc.TestCategoryId)
+                                    .FirstOrDefault().Name
+                                    + " > " + qc.Name,
+                                    ScribeId = aq.ScribeId,
+                                    ScribeName = scribes.Where(s => s.Id == aq.ScribeId).FirstOrDefault().Username,
+                                    IsAssigned = true
+                                });
+                                break;
+                            }
+                            else
+                            {
+                                taskList.Add(new TaskDTO
+                                {
+                                    TaskId = qc.Id,
+                                    TaskName = "Câu hỏi " +
+                                    testCategories.Where(t => t.Id == qc.TestCategoryId)
+                                    .FirstOrDefault().Name
+                                    + " > " + qc.Name,
+                                    ScribeId = null,
+                                    ScribeName = null,
+                                    IsAssigned = false
+                                });
+                                break;
+                            }
+
+                        }
                     }
                 }
+                else
+                {
+                    taskList.Add(new TaskDTO
+                    {
+                        TaskId = qc.Id,
+                        TaskName = "Câu hỏi " +
+                                    testCategories.Where(t => t.Id == qc.TestCategoryId)
+                                    .FirstOrDefault().Name
+                                    + " > " + qc.Name,
+                        ScribeId = null,
+                        ScribeName = null,
+                        IsAssigned = false
+                    });
+                }
+
             }
 
             return taskList.OrderBy(t => t.TaskName);
