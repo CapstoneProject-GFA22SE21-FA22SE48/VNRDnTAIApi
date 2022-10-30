@@ -9,6 +9,7 @@ using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using DTOsLibrary;
 
 namespace VNRDnTAIApi.Controllers
 {
@@ -113,15 +114,15 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/TestCategories/Count/5
-        [HttpGet("Count/{id}")]
+        [HttpGet("Count")]
         [ProducesResponseType(200)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> CountQuestionsByTestCategoryId(Guid id)
+        public async Task<ActionResult<IEnumerable<TestCategoryCountDTO>>> CountQuestionsByTestCategoryId()
         {
             try
             {
                 return StatusCode(200,
-                await _entity.CountQuestionsByTestCategoryId(id));
+                await _entity.CountQuestionsByTestCategoryId());
             }
             catch (Exception ex)
             {
