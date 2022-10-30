@@ -111,5 +111,22 @@ namespace VNRDnTAIApi.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        // GET: api/TestCategories/Count/5
+        [HttpGet("Count/{id}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> CountQuestionsByTestCategoryId(Guid id)
+        {
+            try
+            {
+                return StatusCode(200,
+                await _entity.CountQuestionsByTestCategoryId(id));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }
