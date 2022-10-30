@@ -29,5 +29,9 @@ namespace DTOsLibrary.ManageROM
 
         public List<ReferenceDTO> ParagraphReferenceList { get; set; }
         public string DeniedReason { get; set; }
+
+        //Used for scribe rom
+        public Guid AdminId { get; set; }
+        public string AdminUsername { get; set; }
     }
 }

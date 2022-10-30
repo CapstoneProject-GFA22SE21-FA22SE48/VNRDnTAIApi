@@ -54,13 +54,13 @@ namespace VNRDnTAIApi.Controllers
 
         // GET: api/LawModificationRequests/ScribeROMList/5
         [HttpGet("ScribeROMList/{scribeId}")]
-        [ProducesResponseType(typeof(AdminRomListDTO), 200)]
+        [ProducesResponseType(typeof(ScribeRomListDTO), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<AdminRomListDTO>> GetScribeRomList(Guid adminId)
+        public async Task<ActionResult<ScribeRomListDTO>> GetScribeRomList(Guid scribeId)
         {
             try
             {
-                return StatusCode(200, await _entity.GetAdminRomList(adminId));
+                return StatusCode(200, await _entity.GetScribeRomList(scribeId));
             }
             catch (Exception ex)
             {
@@ -160,15 +160,15 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // DELETE: api/LawModificationRequests/Paragraphs/5
-        [HttpDelete("Paragraphs/{modifyingParagraphId}")]
+        // DELETE: api/LawModificationRequests/5
+        [HttpDelete("{lawRomId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> DeleteLawModificationRequestByParagraphId(Guid modifyingParagraphId)
+        public async Task<IActionResult> DeleteLawModificationRequest(Guid lawRomId)
         {
             try
             {
-                await _entity.RemoveLawModificationRequestByParagraphId(modifyingParagraphId);
+                await _entity.RemoveLawModificationRequest(lawRomId);
                 return StatusCode(204);
             }
             catch (Exception ex)
@@ -300,6 +300,22 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.DenyParagraphRom(modifyingParagraphId, deniedReason));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        //---------------------------------------------------
+        // POST: api/LawModificationRequests/Cancel/5
+        [HttpPost("Cancel")]
+        [ProducesResponseType(typeof(LawModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<LawModificationRequest>> CancelLawRom([FromBody] Guid lawRomId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.CancelLawRom(lawRomId));
             }
             catch (Exception ex)
             {

@@ -55,8 +55,21 @@ namespace DataAccessLibrary.Business_Entity
         {
             QuestionModificationRequest questionModificationRequest =
                 await work.QuestionModificationRequests.GetAsync(modifyingQuestionId);
-            questionModificationRequest.IsDeleted = true;
+            if (questionModificationRequest != null)
+            {
+                questionModificationRequest.IsDeleted = true;
+            }
+
+            Question modifyingQuestion = (await work.Questions.GetAllAsync())
+                .Where(q => q.Id == modifyingQuestionId)
+                .FirstOrDefault();
+            if (modifyingQuestion != null)
+            {
+                modifyingQuestion.IsDeleted = true;
+            }
+
             work.QuestionModificationRequests.Update(questionModificationRequest);
+            work.Questions.Update(modifyingQuestion);
             await work.Save();
         }
 
@@ -200,6 +213,20 @@ namespace DataAccessLibrary.Business_Entity
                 }
             }
 
+            await work.Save();
+            return questionRom;
+        }
+        //---------------------------------------------------
+        public async Task<QuestionModificationRequest> CancelQuestionRom(Guid modifyingQuestionId)
+        {
+            QuestionModificationRequest questionRom = (await work.QuestionModificationRequests.GetAllAsync())
+                .Where(rom => !rom.IsDeleted && rom.ModifyingQuestionId == modifyingQuestionId)
+                .FirstOrDefault();
+
+            if (questionRom != null)
+            {
+                questionRom.Status = (int)Status.Cancelled;
+            }
             await work.Save();
             return questionRom;
         }
