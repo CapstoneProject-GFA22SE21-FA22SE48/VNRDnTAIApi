@@ -255,6 +255,23 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
+        // PUT: api/Users/Scribes/Promote
+        [HttpPost("Scribes/Promote")]
+        [ProducesResponseType(typeof(User), 200)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> PromoteScribe([FromBody] ScribePromotionDTO scribePromotionDTO)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.PromoteScribe(scribePromotionDTO));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         // PUT: api/Users/Members/ReEnable
         [HttpPut("Members/ReEnable/{id}")]
         [ProducesResponseType(typeof(User), 200)]
@@ -374,15 +391,15 @@ namespace VNRDnTAIApi.Controllers
         {
             try
             {
-                //if (string.IsNullOrEmpty(loginUserDTO.Username))
-                //{
-                //    throw new ArgumentException("Vui lòng nhập tên đăng nhập!");
-                //}
+                if (string.IsNullOrEmpty(loginUserDTO.Username))
+                {
+                    throw new ArgumentException("Vui lòng nhập tên đăng nhập!");
+                }
 
-                //if (string.IsNullOrEmpty(loginUserDTO.Password))
-                //{
-                //    throw new ArgumentException("Vui lòng nhập mật khẩu!");
-                //}
+                if (string.IsNullOrEmpty(loginUserDTO.Password))
+                {
+                    throw new ArgumentException("Vui lòng nhập mật khẩu!");
+                }
                 User user = await _entity
                     .LoginWeb(loginUserDTO.Username, loginUserDTO.Password);
 
