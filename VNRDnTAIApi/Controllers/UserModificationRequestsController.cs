@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BusinessObjectLibrary;
+﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace VNRDnTAIApi.Controllers
 {
@@ -125,6 +119,54 @@ namespace VNRDnTAIApi.Controllers
             {
                 await _entity.RemoveUserModificationRequest(modifyingUserId);
                 return StatusCode(204);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        //---------------------------------------------------
+        // GET: api/UserModificationRequests/UserROMDetail/5
+        [HttpGet("UserROMDetail/{modifyingUserId}")]
+        [ProducesResponseType(typeof(UserModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<SignModificationRequest>> GetUserRomDetail(Guid modifyingUserId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetUserRomDetail(modifyingUserId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        //---------------------------------------------------
+        // POST: api/UserModificationRequests/Approve/5
+        [HttpPost("Approve/{modifyingUserId}")]
+        [ProducesResponseType(typeof(UserModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<UserModificationRequest>> ApproveUserROM(Guid modifyingUserId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.ApproveUserRom(modifyingUserId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        //---------------------------------------------------
+        // POST: api/UserModificationRequests/Deny/5
+        [HttpPost("Deny/{modifyingUserId}")]
+        [ProducesResponseType(typeof(UserModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<UserModificationRequest>> DenyUserROM(Guid modifyingUserId, [FromBody] string deniedReason)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.DenyUserRom(modifyingUserId, deniedReason));
             }
             catch (Exception ex)
             {

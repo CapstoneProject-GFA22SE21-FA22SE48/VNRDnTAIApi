@@ -197,7 +197,7 @@ namespace DataAccessLibrary.Business_Entity
 
             //4. User Roms
             List<UserModificationRequest> userRoms = (await work.UserModificationRequests.GetAllAsync())
-                .Where(rom => !rom.IsDeleted && rom.ArbitratingAdminId == adminId).ToList();
+                .Where(rom => !rom.IsDeleted && (rom.ArbitratingAdminId == adminId || rom.PromotingAdminId == adminId)).ToList();
 
             List<UserRomDTO> userRomDTOs = new List<UserRomDTO>();
             foreach (UserModificationRequest userRom in userRoms)

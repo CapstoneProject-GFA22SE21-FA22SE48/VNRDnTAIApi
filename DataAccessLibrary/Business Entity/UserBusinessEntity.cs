@@ -207,22 +207,41 @@ namespace DataAccessLibrary.Business_Entity
             return user;
         }
 
-        public async Task<User> PromoteScribe(ScribePromotionDTO scribePromotionDTO)
+        public async Task<ScribePromotionDTO> PromoteScribe(ScribePromotionDTO scribePromotionDTO)
         {
-            UserModificationRequest existedUserRom =
+            UserModificationRequest existedPendingUserRom =
                 (await work.UserModificationRequests.GetAllAsync())
-                .Where(rom => !rom.IsDeleted && rom.ModifiedUserId == scribePromotionDTO.ScribeId)
+                .Where(rom => !rom.IsDeleted && rom.ModifiedUserId == scribePromotionDTO.ScribeId
+                && rom.Status == (int)Status.Pending)
                 .FirstOrDefault();
 
-            if (existedUserRom != null)
+            ScribePromotionDTO responseScribe = null;
+
+            if (existedPendingUserRom != null)
             {
-                throw new Exception("Đã tồn tại đề xuất trở thành Quản trị viên cho nhân viên này");
+                responseScribe = new ScribePromotionDTO
+                {
+                    ScribeId = scribePromotionDTO.ScribeId,
+                    PromotingAdminId = scribePromotionDTO.PromotingAdminId,
+                    ArbitratingAdminId = scribePromotionDTO.ArbitratingAdminId,
+                    ErrorMessage = "Đã tồn tại đề xuất trở thành Quản trị viên cho nhân viên này"
+
+                };
+                return responseScribe;
             }
 
             User existedScribe = await work.Users.GetAsync(scribePromotionDTO.ScribeId);
             if (existedScribe.Status == (int)Status.Deactivated)
             {
-                throw new Exception("Tài khoản nhân viên đã bị ngưng hoạt động bởi Quản trị viên khác");
+                responseScribe = new ScribePromotionDTO
+                {
+                    ScribeId = scribePromotionDTO.ScribeId,
+                    PromotingAdminId = scribePromotionDTO.PromotingAdminId,
+                    ArbitratingAdminId = scribePromotionDTO.ArbitratingAdminId,
+                    ErrorMessage = "Tài khoản nhân viên đã bị ngưng hoạt động bởi Quản trị viên khác"
+
+                };
+                return responseScribe;
             }
 
             User newScribe = null;
@@ -252,9 +271,17 @@ namespace DataAccessLibrary.Business_Entity
                     IsDeleted = false
                 };
                 await work.UserModificationRequests.AddAsync(userRom);
+
+                scribePromotionDTO = new ScribePromotionDTO
+                {
+                    ScribeId = newScribe.Id,
+                    ArbitratingAdminId = scribePromotionDTO.ArbitratingAdminId,
+                    PromotingAdminId = scribePromotionDTO.PromotingAdminId,
+                    ErrorMessage = null
+                };
             }
             await work.Save();
-            return newScribe;
+            return scribePromotionDTO;
         }
 
         //Deactivate Member: status (deactivated) + comment (isDeleted = true)

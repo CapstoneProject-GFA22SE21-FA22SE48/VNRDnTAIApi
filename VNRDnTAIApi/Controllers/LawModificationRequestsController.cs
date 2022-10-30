@@ -52,6 +52,22 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
+        // GET: api/LawModificationRequests/ScribeROMList/5
+        [HttpGet("ScribeROMList/{scribeId}")]
+        [ProducesResponseType(typeof(AdminRomListDTO), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<AdminRomListDTO>> GetScribeRomList(Guid adminId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetAdminRomList(adminId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         // GET: api/LawModificationRequests/ModifyingParagraphs/5
         [HttpGet("ModifyingParagraphs/{modifyingParagraphId}")]
         [ProducesResponseType(typeof(LawModificationRequest), 200)]
