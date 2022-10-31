@@ -72,7 +72,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<AssignedColumn>(entity =>
             {
                 entity.HasKey(e => new { e.ColumnId, e.ScribeId })
-                    .HasName("PK__Assigned__C05B11FDFF265322");
+                    .HasName("PK__Assigned__C05B11FD9976174A");
 
                 entity.ToTable("AssignedColumn");
 
@@ -92,7 +92,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<AssignedQuestionCategory>(entity =>
             {
                 entity.HasKey(e => new { e.QuestionCategoryId, e.ScribeId })
-                    .HasName("PK__Assigned__92041373C3FC24E9");
+                    .HasName("PK__Assigned__92041373DF5B0E71");
 
                 entity.ToTable("AssignedQuestionCategory");
 
@@ -112,7 +112,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<AssignedSignCategory>(entity =>
             {
                 entity.HasKey(e => new { e.SignCategoryId, e.ScribeId })
-                    .HasName("PK__Assigned__E7CAD648CD3C55D6");
+                    .HasName("PK__Assigned__E7CAD648A811294C");
 
                 entity.ToTable("AssignedSignCategory");
 
@@ -210,7 +210,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<KeywordParagraph>(entity =>
             {
                 entity.HasKey(e => new { e.KeywordId, e.ParagraphId })
-                    .HasName("PK__KeywordP__852C78FC13E1968D");
+                    .HasName("PK__KeywordP__852C78FC3DE8F450");
 
                 entity.ToTable("KeywordParagraph");
 
@@ -344,7 +344,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<QuestionModificationRequest>(entity =>
             {
                 entity.HasKey(e => e.ModifyingQuestionId)
-                    .HasName("PK__Question__94B14AC723DAF521");
+                    .HasName("PK__Question__94B14AC71B079C6C");
 
                 entity.ToTable("QuestionModificationRequest");
 
@@ -381,7 +381,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<Reference>(entity =>
             {
                 entity.HasKey(e => new { e.ParagraphId, e.ReferenceParagraphId })
-                    .HasName("PK__Referenc__44419EC0D8D1926B");
+                    .HasName("PK__Referenc__44419EC04F30B63A");
 
                 entity.ToTable("Reference");
 
@@ -598,7 +598,6 @@ namespace BusinessObjectLibrary
                 entity.HasOne(d => d.Answer)
                     .WithMany(p => p.TestResultDetails)
                     .HasForeignKey(d => d.AnswerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__TestResul__Answe__3C34F16F");
 
                 entity.HasOne(d => d.Question)
@@ -640,7 +639,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<UserModificationRequest>(entity =>
             {
                 entity.HasKey(e => new { e.ModifyingUserId, e.ModifiedUserId })
-                    .HasName("PK__UserModi__C95E8661D0D2206A");
+                    .HasName("PK__UserModi__C95E86612B795B9F");
 
                 entity.ToTable("UserModificationRequest");
 
