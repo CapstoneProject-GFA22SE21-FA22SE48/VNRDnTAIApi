@@ -50,6 +50,11 @@ namespace DataAccessLibrary.Business_Entity
             signModificationRequest.IsDeleted = false;
             await work.SignModificationRequests.AddAsync(signModificationRequest);
             await work.Save();
+
+            //Get data in return for notification adding
+            signModificationRequest.Scribe = (await work.Users.GetAllAsync())
+                .Where(u => u.Id == signModificationRequest.ScribeId)
+                .FirstOrDefault();
             return signModificationRequest;
         }
         public async Task<SignModificationRequest> UpdateSignModificationRequest(SignModificationRequest signModificationRequest)
