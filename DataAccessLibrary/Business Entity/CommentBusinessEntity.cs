@@ -36,7 +36,19 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<Comment> AddComment(Comment comment)
         {
             comment.Id = Guid.NewGuid();
-            //comment.CreatedDate = DateTime.Now;
+            comment.CreatedDate = DateTime.Now;
+            comment.IsDeleted = false;
+            await work.Comments.AddAsync(comment);
+            await work.Save();
+            return comment;
+        }
+        public async Task<Comment> AddUserComment(Guid userId, string content)
+        {
+            Comment comment = new Comment();
+            comment.Id = Guid.NewGuid();
+            comment.UserId = userId;
+            comment.Content = content;
+            comment.CreatedDate = DateTime.Now;
             comment.IsDeleted = false;
             await work.Comments.AddAsync(comment);
             await work.Save();
