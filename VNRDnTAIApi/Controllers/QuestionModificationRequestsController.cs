@@ -127,8 +127,8 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // DELETE: api/QuestionModificationRequests/Questions/5
-        [HttpDelete("Questions/{modifyingQuestionId}")]
+        // DELETE: api/QuestionModificationRequests/5
+        [HttpDelete("{modifyingQuestionId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> DeleteQuestionModificationRequest(Guid modifyingQuestionId)
@@ -185,6 +185,22 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.DenyQuestionRom(modifyingQuestionId, deniedReason));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        //---------------------------------------------------
+        // POST: api/QuestionModificationRequests/Cancel/5
+        [HttpPost("Cancel")]
+        [ProducesResponseType(typeof(QuestionModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<QuestionModificationRequest>> CancelQuestionRom([FromBody] Guid modifyingQuestionId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.CancelQuestionRom(modifyingQuestionId));
             }
             catch (Exception ex)
             {

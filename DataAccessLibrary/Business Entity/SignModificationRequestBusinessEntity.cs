@@ -58,11 +58,34 @@ namespace DataAccessLibrary.Business_Entity
             await work.Save();
             return signModificationRequest;
         }
-        public async Task RemoveSignModificationRequest(Guid modifyingSignId)
+        public async Task RemoveSignModificationRequest(Guid signRomId)
         {
-            SignModificationRequest signModificationRequest = await work.SignModificationRequests.GetAsync(modifyingSignId);
-            signModificationRequest.IsDeleted = true;
-            work.SignModificationRequests.Update(signModificationRequest);
+            SignModificationRequest signModificationRequest = await work.SignModificationRequests.GetAsync(signRomId);
+            if (signModificationRequest != null)
+            {
+                signModificationRequest.IsDeleted = true;
+                work.SignModificationRequests.Update(signModificationRequest);
+
+                if (signModificationRequest.ModifyingSignId != null)
+                {
+                    Sign sign = await work.Signs.GetAsync((Guid)signModificationRequest.ModifyingSignId);
+                    if (sign != null)
+                    {
+                        sign.IsDeleted = true;
+                        work.Signs.Update(sign);
+                    }
+                }
+                else if (signModificationRequest.ModifyingGpssignId != null)
+                {
+                    Gpssign gpssign = await work.Gpssigns.GetAsync((Guid)signModificationRequest.ModifyingGpssignId);
+                    if (gpssign != null)
+                    {
+                        gpssign.IsDeleted = true;
+                        work.Gpssigns.Update(gpssign);
+                    }
+                }
+            }
+
             await work.Save();
         }
 
@@ -191,6 +214,18 @@ namespace DataAccessLibrary.Business_Entity
                 }
             }
 
+            await work.Save();
+            return signRom;
+        }
+        //---------------------------------------------------
+        public async Task<SignModificationRequest> CancelSignRom(Guid signRomId)
+        {
+            SignModificationRequest signRom = (await work.SignModificationRequests.GetAsync(signRomId));
+
+            if (signRom != null)
+            {
+                signRom.Status = (int)Status.Cancelled;
+            }
             await work.Save();
             return signRom;
         }

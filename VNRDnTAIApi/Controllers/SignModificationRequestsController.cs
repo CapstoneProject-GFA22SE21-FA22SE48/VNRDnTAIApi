@@ -124,15 +124,15 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // DELETE: api/SignModificationRequests/Signs/5
-        [HttpDelete("Signs/{modifyingSignId}")]
+        // DELETE: api/SignModificationRequests/5
+        [HttpDelete("{signRomId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> DeleteSignModificationRequest(Guid modifyingSignId)
+        public async Task<IActionResult> DeleteSignModificationRequest(Guid signRomId)
         {
             try
             {
-                await _entity.RemoveSignModificationRequest(modifyingSignId);
+                await _entity.RemoveSignModificationRequest(signRomId);
                 return StatusCode(204);
             }
             catch (Exception ex)
@@ -200,6 +200,22 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.DenySignRom(modifyingSignId, deniedReason));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        //---------------------------------------------------
+        // POST: api/SignModificationRequests/Cancel/5
+        [HttpPost("Cancel")]
+        [ProducesResponseType(typeof(SignModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<SignModificationRequest>> CancelSignRom([FromBody] Guid signRomId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.CancelSignRom(signRomId));
             }
             catch (Exception ex)
             {

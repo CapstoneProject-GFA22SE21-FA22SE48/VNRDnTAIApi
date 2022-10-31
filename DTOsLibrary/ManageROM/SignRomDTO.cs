@@ -24,5 +24,9 @@ namespace DTOsLibrary.ManageROM
         public DateTime CreatedDate { get; set; }
         public string DeniedReason { get; set; }
 
+        //Used for scribe rom
+        public Guid AdminId { get; set; }
+        public string AdminUsername { get; set; }
+
     }
 }
