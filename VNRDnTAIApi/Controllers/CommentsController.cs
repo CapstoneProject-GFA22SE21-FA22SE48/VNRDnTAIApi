@@ -113,6 +113,22 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
+        // POST: api/Comments/5
+        [HttpPost("{userId}")]
+        [ProducesResponseType(typeof(Comment), 201)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<Comment>> AddUserComment(Guid userId, [FromBody] string content)
+        {
+            try
+            {
+                return StatusCode(201, await _entity.AddUserComment(userId, content));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         // DELETE: api/Comments/5
         [HttpDelete("{id}")]
         [ProducesResponseType(204)]
