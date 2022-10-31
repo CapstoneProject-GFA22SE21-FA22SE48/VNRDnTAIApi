@@ -55,6 +55,11 @@ namespace DataAccessLibrary.Business_Entity
             lawModificationRequest.IsDeleted = false;
             await work.LawModificationRequests.AddAsync(lawModificationRequest);
             await work.Save();
+
+            //Get data in return for notification adding
+            lawModificationRequest.Scribe = (await work.Users.GetAllAsync())
+                .Where(u => u.Id == lawModificationRequest.ScribeId)
+                .FirstOrDefault();
             return lawModificationRequest;
         }
 

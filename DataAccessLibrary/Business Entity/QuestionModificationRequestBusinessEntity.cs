@@ -83,6 +83,11 @@ namespace DataAccessLibrary.Business_Entity
             questionModificationRequest.IsDeleted = false;
             await work.QuestionModificationRequests.AddAsync(questionModificationRequest);
             await work.Save();
+
+            //Get data in return for notification adding
+            questionModificationRequest.Scribe = (await work.Users.GetAllAsync())
+                .Where(u => u.Id == questionModificationRequest.ScribeId)
+                .FirstOrDefault();
             return questionModificationRequest;
         }
         //--------------------------------------------------
