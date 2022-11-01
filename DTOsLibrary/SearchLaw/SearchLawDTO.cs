@@ -9,6 +9,7 @@ namespace DTOsLibrary.SearchLaw
 {
     public class SearchLawDTO
     {
+        public string Name { get; set; }
         public string StatueDesc { get; set; }
         public string SectionDesc { get; set; }
         public string? ParagraphDesc { get; set; }

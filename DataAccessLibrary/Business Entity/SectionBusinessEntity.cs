@@ -96,7 +96,7 @@ namespace DataAccessLibrary.Business_Entity
                     && paragraph.Section.VehicleCategoryId == vehicleCategoryId
                     && !paragraph.IsDeleted)
                 .ToList();
-            if(paragraphList.Count == 0)
+            if (paragraphList.Count == 0)
             {
                 paragraphList = (await work.Paragraphs.ExecuteQueryAsync(
                 "select * FROM FREETEXTTABLE(Paragraph,Description, N\'\"" + query + "\"\') as r join Paragraph on Paragraph.Id = r.[KEY] ORDER BY RANK desc"))
@@ -110,6 +110,7 @@ namespace DataAccessLibrary.Business_Entity
             {
                 res.Add(new SearchLawDTO
                 {
+                    Name = paragraph.Section.Statue.Name + " " + paragraph.Section.Name + " " + paragraph.Name,
                     StatueDesc = char.ToUpper(paragraph.Section.Statue.Description.Remove(0, 8)[0]) + paragraph.Section.Statue.Description.Remove(0, 8).Substring(1),
                     ParagraphDesc = paragraph.Description.Replace(":", ":\\\n").Replace(";", ";\\\n \\\n"),
                     SectionDesc = paragraph.Section.Description,
@@ -156,6 +157,7 @@ namespace DataAccessLibrary.Business_Entity
             {
                 res.Add(new SearchLawDTO
                 {
+                    Name = section.Statue.Name + " " + section.Name,
                     StatueDesc = char.ToUpper(section.Statue.Description.Remove(0, 8)[0]) + section.Statue.Description.Remove(0, 8).Substring(1),
                     ParagraphDesc = "",
                     SectionDesc = section.Description,
