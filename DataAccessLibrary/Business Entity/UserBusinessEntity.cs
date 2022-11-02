@@ -310,6 +310,35 @@ namespace DataAccessLibrary.Business_Entity
         {
             User deactivatingScribe = await work.Users.GetAsync(scribe.Id);
             deactivatingScribe.Status = (int)Status.Deactivated;
+
+            //Remove all assigned tasks of scribe
+            IEnumerable<AssignedColumn> assignedColumns =
+                (await work.AssignedColumns.GetAllAsync())
+                .Where(l => !l.IsDeleted && l.ScribeId == scribe.Id);
+
+            IEnumerable<AssignedQuestionCategory> assignedQuestionCategories =
+                (await work.AssignedQuestionCategories.GetAllAsync())
+                .Where(l => !l.IsDeleted && l.ScribeId == scribe.Id);
+
+            IEnumerable<AssignedSignCategory> assignedSignCategories =
+                (await work.AssignedSignCategories.GetAllAsync())
+                .Where(l => !l.IsDeleted && l.ScribeId == scribe.Id);
+
+            foreach (AssignedColumn assignedColumn in assignedColumns)
+            {
+                work.AssignedColumns.Delete(assignedColumn);
+            }
+
+            foreach (AssignedSignCategory assignedSignCategory in assignedSignCategories)
+            {
+                work.AssignedSignCategories.Delete(assignedSignCategory);
+            }
+
+            foreach (AssignedQuestionCategory assignedQuestionCategory in assignedQuestionCategories)
+            {
+                work.AssignedQuestionCategories.Delete(assignedQuestionCategory);
+            }
+
             await work.Save();
             return deactivatingScribe;
 
