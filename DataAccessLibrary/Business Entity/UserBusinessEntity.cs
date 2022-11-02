@@ -279,6 +279,11 @@ namespace DataAccessLibrary.Business_Entity
                     PromotingAdminId = scribePromotionDTO.PromotingAdminId,
                     ErrorMessage = null
                 };
+
+                //include to used in notification
+                scribePromotionDTO.Scribe = (await work.Users.GetAsync(scribePromotionDTO.ScribeId));
+                scribePromotionDTO.PromotingAdmin = (await work.Users.GetAsync(scribePromotionDTO.PromotingAdminId));
+                scribePromotionDTO.ArbitratingAdmin = (await work.Users.GetAsync(scribePromotionDTO.ArbitratingAdminId));
             }
             await work.Save();
             return scribePromotionDTO;
