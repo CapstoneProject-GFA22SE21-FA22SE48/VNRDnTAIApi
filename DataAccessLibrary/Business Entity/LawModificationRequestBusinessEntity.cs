@@ -583,6 +583,10 @@ namespace DataAccessLibrary.Business_Entity
                 }
             }
             await work.Save();
+
+            //include in return to use in notification
+            statueRom.Scribe = (await work.Users.GetAsync(statueRom.ScribeId));
+            statueRom.Admin = (await work.Users.GetAsync(statueRom.AdminId));
             return statueRom;
         }
         //--------------------------------------------------
@@ -617,6 +621,10 @@ namespace DataAccessLibrary.Business_Entity
             }
 
             await work.Save();
+
+            //include in return to use in notification
+            statueRom.Scribe = (await work.Users.GetAsync(statueRom.ScribeId));
+            statueRom.Admin = (await work.Users.GetAsync(statueRom.AdminId));
             return statueRom;
         }
         //--------------------------------------------------
@@ -727,6 +735,10 @@ namespace DataAccessLibrary.Business_Entity
                 }
             }
             await work.Save();
+
+            //include in return to use in notification
+            sectionRom.Scribe = (await work.Users.GetAsync(sectionRom.ScribeId));
+            sectionRom.Admin = (await work.Users.GetAsync(sectionRom.AdminId));
             return sectionRom;
         }
         //--------------------------------------------------
@@ -761,6 +773,10 @@ namespace DataAccessLibrary.Business_Entity
             }
 
             await work.Save();
+
+            //include in return to use in notification
+            sectionRom.Scribe = (await work.Users.GetAsync(sectionRom.ScribeId));
+            sectionRom.Admin = (await work.Users.GetAsync(sectionRom.AdminId));
             return sectionRom;
         }
         //--------------------------------------------------
@@ -833,6 +849,10 @@ namespace DataAccessLibrary.Business_Entity
                 }
             }
             await work.Save();
+
+            //include in return to use in notification
+            paraRom.Scribe = (await work.Users.GetAsync(paraRom.ScribeId));
+            paraRom.Admin = (await work.Users.GetAsync(paraRom.AdminId));
             return paraRom;
         }
         //--------------------------------------------------
@@ -867,6 +887,10 @@ namespace DataAccessLibrary.Business_Entity
             }
 
             await work.Save();
+
+            //include in return to use in notification
+            paraRom.Scribe = (await work.Users.GetAsync(paraRom.ScribeId));
+            paraRom.Admin = (await work.Users.GetAsync(paraRom.AdminId));
             return paraRom;
         }
         //--------------------------------------------------

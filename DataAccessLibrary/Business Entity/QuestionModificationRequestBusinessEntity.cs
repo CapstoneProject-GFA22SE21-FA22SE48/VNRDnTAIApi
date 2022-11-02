@@ -186,6 +186,10 @@ namespace DataAccessLibrary.Business_Entity
                 }
             }
             await work.Save();
+
+            //include in return to use in notification
+            questionRom.Scribe = (await work.Users.GetAsync(questionRom.ScribeId));
+            questionRom.Admin = (await work.Users.GetAsync(questionRom.AdminId));
             return questionRom;
         }
         //----------------------------------------------------
@@ -219,6 +223,10 @@ namespace DataAccessLibrary.Business_Entity
             }
 
             await work.Save();
+
+            //include in return to use in notification
+            questionRom.Scribe = (await work.Users.GetAsync(questionRom.ScribeId));
+            questionRom.Admin = (await work.Users.GetAsync(questionRom.AdminId));
             return questionRom;
         }
         //---------------------------------------------------
