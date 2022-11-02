@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Text.RegularExpressions;
-
-namespace VNRDnTAIApi.Utilities
+﻿namespace VNRDnTAIApi.Utilities
 {
     public static class StringUtils
     {
@@ -15,6 +11,6 @@ namespace VNRDnTAIApi.Utilities
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
-        
+
     }
 }
