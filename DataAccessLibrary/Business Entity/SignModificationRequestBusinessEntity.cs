@@ -186,6 +186,20 @@ namespace DataAccessLibrary.Business_Entity
                 }
             }
             await work.Save();
+
+            //include in return to use in notification
+            if (signRom.ScribeId != null)
+            {
+                signRom.Scribe = (await work.Users.GetAsync((Guid)signRom.ScribeId));
+            }
+            if (signRom.AdminId != null)
+            {
+                signRom.Admin = (await work.Users.GetAsync((Guid)signRom.AdminId));
+            }
+            if (signRom.UserId != null)
+            {
+                signRom.User = (await work.Users.GetAsync((Guid)signRom.UserId));
+            }
             return signRom;
         }
         //----------------------------------------------------
@@ -220,6 +234,20 @@ namespace DataAccessLibrary.Business_Entity
             }
 
             await work.Save();
+
+            //include in return to use in notification
+            if (signRom.ScribeId != null)
+            {
+                signRom.Scribe = (await work.Users.GetAsync((Guid)signRom.ScribeId));
+            }
+            if (signRom.AdminId != null)
+            {
+                signRom.Admin = (await work.Users.GetAsync((Guid)signRom.AdminId));
+            }
+            if (signRom.UserId != null)
+            {
+                signRom.User = (await work.Users.GetAsync((Guid)signRom.UserId));
+            }
             return signRom;
         }
         //---------------------------------------------------

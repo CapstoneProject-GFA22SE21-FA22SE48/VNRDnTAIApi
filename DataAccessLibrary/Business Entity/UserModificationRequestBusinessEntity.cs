@@ -146,6 +146,10 @@ namespace DataAccessLibrary.Business_Entity
 
             }
             await work.Save();
+
+            //include in return to use in notification
+            userRom.PromotingAdmin = (await work.Users.GetAsync(userRom.PromotingAdminId));
+            userRom.ArbitratingAdmin = (await work.Users.GetAsync(userRom.ArbitratingAdminId));
             return userRom;
         }
         //----------------------------------------------------
@@ -161,6 +165,10 @@ namespace DataAccessLibrary.Business_Entity
             }
 
             await work.Save();
+
+            //include in return to use in notification
+            userRom.PromotingAdmin = (await work.Users.GetAsync(userRom.PromotingAdminId));
+            userRom.ArbitratingAdmin = (await work.Users.GetAsync(userRom.ArbitratingAdminId));
             return userRom;
         }
     }
