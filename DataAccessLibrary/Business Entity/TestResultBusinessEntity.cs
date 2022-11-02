@@ -4,7 +4,6 @@ using DTOsLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Business_Entity
@@ -45,7 +44,10 @@ namespace DataAccessLibrary.Business_Entity
                 var i = new TestAttempDTO();
                 i.imageUrl = (await work.Questions.GetAsync(trd.QuestionId)).ImageUrl;
                 i.questionContent = (await work.Questions.GetAsync(trd.QuestionId)).Content;
-                i.chosenAnswerContent = (await work.Answers.GetAsync((Guid)trd.AnswerId)).Description;
+                if (trd.AnswerId != null)
+                {
+                    i.chosenAnswerContent = (await work.Answers.GetAsync((Guid)trd.AnswerId)).Description;
+                }
                 i.correctAnswerContent = (await work.Questions.GetAsync(trd.QuestionId)).Answers.FirstOrDefault(a => a.IsCorrect).Description;
                 i.isCorrect = i.chosenAnswerContent.Equals(i.correctAnswerContent);
                 res.Add(i);
