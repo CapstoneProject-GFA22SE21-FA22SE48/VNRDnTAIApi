@@ -190,6 +190,7 @@ namespace DataAccessLibrary.Business_Entity
             //include in return to use in notification
             questionRom.Scribe = (await work.Users.GetAsync(questionRom.ScribeId));
             questionRom.Admin = (await work.Users.GetAsync(questionRom.AdminId));
+            questionRom.ModifyingQuestion = (await work.Questions.GetAsync(questionRom.ModifyingQuestionId));
             return questionRom;
         }
         //----------------------------------------------------
@@ -227,6 +228,7 @@ namespace DataAccessLibrary.Business_Entity
             //include in return to use in notification
             questionRom.Scribe = (await work.Users.GetAsync(questionRom.ScribeId));
             questionRom.Admin = (await work.Users.GetAsync(questionRom.AdminId));
+            questionRom.ModifyingQuestion = (await work.Questions.GetAsync(questionRom.ModifyingQuestionId));
             return questionRom;
         }
         //---------------------------------------------------
