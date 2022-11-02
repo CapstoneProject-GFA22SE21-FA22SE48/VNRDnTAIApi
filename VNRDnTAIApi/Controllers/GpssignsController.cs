@@ -100,7 +100,7 @@ namespace VNRDnTAIApi.Controllers
         [HttpPost("AddGpsSignDTO")]
         [ProducesResponseType(typeof(Gpssign), 201)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<Gpssign>> PostGpsSignDTO(GpsSignDTO gpsSignDTO)
+        public async Task<ActionResult<Gpssign>> PostGpsSignDTO([FromBody]GpsSignDTO gpsSignDTO)
         {
             try
             {
@@ -129,15 +129,15 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // GET: api/Gpssigns/
+        // GET: api/Gpssigns/GetNearbyGpsSign
         [HttpGet("GetNearbyGpsSign")]
         [ProducesResponseType(200)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> GetNearbyGpsSign(decimal latitude, decimal longtitude, decimal distance)
+        public async Task<IActionResult> GetNearbyGpsSign(double latitude, double longtitude, double distance)
         {
             try
             {
-                return StatusCode(200, await _entity.GetGpssignsAsync());
+                return StatusCode(200, await _entity.GetGpssignsNearby(latitude, longtitude, distance));
             }
             catch (Exception ex)
             {
