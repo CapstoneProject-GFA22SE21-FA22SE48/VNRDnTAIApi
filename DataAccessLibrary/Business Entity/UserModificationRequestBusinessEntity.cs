@@ -150,6 +150,7 @@ namespace DataAccessLibrary.Business_Entity
             //include in return to use in notification
             userRom.PromotingAdmin = (await work.Users.GetAsync(userRom.PromotingAdminId));
             userRom.ArbitratingAdmin = (await work.Users.GetAsync(userRom.ArbitratingAdminId));
+            userRom.ModifyingUser = (await work.Users.GetAsync(userRom.ModifyingUserId));
             return userRom;
         }
         //----------------------------------------------------
@@ -168,6 +169,7 @@ namespace DataAccessLibrary.Business_Entity
 
             //include in return to use in notification
             userRom.PromotingAdmin = (await work.Users.GetAsync(userRom.PromotingAdminId));
+            userRom.ModifyingUser = (await work.Users.GetAsync(userRom.ModifyingUserId));
             userRom.ArbitratingAdmin = (await work.Users.GetAsync(userRom.ArbitratingAdminId));
             return userRom;
         }
