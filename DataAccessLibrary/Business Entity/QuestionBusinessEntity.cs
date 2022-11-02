@@ -88,7 +88,7 @@ namespace DataAccessLibrary.Business_Entity
 
             double rate = 25 / noOfQuestionCat;
             var qs = (await work.Questions.GetAllAsync(nameof(Question.Answers)))
-                .Where(question => !question.IsDeleted && question.Status == (int)Status.Active);
+                .Where(question => !question.IsDeleted && question.Status == (int)Status.Active && question.TestCategoryId.ToString() == testCatId);
             var qcs = (await work.QuestionCategories.GetAllAsync()).Where(qc => !qc.IsDeleted);
 
             foreach (var qc in qcs)
@@ -101,7 +101,7 @@ namespace DataAccessLibrary.Business_Entity
                 {
                     rate = Math.Floor(rate);
                 }
-                res.AddRange(qc.Questions.Take((int)rate));
+                res.AddRange(qc.Questions.Where(question => !question.IsDeleted && question.Status == (int)Status.Active && question.TestCategoryId.ToString() == testCatId).OrderBy(x => Guid.NewGuid()).Take((int)rate));
             }
 
             res = res.DistinctBy(x => x.Content).OrderBy(x => Guid.NewGuid()).ToList();
