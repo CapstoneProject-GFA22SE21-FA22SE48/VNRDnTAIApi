@@ -21,36 +21,81 @@ namespace DataAccessLibrary.Business_Entity
                 .Where(testResult => !testResult.IsDeleted);
         }
 
-        public async Task<IEnumerable<TestResult>> GetTestResultByUserId(Guid userId)
+        public async Task<IEnumerable<TestResult>> GetTestResultByUserId(Guid userId, Guid testCategoryId)
         {
             await work.TestResults.GetAllAsync();
+            var trds = await work.TestResultDetails.GetAllAsync();
             var trs = (await work.TestResults.GetAllAsync())
-                .Where(testResult => !testResult.IsDeleted && testResult.UserId == userId).OrderByDescending(o => o.CreatedDate);
+                .Where(testResult => !testResult.IsDeleted && testResult.UserId == userId && testResult.TestCategoryId == testCategoryId).OrderByDescending(o => o.CreatedDate);
             foreach (var tr in trs)
             {
-                tr.TestResultDetails = (await work.TestResultDetails.GetAllAsync()).Where(trd => !trd.IsDeleted && trd.TestResultId == tr.Id).ToList();
+                tr.TestResultDetails = trds.Where(trd => !trd.IsDeleted && trd.TestResultId == tr.Id).ToList();
             }
-            return trs.Take(10);
+            return trs;
         }
 
-        public async Task<IEnumerable<TestAttempDTO>> GetTestAttemptDTOs(Guid testResultId)
+        public async Task<IEnumerable<TestAttempDTO>> GetTestAttemptDTOs(Guid testResultId, Guid userId, Guid testCategoryId)
         {
+            //Get Wrong Answer
             var res = new List<TestAttempDTO>();
             await work.TestResultDetails.GetAllAsync();
             await work.Answers.GetAllAsync();
-            var tr = (await work.TestResults.GetAsync(testResultId));
-            foreach (var trd in tr.TestResultDetails)
+
+            if (testResultId == Guid.Empty)
             {
-                var i = new TestAttempDTO();
-                i.imageUrl = (await work.Questions.GetAsync(trd.QuestionId)).ImageUrl;
-                i.questionContent = (await work.Questions.GetAsync(trd.QuestionId)).Content;
-                if (trd.AnswerId != null)
+                var trs = (await work.TestResults.GetAllAsync())
+                .Where(testResult => !testResult.IsDeleted && testResult.UserId == userId && testResult.TestCategoryId == testCategoryId).OrderByDescending(o => o.CreatedDate).Take(10);
+                foreach (var tr in trs)
                 {
-                    i.chosenAnswerContent = (await work.Answers.GetAsync((Guid)trd.AnswerId)).Description;
+                    tr.TestResultDetails = (await work.TestResultDetails.GetAllAsync()).Where(trd => !trd.IsDeleted && trd.TestResultId == tr.Id).ToList();
                 }
-                i.correctAnswerContent = (await work.Questions.GetAsync(trd.QuestionId)).Answers.FirstOrDefault(a => a.IsCorrect).Description;
-                i.isCorrect = i.chosenAnswerContent.Equals(i.correctAnswerContent);
-                res.Add(i);
+
+                var onlyWrongTestResultDetail = new List<TestResultDetail>();
+                var wrong = new List<TestResultDetail>();
+                var right = new List<TestResultDetail>();
+
+                foreach (var tr in trs)
+                {
+                    foreach (var trd in tr.TestResultDetails)
+                    {
+                        if (trd.IsCorrect)
+                        {
+                            right.Add(trd);
+                        }
+                        else
+                        {
+                            wrong.Add(trd);
+                        }
+                    }
+                }
+                onlyWrongTestResultDetail = wrong.Where(w => !right.Contains(w)).DistinctBy(x => x.QuestionId).ToList();
+                foreach (var trd in onlyWrongTestResultDetail)
+                {
+                    if (trd.Answer != null)
+                    {
+                        var i = new TestAttempDTO();
+                        i.imageUrl = (await work.Questions.GetAsync(trd.QuestionId)).ImageUrl;
+                        i.questionContent = (await work.Questions.GetAsync(trd.QuestionId)).Content;
+                        i.chosenAnswerContent = trd.Answer != null ? (await work.Answers.GetAsync((Guid)trd.AnswerId)).Description : "";
+                        i.correctAnswerContent = (await work.Questions.GetAsync(trd.QuestionId)).Answers.FirstOrDefault(a => a.IsCorrect).Description;
+                        i.isCorrect = i.chosenAnswerContent.Equals(i.correctAnswerContent);
+                        res.Add(i);
+                    }
+                }
+            }
+            else
+            {
+                var tr = (await work.TestResults.GetAsync(testResultId));
+                foreach (var trd in tr.TestResultDetails)
+                {
+                    var i = new TestAttempDTO();
+                    i.imageUrl = (await work.Questions.GetAsync(trd.QuestionId)).ImageUrl;
+                    i.questionContent = (await work.Questions.GetAsync(trd.QuestionId)).Content;
+                    i.chosenAnswerContent = trd.Answer != null ? (await work.Answers.GetAsync((Guid)trd.AnswerId)).Description : "";
+                    i.correctAnswerContent = (await work.Questions.GetAsync(trd.QuestionId)).Answers.FirstOrDefault(a => a.IsCorrect).Description;
+                    i.isCorrect = i.chosenAnswerContent.Equals(i.correctAnswerContent);
+                    res.Add(i);
+                }
             }
             return res;
         }

@@ -11,8 +11,8 @@ namespace DTOsLibrary
     {
         public string imageUrl { get; set; }
         public string questionContent { get; set; }
-        public string chosenAnswerContent { get; set; }
-        public string correctAnswerContent { get; set; }
+        public string? chosenAnswerContent { get; set; }
+        public string? correctAnswerContent { get; set; }
         public bool isCorrect { get; set; }
     }
 }
