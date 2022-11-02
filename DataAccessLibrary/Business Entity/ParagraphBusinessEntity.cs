@@ -45,6 +45,7 @@ namespace DataAccessLibrary.Business_Entity
                        && paragraph.Id.Equals(id))
                .FirstOrDefault();
 
+            res.Name = paragraph.Section.Statue.Name + " " + paragraph.Section.Name + " " + paragraph.Name;
             res.StatueDesc = char.ToUpper(paragraph.Section.Statue.Description.Remove(0, 8)[0]) + paragraph.Section.Statue.Description.Remove(0, 8).Substring(1);
             res.ParagraphDesc = paragraph.Description;
             res.SectionDesc = paragraph.Section.Description;
