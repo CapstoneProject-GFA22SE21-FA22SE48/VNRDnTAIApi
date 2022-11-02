@@ -200,6 +200,14 @@ namespace DataAccessLibrary.Business_Entity
             {
                 signRom.User = (await work.Users.GetAsync((Guid)signRom.UserId));
             }
+            if (signRom.ModifyingSignId != null)
+            {
+                signRom.ModifyingSign = (await work.Signs.GetAsync((Guid)signRom.ModifyingSignId));
+            }
+            if (signRom.ModifyingGpssignId != null)
+            {
+                signRom.ModifyingGpssign = (await work.Gpssigns.GetAsync((Guid)signRom.ModifyingGpssignId)); ;
+            }
             return signRom;
         }
         //----------------------------------------------------
@@ -247,6 +255,14 @@ namespace DataAccessLibrary.Business_Entity
             if (signRom.UserId != null)
             {
                 signRom.User = (await work.Users.GetAsync((Guid)signRom.UserId));
+            }
+            if (signRom.ModifyingSignId != null)
+            {
+                signRom.ModifyingSign = (await work.Signs.GetAsync((Guid)signRom.ModifyingSignId));
+            }
+            if (signRom.ModifyingGpssignId != null)
+            {
+                signRom.ModifyingGpssign = (await work.Gpssigns.GetAsync((Guid)signRom.ModifyingGpssignId)); ;
             }
             return signRom;
         }
