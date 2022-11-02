@@ -80,7 +80,8 @@ namespace DataAccessLibrary.Business_Entity
             var noOfQuestionCat = 7;
 
             //Get noOfQuestionCat by testCat
-            noOfQuestionCat = (await work.Questions.GetAllAsync()).GroupBy(g => new { g.TestCategoryId })
+            noOfQuestionCat = (await work.Questions.GetAllAsync()).Where(q => q.TestCategoryId.ToString() == testCatId)
+                .GroupBy(g => new { g.QuestionCategoryId })
                          .Select(g => g.First())
                          .ToList()
                          .Count();
@@ -100,8 +101,10 @@ namespace DataAccessLibrary.Business_Entity
                 {
                     rate = Math.Floor(rate);
                 }
-                res.AddRange(qc.Questions.OrderBy(x => Guid.NewGuid()).Take((int)rate));
+                res.AddRange(qc.Questions.Take((int)rate));
             }
+
+            res = res.DistinctBy(x => x.Content).OrderBy(x => Guid.NewGuid()).ToList();
 
             if (res.Count > 25)
             {
@@ -109,7 +112,7 @@ namespace DataAccessLibrary.Business_Entity
             }
             else if (res.Count < 25)
             {
-                res.AddRange(qs.Where(q => !q.IsDeleted && !res.Contains(q)).OrderBy(x => Guid.NewGuid()).Take(25 - res.Count));
+                res.AddRange(qs.Where(q => !q.IsDeleted && !res.Any(r => r.Content == q.Content)).OrderBy(x => Guid.NewGuid()).Take(25 - res.Count));
             }
             foreach (var question in res)
             {

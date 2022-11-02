@@ -60,11 +60,11 @@ namespace VNRDnTAIApi.Controllers
         [HttpGet("GetTestResultByUserId")]
         [ProducesResponseType(typeof(TestResult), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<TestResult>> GetTestResultByUserId([FromQuery] Guid userId)
+        public async Task<ActionResult<TestResult>> GetTestResultByUserId([FromQuery] Guid userId, [FromQuery] Guid testCategoryId)
         {
             try
             {
-                return StatusCode(200, await _entity.GetTestResultByUserId(userId));
+                return StatusCode(200, await _entity.GetTestResultByUserId(userId, testCategoryId));
             }
             catch (Exception ex)
             {
@@ -75,11 +75,11 @@ namespace VNRDnTAIApi.Controllers
         [HttpGet("GetTestAttemptDTOs")]
         [ProducesResponseType(typeof(TestResult), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<TestAttempDTO>> GetTestAttemptDTOs([FromQuery] Guid testResultId)
+        public async Task<ActionResult<TestAttempDTO>> GetTestAttemptDTOs([FromQuery] Guid testResultId, [FromQuery] Guid userId, [FromQuery] Guid testCategoryId)
         {
             try
             {
-                return StatusCode(200, await _entity.GetTestAttemptDTOs(testResultId));
+                return StatusCode(200, await _entity.GetTestAttemptDTOs(testResultId, userId, testCategoryId));
             }
             catch (Exception ex)
             {
