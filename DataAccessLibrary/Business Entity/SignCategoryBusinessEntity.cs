@@ -52,7 +52,7 @@ namespace DataAccessLibrary.Business_Entity
                             ParagraphDesc = sp.Paragraph.Description,
                             MaxPenalty = sp.Paragraph.Section.MaxPenalty.ToString(),
                             MinPenalty = sp.Paragraph.Section.MinPenalty.ToString(),
-                            AdditionalPenalty = sp.Paragraph.AdditionalPenalty.ToString(),
+                            AdditionalPenalty = sp.Paragraph.AdditionalPenalty != null ? sp.Paragraph.AdditionalPenalty.ToString() : "",
                             ReferenceParagraph = allPars.Where(par => sp.Paragraph.ReferenceReferenceParagraphs.Any(rp => rp.ParagraphId == par.Id)).Select(p => new SearchParagraphDTO
                             {
                                 Id = sp.Paragraph.Id,
