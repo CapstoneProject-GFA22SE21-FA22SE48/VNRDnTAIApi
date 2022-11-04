@@ -186,23 +186,50 @@ namespace DataAccessLibrary.Business_Entity
             return signDTOs.OrderBy(s => s.Name);
         }
 
-        //This new sign is created for ROM of update, delete 
-        public async Task<Sign> AddSignForROM(Sign sign)
+        //This new sign is created for ROM of update, delete, create
+        public async Task<SignDTO> AddSignForROM(SignDTO signDTO)
         {
-            sign.SignCategory = null;
-            sign.Id = Guid.NewGuid();
-            sign.Status = (int)Status.Deactivated;
+            signDTO.SignCategory = null;
+            signDTO.Id = Guid.NewGuid();
+            signDTO.Status = (int)Status.Deactivated;
 
             //If the sign is for Delete ROM, then keep IsDeleted = true
-            if (sign.IsDeleted == true) { }
+            if (signDTO.IsDeleted == true) { }
             else
             {
-                sign.IsDeleted = false;
+                signDTO.IsDeleted = false;
+            }
+
+            //Convert signDTO to sign
+            Sign sign = new Sign
+            {
+                Id = signDTO.Id,
+                SignCategoryId = signDTO.SignCategoryId,
+                Name = signDTO.Name,
+                Description = signDTO.Description,
+                ImageUrl = signDTO.ImageUrl,
+                Status = signDTO.Status,
+                IsDeleted = signDTO.IsDeleted
+            };
+
+            // If the sign has signParagraphs -> insert to SignParagraph table
+            if (signDTO.SignParagraphs != null && signDTO.SignParagraphs.Count > 0)
+            {
+                foreach (var signParagraph in signDTO.SignParagraphs)
+                {
+                    await work.SignParagraphs.AddAsync(new SignParagraph
+                    {
+                        Id = Guid.NewGuid(),
+                        SignId = signDTO.Id,
+                        ParagraphId = signParagraph.SignParagraphParagraphId,
+                        IsDeleted = false,
+                    });
+                }
             }
 
             await work.Signs.AddAsync(sign);
             await work.Save();
-            return sign;
+            return signDTO;
         }
         public async Task<Sign> UpdateSign(Sign sign)
         {
