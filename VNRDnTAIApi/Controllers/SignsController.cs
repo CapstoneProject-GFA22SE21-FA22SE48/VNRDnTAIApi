@@ -1,10 +1,8 @@
 ﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace VNRDnTAIApi.Controllers
 {
@@ -109,13 +107,13 @@ namespace VNRDnTAIApi.Controllers
 
         // POST: api/Signs
         [HttpPost]
-        [ProducesResponseType(typeof(Sign), 201)]
+        [ProducesResponseType(typeof(SignDTO), 201)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<Sign>> PostSign(Sign sign)
+        public async Task<ActionResult<SignDTO>> PostSign(SignDTO signDTO)
         {
             try
             {
-                return StatusCode(201, await _entity.AddSignForROM(sign));
+                return StatusCode(201, await _entity.AddSignForROM(signDTO));
             }
             catch (Exception ex)
             {
