@@ -251,7 +251,6 @@ namespace DataAccessLibrary.Business_Entity
                         .ThenBy(r => int.Parse(r.SignParagraphSectionName.Split(" ")[1]))
                         .ThenBy(r => r.SignParagraphParagraphName).ToList();
                 signRomDTO.ModifiedSign.SignParagraphs = signParagraphList;
-                signRomDTO.ModifiedSign.SignCategory = null;
             }
 
             if (signRom.ModifyingSign != null)
@@ -376,7 +375,6 @@ namespace DataAccessLibrary.Business_Entity
                         .ThenBy(r => int.Parse(r.SignParagraphSectionName.Split(" ")[1]))
                         .ThenBy(r => r.SignParagraphParagraphName).ToList();
                 signRomDTO.ModifyingSign.SignParagraphs = signParagraphList;
-                signRomDTO.ModifyingSign.SignCategory = null;
             }
 
             return signRomDTO;
