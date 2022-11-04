@@ -220,6 +220,38 @@ namespace DataAccessLibrary.Business_Entity
                 {
                     User scribe = await work.Users.GetAsync(questionRom.ScribeId);
                     scribe.Status = (int)Status.Deactivated;
+
+                    //All pending roms Status of scribe will be set as Confirmed
+                    IEnumerable<LawModificationRequest> pendingLawRoms = (await work.LawModificationRequests.GetAllAsync())
+                        .Where(rom => !rom.IsDeleted && rom.Status == (int)Status.Pending && rom.ScribeId == scribe.Id);
+                    IEnumerable<SignModificationRequest> pendingSignRoms = (await work.SignModificationRequests.GetAllAsync())
+                        .Where(rom => !rom.IsDeleted && rom.Status == (int)Status.Pending && rom.ScribeId == scribe.Id);
+                    IEnumerable<QuestionModificationRequest> pendingQuestionRoms = (await work.QuestionModificationRequests.GetAllAsync())
+                        .Where(rom => !rom.IsDeleted && rom.Status == (int)Status.Pending && rom.ScribeId == scribe.Id);
+
+                    if (pendingLawRoms != null)
+                    {
+                        foreach (LawModificationRequest pendingLawRom in pendingLawRoms)
+                        {
+                            pendingLawRom.Status = (int)Status.Confirmed;
+                        }
+                    }
+
+                    if (pendingSignRoms != null)
+                    {
+                        foreach (SignModificationRequest pendingSignRom in pendingSignRoms)
+                        {
+                            pendingSignRom.Status = (int)Status.Confirmed;
+                        }
+                    }
+
+                    if (pendingQuestionRoms != null)
+                    {
+                        foreach (QuestionModificationRequest pendingQuestionRom in pendingQuestionRoms)
+                        {
+                            pendingQuestionRom.Status = (int)Status.Confirmed;
+                        }
+                    }
                 }
             }
 
