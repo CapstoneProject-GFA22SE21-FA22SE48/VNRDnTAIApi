@@ -339,6 +339,37 @@ namespace DataAccessLibrary.Business_Entity
                 work.AssignedQuestionCategories.Delete(assignedQuestionCategory);
             }
 
+            //Hard delete all Roms of scribe
+            IEnumerable<LawModificationRequest> lawRoms = (await work.LawModificationRequests.GetAllAsync())
+                        .Where(rom => rom.ScribeId == scribe.Id);
+            IEnumerable<SignModificationRequest> signRoms = (await work.SignModificationRequests.GetAllAsync())
+                .Where(rom => rom.ScribeId == scribe.Id);
+            IEnumerable<QuestionModificationRequest> questionRoms = (await work.QuestionModificationRequests.GetAllAsync())
+                .Where(rom => rom.ScribeId == scribe.Id);
+
+            if (lawRoms != null)
+            {
+                foreach (LawModificationRequest lawRom in lawRoms)
+                {
+                    work.LawModificationRequests.Delete(lawRom);
+                }
+            }
+
+            if (signRoms != null)
+            {
+                foreach (SignModificationRequest signRom in signRoms)
+                {
+                    work.SignModificationRequests.Delete(signRom);
+                }
+            }
+
+            if (questionRoms != null)
+            {
+                foreach (QuestionModificationRequest questionRom in questionRoms)
+                {
+                    work.QuestionModificationRequests.Delete(questionRom);
+                }
+            }
             await work.Save();
             return deactivatingScribe;
 
