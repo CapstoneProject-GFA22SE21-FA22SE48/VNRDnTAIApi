@@ -1,6 +1,7 @@
 ﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VNRDnTAIApi.Controllers
@@ -144,9 +145,9 @@ namespace VNRDnTAIApi.Controllers
         //---------------------------------------------------
         // GET: api/SignModificationRequests/SignROMDetail/5
         [HttpGet("SignROMDetail/{modifyingSignId}")]
-        [ProducesResponseType(typeof(SignModificationRequest), 200)]
+        [ProducesResponseType(typeof(SignModificationRequestDTO), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<SignModificationRequest>> GetSignRomDetail(Guid modifyingSignId)
+        public async Task<ActionResult<SignModificationRequestDTO>> GetSignRomDetail(Guid modifyingSignId)
         {
             try
             {
