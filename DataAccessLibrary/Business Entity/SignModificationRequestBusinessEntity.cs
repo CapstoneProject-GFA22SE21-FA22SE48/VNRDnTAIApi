@@ -430,6 +430,19 @@ namespace DataAccessLibrary.Business_Entity
                         {
                             signMod.ModifiedSignId = modifyingSign.Id;
                         }
+
+                        //Reference all SignParagraph of ModifiedSignId to ModifyingSignId
+                        IEnumerable<SignParagraph> modifiedSignIdSignParagraphs =
+                            (await work.SignParagraphs.GetAllAsync())
+                            .Where(sp => !sp.IsDeleted && sp.SignId == modifiedSign.Id);
+
+                        if (modifiedSignIdSignParagraphs != null)
+                        {
+                            foreach (SignParagraph signPara in modifiedSignIdSignParagraphs)
+                            {
+                                signPara.SignId = modifyingSign.Id;
+                            }
+                        }
                     }
                 }
                 else if (signRom.OperationType == (int)OperationType.Delete)
