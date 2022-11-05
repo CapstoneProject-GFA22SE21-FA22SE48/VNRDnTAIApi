@@ -28,6 +28,8 @@ namespace BusinessObjectLibrary
         public Guid Id { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+        public string Avatar { get; set; }
+        public string DisplayName { get; set; }
         public int Role { get; set; }
         public string Gmail { get; set; }
         public int Status { get; set; }
