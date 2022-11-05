@@ -890,6 +890,19 @@ namespace DataAccessLibrary.Business_Entity
                         {
                             lawMod.ModifiedParagraphId = modifyingParagraph.Id;
                         }
+
+                        //Reference all SignParagraph of ModifiedParagraphId to ModifyingParagraphId
+                        IEnumerable<SignParagraph> modifiedParagraphIdSignParagraphs =
+                            (await work.SignParagraphs.GetAllAsync())
+                            .Where(sp => !sp.IsDeleted && sp.ParagraphId == modifiedPargraph.Id);
+
+                        if (modifiedParagraphIdSignParagraphs != null)
+                        {
+                            foreach (SignParagraph signPara in modifiedParagraphIdSignParagraphs)
+                            {
+                                signPara.ParagraphId = modifyingParagraph.Id;
+                            }
+                        }
                     }
                 }
                 else if (paraRom.OperationType == (int)OperationType.Delete)
