@@ -611,6 +611,10 @@ namespace DataAccessLibrary.Business_Entity
             SignModificationRequest rom = (await work.SignModificationRequests.GetAllAsync())
                 .Where(rom => !rom.IsDeleted && rom.ModifyingGpssignId == gpsSignRom.ModifyingGpssignId)
                 .FirstOrDefault();
+            if (rom.ScribeId != null)
+            {
+                throw new Exception("Yêu cầu không còn khả dụng");
+            }
             if (rom != null)
             {
                 rom.ScribeId = gpsSignRom.ScribeId;
