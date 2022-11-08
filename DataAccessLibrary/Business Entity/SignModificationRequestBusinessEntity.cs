@@ -605,5 +605,20 @@ namespace DataAccessLibrary.Business_Entity
             await work.Save();
             return signRom;
         }
+        //---------------------------------------------------
+        public async Task<SignModificationRequest> ClaimGpssignRom(SignModificationRequest gpsSignRom)
+        {
+            SignModificationRequest rom = (await work.SignModificationRequests.GetAllAsync())
+                .Where(rom => !rom.IsDeleted && rom.ModifyingGpssignId == gpsSignRom.ModifyingGpssignId)
+                .FirstOrDefault();
+            if (rom != null)
+            {
+                rom.ScribeId = gpsSignRom.ScribeId;
+                rom.Status = (int)Status.Claimed;
+            }
+            work.SignModificationRequests.Update(rom);
+            await work.Save();
+            return gpsSignRom;
+        }
     }
 }
