@@ -380,12 +380,18 @@ namespace DataAccessLibrary.Business_Entity
             return signRomDTO;
         }
         //--------------------------------------------------
-        public async Task<SignModificationRequest> GetGpssignRomDetail(Guid modifyingGpssignId)
+        public async Task<IEnumerable<SignModificationRequest>> GetGpssignRoms()
         {
-            SignModificationRequest gpssignRom =
-                (await work.SignModificationRequests.GetAllAsync(nameof(SignModificationRequest.ModifyingGpssign), nameof(SignModificationRequest.ModifiedGpssign)))
-                .Where(s => s.ModifyingGpssignId == modifyingGpssignId).FirstOrDefault();
-            return gpssignRom;
+            IEnumerable<SignModificationRequest> gpssignRoms =
+                (await work.SignModificationRequests.GetAllMultiIncludeAsync(
+                    include: gpsSign => gpsSign
+                    .Include(g => g.ModifyingGpssign)
+                    .ThenInclude(m => m.Sign)
+                    .Include(g => g.ModifiedGpssign)
+                    .ThenInclude(m => m.Sign))
+                    )
+                    .Where(rom => !rom.IsDeleted && rom.ModifyingGpssignId != null);
+            return gpssignRoms;
         }
         //--------------------------------------------------
         public async Task<SignModificationRequest> ApproveSignRom(Guid modifyingSignId)
