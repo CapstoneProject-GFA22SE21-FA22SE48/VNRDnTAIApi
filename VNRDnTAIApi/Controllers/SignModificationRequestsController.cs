@@ -223,5 +223,27 @@ namespace VNRDnTAIApi.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+        //---------------------------------------------------
+        // PUT: api/SignModificationRequests/GPSSign/Claim/5
+        [HttpPut("GPSSign/Claim/{modifyingGpssignId}")]
+        [ProducesResponseType(typeof(SignModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<SignModificationRequest>> ClaimGpssignRom(Guid modifyingGpssignId, SignModificationRequest gpsSignRom)
+        {
+            if (modifyingGpssignId != gpsSignRom.ModifyingGpssignId)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                return StatusCode(200, await _entity.ClaimGpssignRom(gpsSignRom));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }
