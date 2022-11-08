@@ -161,14 +161,14 @@ namespace VNRDnTAIApi.Controllers
 
         //---------------------------------------------------
         // GET: api/SignModificationRequests/GpssignROMs
-        [HttpGet("GpssignROMs")]
+        [HttpGet("GpssignROMs/{scribeId}")]
         [ProducesResponseType(typeof(IEnumerable<SignModificationRequest>), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<SignModificationRequest>>> GetGpssignRoms()
+        public async Task<ActionResult<IEnumerable<SignModificationRequest>>> GetGpssignRoms(Guid scribeId)
         {
             try
             {
-                return StatusCode(200, await _entity.GetGpssignRoms());
+                return StatusCode(200, await _entity.GetGpssignRoms(scribeId));
             }
             catch (Exception ex)
             {
