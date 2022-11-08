@@ -380,7 +380,7 @@ namespace DataAccessLibrary.Business_Entity
             return signRomDTO;
         }
         //--------------------------------------------------
-        public async Task<IEnumerable<SignModificationRequest>> GetGpssignRoms()
+        public async Task<IEnumerable<SignModificationRequest>> GetGpssignRoms(Guid scribeId)
         {
             IEnumerable<SignModificationRequest> gpssignRoms =
                 (await work.SignModificationRequests.GetAllMultiIncludeAsync(
@@ -388,9 +388,14 @@ namespace DataAccessLibrary.Business_Entity
                     .Include(g => g.ModifyingGpssign)
                     .ThenInclude(m => m.Sign)
                     .Include(g => g.ModifiedGpssign)
-                    .ThenInclude(m => m.Sign))
+                    .ThenInclude(m => m.Sign)
+                    .Include(g => g.User))
                     )
-                    .Where(rom => !rom.IsDeleted && rom.ModifyingGpssignId != null);
+                    .Where( //Get only Pending GPS Sign rom or scribe claimed GPS Sign Rom
+                        rom => !rom.IsDeleted
+                        && rom.ModifyingGpssignId != null
+                        && (rom.Status == (int)Status.Pending || rom.ScribeId == scribeId)
+                    );
             return gpssignRoms;
         }
         //--------------------------------------------------
