@@ -21,6 +21,10 @@ namespace DataAccessLibrary.Business_Entity
         {
             return await work.SignModificationRequests.GetAllAsync();
         }
+        public async Task<SignModificationRequest> GetSignModificationRequestAsyncById(Guid id)
+        {
+            return await work.SignModificationRequests.GetAsync(id);
+        }
 
         public async Task<SignModificationRequest> GetSignModificationRequestByModifyingSignIdAsync(Guid modifyingSignId)
         {
@@ -41,6 +45,13 @@ namespace DataAccessLibrary.Business_Entity
         {
             return (await work.SignModificationRequests.GetAllAsync())
                 .Where(p => p.ScribeId.Equals(scribeId));
+        }
+
+        public async Task<IEnumerable<SignModificationRequest>>
+            GetSignModificationRequestsByScribeIdAndStatusAsync(Guid scribeId, int status)
+        {
+            return (await work.SignModificationRequests.GetAllAsync())
+                .Where(p => !p.IsDeleted && p.Status == status && p.ScribeId.Equals(scribeId));
         }
 
         public async Task<SignModificationRequest> AddSignModificationRequest(SignModificationRequest signModificationRequest)

@@ -414,7 +414,7 @@ namespace DataAccessLibrary.Business_Entity
         {
             return (await work.Users.GetAllAsync())
                 .Where((user) => !user.IsDeleted && user.Username == username
-                    && user.Password == password)
+                    && user.Password == password && user.Status == (int)Status.Active)
                 .FirstOrDefault();
         }
 
@@ -425,8 +425,10 @@ namespace DataAccessLibrary.Business_Entity
             user.CreatedDate = DateTime.Now;
             user.Username = username;
             user.Password = password;
+            user.DisplayName = String.IsNullOrEmpty(email) ? username : email;
+            user.Avatar = "https://firebasestorage.googleapis.com/v0/b/vnrdntai.appspot.com/o/images%2Favatar%2Fdefault_avatar_x025.png?alt=media";
             user.Gmail = email;
-            user.Status = 5;
+            user.Status = (int)Status.Active;
             user.Role = (int)UserRoles.MEMBER;
             user.IsDeleted = false;
 
