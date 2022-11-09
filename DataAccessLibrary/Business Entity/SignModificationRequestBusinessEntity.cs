@@ -417,6 +417,14 @@ namespace DataAccessLibrary.Business_Entity
 
             if (signRom != null)
             {
+                if (signRom.Status == (int)Status.Cancelled)
+                {
+                    throw new Exception("Yêu cầu đã bị hủy");
+                }
+            }
+
+            if (signRom != null)
+            {
                 Sign modifyingSign = await work.Signs.GetAsync((Guid)signRom.ModifyingSignId);
                 Sign modifiedSign = null;
                 if (signRom.ModifiedSignId != null)
@@ -521,6 +529,15 @@ namespace DataAccessLibrary.Business_Entity
         {
             SignModificationRequest signRom = (await work.SignModificationRequests.GetAllAsync())
                 .Where(s => s.ModifyingSignId == modifyingSignId).FirstOrDefault();
+
+            if (signRom != null)
+            {
+                if (signRom.Status == (int)Status.Cancelled)
+                {
+                    throw new Exception("Yêu cầu đã bị hủy");
+                }
+            }
+
             if (signRom != null)
             {
                 signRom.Status = (int)Status.Denied;
@@ -608,6 +625,14 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<SignModificationRequest> CancelSignRom(Guid signRomId)
         {
             SignModificationRequest signRom = (await work.SignModificationRequests.GetAsync(signRomId));
+
+            if (signRom != null)
+            {
+                if (signRom.Status == (int)Status.Approved || signRom.Status == (int)Status.Denied)
+                {
+                    throw new Exception("Yêu cầu đã được xử lý");
+                }
+            }
 
             if (signRom != null)
             {

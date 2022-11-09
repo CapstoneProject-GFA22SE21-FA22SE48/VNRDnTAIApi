@@ -483,6 +483,14 @@ namespace DataAccessLibrary.Business_Entity
 
             if (statueRom != null)
             {
+                if (statueRom.Status == (int)Status.Cancelled)
+                {
+                    throw new Exception("Yêu cầu đã bị hủy");
+                }
+            }
+
+            if (statueRom != null)
+            {
                 Statue modifyingStatue = await work.Statues.GetAsync((Guid)statueRom.ModifyingStatueId);
                 Statue modifiedStatue = null;
 
@@ -595,6 +603,15 @@ namespace DataAccessLibrary.Business_Entity
         {
             LawModificationRequest statueRom = (await work.LawModificationRequests.GetAllAsync())
                .Where(l => l.ModifyingStatueId == modifyingStatueId).FirstOrDefault();
+
+            if (statueRom != null)
+            {
+                if (statueRom.Status == (int)Status.Cancelled)
+                {
+                    throw new Exception("Yêu cầu đã bị hủy");
+                }
+            }
+
             if (statueRom != null)
             {
                 statueRom.Status = (int)Status.Denied;
@@ -666,6 +683,14 @@ namespace DataAccessLibrary.Business_Entity
         {
             LawModificationRequest sectionRom = (await work.LawModificationRequests.GetAllAsync())
                 .Where(l => l.ModifyingSectionId == modifyingSectionId).FirstOrDefault();
+
+            if (sectionRom != null)
+            {
+                if (sectionRom.Status == (int)Status.Cancelled)
+                {
+                    throw new Exception("Yêu cầu đã bị hủy");
+                }
+            }
 
             if (sectionRom != null)
             {
@@ -781,6 +806,15 @@ namespace DataAccessLibrary.Business_Entity
         {
             LawModificationRequest sectionRom = (await work.LawModificationRequests.GetAllAsync())
                .Where(l => l.ModifyingSectionId == modifyingSectionId).FirstOrDefault();
+
+            if (sectionRom != null)
+            {
+                if (sectionRom.Status == (int)Status.Cancelled)
+                {
+                    throw new Exception("Yêu cầu đã bị hủy");
+                }
+            }
+
             if (sectionRom != null)
             {
                 sectionRom.Status = (int)Status.Denied;
@@ -852,6 +886,14 @@ namespace DataAccessLibrary.Business_Entity
         {
             LawModificationRequest paraRom = (await work.LawModificationRequests.GetAllAsync())
                 .Where(p => p.ModifyingParagraphId == modifyingParagraphId).FirstOrDefault();
+
+            if (paraRom != null)
+            {
+                if (paraRom.Status == (int)Status.Cancelled)
+                {
+                    throw new Exception("Yêu cầu đã bị hủy");
+                }
+            }
 
             if (paraRom != null)
             {
@@ -942,6 +984,15 @@ namespace DataAccessLibrary.Business_Entity
         {
             LawModificationRequest paraRom = (await work.LawModificationRequests.GetAllAsync())
                .Where(l => l.ModifyingParagraphId == modifyingParagraphId).FirstOrDefault();
+
+            if (paraRom != null)
+            {
+                if (paraRom.Status == (int)Status.Cancelled)
+                {
+                    throw new Exception("Yêu cầu đã bị hủy");
+                }
+            }
+
             if (paraRom != null)
             {
                 paraRom.Status = (int)Status.Denied;
@@ -1194,6 +1245,14 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<LawModificationRequest> CancelLawRom(Guid lawRomId)
         {
             LawModificationRequest lawRom = (await work.LawModificationRequests.GetAsync(lawRomId));
+
+            if (lawRom != null)
+            {
+                if (lawRom.Status == (int)Status.Approved || lawRom.Status == (int)Status.Denied)
+                {
+                    throw new Exception("Yêu cầu đã được xử lý");
+                }
+            }
 
             if (lawRom != null)
             {
