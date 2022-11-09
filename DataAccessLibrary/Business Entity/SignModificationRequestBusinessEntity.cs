@@ -548,38 +548,100 @@ namespace DataAccessLibrary.Business_Entity
                 .Where(s => s.ScribeId == signRom.ScribeId).Count()));
                 if (approvalRate < 0.65)
                 {
-                    User scribe = await work.Users.GetAsync((Guid)signRom.ScribeId);
-                    scribe.Status = (int)Status.Deactivated;
+                    //User scribe = await work.Users.GetAsync((Guid)signRom.ScribeId);
+                    //scribe.Status = (int)Status.Deactivated;
 
-                    //All pending roms Status of scribe will be set as Confirmed
-                    IEnumerable<LawModificationRequest> pendingLawRoms = (await work.LawModificationRequests.GetAllAsync())
-                        .Where(rom => !rom.IsDeleted && rom.Status == (int)Status.Pending && rom.ScribeId == scribe.Id);
-                    IEnumerable<SignModificationRequest> pendingSignRoms = (await work.SignModificationRequests.GetAllAsync())
-                        .Where(rom => !rom.IsDeleted && rom.Status == (int)Status.Pending && rom.ScribeId == scribe.Id);
-                    IEnumerable<QuestionModificationRequest> pendingQuestionRoms = (await work.QuestionModificationRequests.GetAllAsync())
-                        .Where(rom => !rom.IsDeleted && rom.Status == (int)Status.Pending && rom.ScribeId == scribe.Id);
+                    ////All pending roms Status of scribe will be set as Confirmed
+                    //IEnumerable<LawModificationRequest> pendingLawRoms = (await work.LawModificationRequests.GetAllAsync())
+                    //    .Where(rom => !rom.IsDeleted && rom.Status == (int)Status.Pending && rom.ScribeId == scribe.Id);
+                    //IEnumerable<SignModificationRequest> pendingSignRoms = (await work.SignModificationRequests.GetAllAsync())
+                    //    .Where(rom => !rom.IsDeleted && rom.Status == (int)Status.Pending && rom.ScribeId == scribe.Id);
+                    //IEnumerable<QuestionModificationRequest> pendingQuestionRoms = (await work.QuestionModificationRequests.GetAllAsync())
+                    //    .Where(rom => !rom.IsDeleted && rom.Status == (int)Status.Pending && rom.ScribeId == scribe.Id);
 
-                    if (pendingLawRoms != null)
+                    //if (pendingLawRoms != null)
+                    //{
+                    //    foreach (LawModificationRequest pendingLawRom in pendingLawRoms)
+                    //    {
+                    //        pendingLawRom.Status = (int)Status.Confirmed;
+                    //    }
+                    //}
+
+                    //if (pendingSignRoms != null)
+                    //{
+                    //    foreach (SignModificationRequest pendingSignRom in pendingSignRoms)
+                    //    {
+                    //        pendingSignRom.Status = (int)Status.Confirmed;
+                    //    }
+                    //}
+
+                    //if (pendingQuestionRoms != null)
+                    //{
+                    //    foreach (QuestionModificationRequest pendingQuestionRom in pendingQuestionRoms)
+                    //    {
+                    //        pendingQuestionRom.Status = (int)Status.Confirmed;
+                    //    }
+                    //}
+                    User deactivatingScribe = await work.Users.GetAsync((Guid)signRom.ScribeId);
+                    deactivatingScribe.Status = (int)Status.Deactivated;
+
+                    //Remove all assigned tasks of scribe
+                    IEnumerable<AssignedColumn> assignedColumns =
+                        (await work.AssignedColumns.GetAllAsync())
+                        .Where(l => !l.IsDeleted && l.ScribeId == deactivatingScribe.Id);
+
+                    IEnumerable<AssignedQuestionCategory> assignedQuestionCategories =
+                        (await work.AssignedQuestionCategories.GetAllAsync())
+                        .Where(l => !l.IsDeleted && l.ScribeId == deactivatingScribe.Id);
+
+                    IEnumerable<AssignedSignCategory> assignedSignCategories =
+                        (await work.AssignedSignCategories.GetAllAsync())
+                        .Where(l => !l.IsDeleted && l.ScribeId == deactivatingScribe.Id);
+
+                    foreach (AssignedColumn assignedColumn in assignedColumns)
                     {
-                        foreach (LawModificationRequest pendingLawRom in pendingLawRoms)
+                        work.AssignedColumns.Delete(assignedColumn);
+                    }
+
+                    foreach (AssignedSignCategory assignedSignCategory in assignedSignCategories)
+                    {
+                        work.AssignedSignCategories.Delete(assignedSignCategory);
+                    }
+
+                    foreach (AssignedQuestionCategory assignedQuestionCategory in assignedQuestionCategories)
+                    {
+                        work.AssignedQuestionCategories.Delete(assignedQuestionCategory);
+                    }
+
+                    //Hard delete all Roms of scribe
+                    IEnumerable<LawModificationRequest> lawRoms = (await work.LawModificationRequests.GetAllAsync())
+                                .Where(rom => rom.ScribeId == deactivatingScribe.Id);
+                    IEnumerable<SignModificationRequest> signRoms = (await work.SignModificationRequests.GetAllAsync())
+                        .Where(rom => rom.ScribeId == deactivatingScribe.Id);
+                    IEnumerable<QuestionModificationRequest> questionRoms = (await work.QuestionModificationRequests.GetAllAsync())
+                        .Where(rom => rom.ScribeId == deactivatingScribe.Id);
+
+                    if (lawRoms != null)
+                    {
+                        foreach (LawModificationRequest lawRom in lawRoms)
                         {
-                            pendingLawRom.Status = (int)Status.Confirmed;
+                            work.LawModificationRequests.Delete(lawRom);
                         }
                     }
 
-                    if (pendingSignRoms != null)
+                    if (signRoms != null)
                     {
-                        foreach (SignModificationRequest pendingSignRom in pendingSignRoms)
+                        foreach (SignModificationRequest sRom in signRoms)
                         {
-                            pendingSignRom.Status = (int)Status.Confirmed;
+                            work.SignModificationRequests.Delete(sRom);
                         }
                     }
 
-                    if (pendingQuestionRoms != null)
+                    if (questionRoms != null)
                     {
-                        foreach (QuestionModificationRequest pendingQuestionRom in pendingQuestionRoms)
+                        foreach (QuestionModificationRequest questionRom in questionRoms)
                         {
-                            pendingQuestionRom.Status = (int)Status.Confirmed;
+                            work.QuestionModificationRequests.Delete(questionRom);
                         }
                     }
                 }
