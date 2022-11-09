@@ -124,6 +124,14 @@ namespace DataAccessLibrary.Business_Entity
 
             if (questionRom != null)
             {
+                if (questionRom.Status == (int)Status.Cancelled)
+                {
+                    throw new Exception("Yêu cầu đã bị hủy");
+                }
+            }
+
+            if (questionRom != null)
+            {
                 Question modifyingQuestion = await work.Questions.GetAsync(questionRom.ModifyingQuestionId);
                 Question modifiedQuestion = null;
                 if (questionRom.ModifiedQuestionId != null)
@@ -197,6 +205,15 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<QuestionModificationRequest> DenyQuestionRom(Guid modifyingQuestionId, string deniedReason)
         {
             QuestionModificationRequest questionRom = (await work.QuestionModificationRequests.GetAsync(modifyingQuestionId));
+
+            if (questionRom != null)
+            {
+                if (questionRom.Status == (int)Status.Cancelled)
+                {
+                    throw new Exception("Yêu cầu đã bị hủy");
+                }
+            }
+
             if (questionRom != null)
             {
                 questionRom.Status = (int)Status.Denied;
@@ -269,6 +286,14 @@ namespace DataAccessLibrary.Business_Entity
             QuestionModificationRequest questionRom = (await work.QuestionModificationRequests.GetAllAsync())
                 .Where(rom => !rom.IsDeleted && rom.ModifyingQuestionId == modifyingQuestionId)
                 .FirstOrDefault();
+
+            if (questionRom != null)
+            {
+                if (questionRom.Status == (int)Status.Approved || questionRom.Status == (int)Status.Denied)
+                {
+                    throw new Exception("Yêu cầu đã được xử lý");
+                }
+            }
 
             if (questionRom != null)
             {
