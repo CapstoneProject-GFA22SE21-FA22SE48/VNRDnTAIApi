@@ -479,6 +479,7 @@ namespace VNRDnTAIApi.Controllers
                         new Claim("Id", user.Id.ToString()),
                         new Claim("Username", String.IsNullOrEmpty(user.Username) ? "" : user.Username),
                         new Claim("Email", String.IsNullOrEmpty(user.Gmail) ? "" : user.Gmail),
+                        new Claim("Role", user.Role.ToString()),
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                     };
 

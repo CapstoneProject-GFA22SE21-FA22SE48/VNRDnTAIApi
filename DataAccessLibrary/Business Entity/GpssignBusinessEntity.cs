@@ -31,7 +31,10 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<Gpssign> AddGpssign(Gpssign gpssign)
         {
             gpssign.Id = Guid.NewGuid();
-            gpssign.IsDeleted = false;
+            if (!gpssign.IsDeleted)
+            {
+                gpssign.IsDeleted = false;
+            }
             await work.Gpssigns.AddAsync(gpssign);
             await work.Save();
             return gpssign;
@@ -48,8 +51,8 @@ namespace DataAccessLibrary.Business_Entity
                 gpsSign.Id = Guid.NewGuid();
                 gpsSign.SignId = gpsSignDTO.SignId;
                 gpsSign.Latitude = gpsSignDTO.Latitude;
-                gpsSign.Longtitude = gpsSignDTO.Longtitude;
-                gpsSign.Status = (int)Status.Active;
+                gpsSign.Longtitude = gpsSignDTO.Longitude;
+                gpsSign.Status = (int)Status.Deactivated;
                 //gpsSign.Status = (int)Status.Deactivated;
                 gpsSign.IsDeleted = false;
                 await work.Gpssigns.AddAsync(gpsSign);
@@ -77,33 +80,21 @@ namespace DataAccessLibrary.Business_Entity
 
         public async Task<IEnumerable<GpsSignDTO>> GetGpssignsNearby(double latitude, double longtitude, double distance)
         {
-            // ko duoc
-            var detal = from gpssigns in
+            var detal = (from gpssigns in
                             (await work.Gpssigns.GetAllAsync())
                             .Where(g => !g.IsDeleted && g.Status == (int)Status.Active)
-                        join signs in (await work.Signs.GetAllAsync()).Where(s => !s.IsDeleted && s.Status == (int)Status.Active)
-                        on gpssigns.SignId equals signs.Id
-                        select new GpsSignDTO
-                        {
-                            Id = gpssigns.Id,
-                            SignId = signs.Id,
-                            ImageUrl = signs.ImageUrl,
-                            Latitude = gpssigns.Latitude,
-                            Longtitude = gpssigns.Longtitude
-                        };
-
-            //var data = (await work.Gpssigns.GetAllAsync()).Where(g => !g.IsDeleted && g.Status == (int)Status.Active).ToList();
-
-            //List<GpsSignDTO> gpsSigns = new();
-
-            //data.ForEach(d =>
-            //{
-            //    if (GpsUtils.GetDistance(latitude, longtitude, (double)d.Latitude, (double)d.Longtitude, "KM") >= distance)
-            //    {
-            //        gpsSigns.Add(new GpsSignDTO { Id = d.Id, Latitude = d.Latitude, Longtitude = d.Longtitude, SignId = (Guid)d.SignId, });
-            //    }
-            //});
-
+                         join signs in (await work.Signs.GetAllAsync()).Where(s => !s.IsDeleted && s.Status == (int)Status.Active)
+                         on gpssigns.SignId equals signs.Id
+                         select new GpsSignDTO
+                         {
+                             Id = gpssigns.Id,
+                             SignId = signs.Id,
+                             ImageUrl = signs.ImageUrl,
+                             Latitude = gpssigns.Latitude,
+                             Longitude = gpssigns.Longtitude
+                         }).Where(g =>
+                            GpsUtils.GetDistance(latitude, longtitude, (double)g.Latitude, (double)g.Longitude, "KM") <= distance)
+                        .ToList();
             return detal;
         }
     }

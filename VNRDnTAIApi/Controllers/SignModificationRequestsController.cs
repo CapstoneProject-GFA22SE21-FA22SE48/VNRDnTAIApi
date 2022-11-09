@@ -86,6 +86,23 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
+        // GET: api/SignModificationRequests/Scribes/5/2
+        [HttpGet("Scribes/{scribeId}/{status}")]
+        [ProducesResponseType(typeof(IEnumerable<SignModificationRequest>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<SignModificationRequest>>>
+            GetSignModificationRequestsByScribeIdAndStatus(Guid scribeId, int status)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetSignModificationRequestsByScribeIdAndStatusAsync(scribeId, status));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         // PUT: api/SignModificationRequests/Signs/5/Users/5
         [HttpPut("Signs/{signId}/Users/{userId}")]
         [ProducesResponseType(typeof(SignModificationRequest), 200)]
@@ -102,6 +119,34 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.UpdateSignModificationRequest(signModificationRequest));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // PUT: api/SignModificationRequests/GPSSigns/5
+        [HttpPut("GPSSigns/{gpsSignRomId}")]
+        [ProducesResponseType(typeof(SignModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult>
+            ConfirmSignModificationRequest(Guid gpsSignRomId, [FromBody] string imageUrl)
+        {   // Expected: { status: 3 (Status.Confirmed), required imageUrl }
+            SignModificationRequest signModificationRequest;
+            try
+            {
+                signModificationRequest = await _entity.GetSignModificationRequestAsyncById(gpsSignRomId);
+                if (signModificationRequest != null)
+                {
+                    signModificationRequest.ImageUrl = imageUrl;
+                    return StatusCode(200, await _entity.UpdateSignModificationRequest(signModificationRequest));
+                }
+                else
+                {
+                    return StatusCode(404, "Request could not be found!");
+                }
             }
             catch (Exception ex)
             {
