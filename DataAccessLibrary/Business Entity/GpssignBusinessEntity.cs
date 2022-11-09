@@ -78,7 +78,7 @@ namespace DataAccessLibrary.Business_Entity
             await work.Save();
         }
 
-        public async Task<IEnumerable<GpsSignDTO>> GetGpssignsNearby(double latitude, double longtitude, double distance)
+        public async Task<IEnumerable<GpsSignDTO>> GetGpssignsNearby(double latitude, double longitude, double distance)
         {
             var detal = (from gpssigns in
                             (await work.Gpssigns.GetAllAsync())
@@ -92,9 +92,11 @@ namespace DataAccessLibrary.Business_Entity
                              ImageUrl = signs.ImageUrl,
                              Latitude = gpssigns.Latitude,
                              Longitude = gpssigns.Longtitude
-                         }).Where(g =>
-                            GpsUtils.GetDistance(latitude, longtitude, (double)g.Latitude, (double)g.Longitude, "KM") <= distance)
-                        .ToList();
+                         })
+                         .Where(g =>
+                            GpsUtils.GetDistance(latitude, longitude, (double)g.Latitude, (double)g.Longitude, "KM") <= distance)
+                        .ToList()
+                        ;
             return detal;
         }
     }

@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using BusinessObjectLibrary;
+using DataAccessLibrary.Business_Entity;
+using DataAccessLibrary.Interfaces;
+using DTOsLibrary;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BusinessObjectLibrary;
-using DataAccessLibrary.Business_Entity;
-using DataAccessLibrary.Interfaces;
-using Microsoft.AspNetCore.Authorization;
-using DTOsLibrary;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace VNRDnTAIApi.Controllers
 {
@@ -100,11 +100,11 @@ namespace VNRDnTAIApi.Controllers
         [HttpPost("AddGpsSignDTO")]
         [ProducesResponseType(typeof(Gpssign), 201)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<Gpssign>> PostGpsSignDTO([FromBody]GpsSignDTO gpsSignDTO)
+        public async Task<ActionResult<Gpssign>> PostGpsSignDTO([FromBody] GpsSignDTO gpsSignDTO)
         {
             try
             {
-               return StatusCode(201, await _entity.AddGpsSignDTO(gpsSignDTO));
+                return StatusCode(201, await _entity.AddGpsSignDTO(gpsSignDTO));
             }
             catch (Exception ex)
             {
@@ -133,11 +133,11 @@ namespace VNRDnTAIApi.Controllers
         [HttpGet("GetNearbyGpsSign")]
         [ProducesResponseType(200)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> GetNearbyGpsSign(double latitude, double longtitude, double distance)
+        public async Task<IActionResult> GetNearbyGpsSign(double latitude, double longitude, double distance)
         {
             try
             {
-                return StatusCode(200, await _entity.GetGpssignsNearby(latitude, longtitude, distance));
+                return StatusCode(200, await _entity.GetGpssignsNearby(latitude, longitude, distance));
             }
             catch (Exception ex)
             {
