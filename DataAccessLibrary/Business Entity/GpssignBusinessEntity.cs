@@ -28,7 +28,7 @@ namespace DataAccessLibrary.Business_Entity
                 gpsSign.Id = Guid.NewGuid();
                 gpsSign.SignId = gpsSignDTO.SignId;
                 gpsSign.Latitude = gpsSignDTO.Latitude;
-                gpsSign.Longtitude = gpsSignDTO.Longitude;
+                gpsSign.Longitude = gpsSignDTO.Longitude;
                 gpsSign.Status = (int)Status.Deactivated;
                 //gpsSign.Status = (int)Status.Deactivated;
                 gpsSign.IsDeleted = false;
@@ -55,7 +55,7 @@ namespace DataAccessLibrary.Business_Entity
                              SignId = signs.Id,
                              ImageUrl = signs.ImageUrl,
                              Latitude = gpssigns.Latitude,
-                             Longitude = gpssigns.Longtitude
+                             Longitude = gpssigns.Longitude
                          })
                          .Where(g =>
                             GpsUtils.GetDistance(latitude, longitude, (double)g.Latitude, (double)g.Longitude, "KM") <= distance)
