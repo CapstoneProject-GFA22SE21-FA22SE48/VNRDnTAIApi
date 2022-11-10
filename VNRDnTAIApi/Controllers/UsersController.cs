@@ -394,6 +394,8 @@ namespace VNRDnTAIApi.Controllers
                         new Claim("Username", String.IsNullOrEmpty(user.Username) ? "" : user.Username),
                         new Claim("Email", String.IsNullOrEmpty(user.Gmail) ? "" : user.Gmail),
                         new Claim("Role", user.Role.ToString()),
+                        new Claim("Avatar", String.IsNullOrEmpty(user.Avatar) ? "" : user.Avatar),
+                        new Claim("DisplayName", String.IsNullOrEmpty(user.DisplayName) ? "" : user.DisplayName),
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                     };
 
@@ -596,6 +598,68 @@ namespace VNRDnTAIApi.Controllers
             catch (ApplicationException ae)
             {
                 return StatusCode(500, ae.Message);
+            }
+        }
+
+        //POST api/Users/5/Refresh
+        [HttpPost("{userId}/Refresh")]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200)]
+        [AllowAnonymous]
+        public async Task<IActionResult> RefreshSession(Guid userId)
+        {
+            User user;
+            try
+            {
+                user = await _entity.GetUserAsync(userId);
+
+                if (user != null)
+                {
+                    var authClaims = new List<Claim>
+                    {
+                        new Claim("Id", user.Id.ToString()),
+                        new Claim("Username", String.IsNullOrEmpty(user.Username) ? "" : user.Username),
+                        new Claim("Email", String.IsNullOrEmpty(user.Gmail) ? "" : user.Gmail),
+                        new Claim("Role", user.Role.ToString()),
+                        new Claim("Avatar", String.IsNullOrEmpty(user.Avatar) ? "" : user.Avatar),
+                        new Claim("DisplayName", String.IsNullOrEmpty(user.DisplayName) ? "" : user.DisplayName),
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                    };
+
+                    var authSignature = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(VNRDnTAIConfiguration.Secret));
+
+                    //Token generate
+                    var token = new JwtSecurityToken(
+                        issuer: VNRDnTAIConfiguration.JwtIssuer,
+                        audience: VNRDnTAIConfiguration.JwtAudience,
+                        //expires: DateTime.Now.AddHours(2),
+                        expires: DateTime.MaxValue,
+                        claims: authClaims,
+                        signingCredentials:
+                            new SigningCredentials(authSignature, SecurityAlgorithms.HmacSha256)
+                        );
+
+                    return StatusCode(200, new
+                    {
+                        token = new JwtSecurityTokenHandler().WriteToken(token),
+                    });
+                }
+                else
+                {
+                    throw new ApplicationException("Sai tên đăng nhập hoặc mật khẩu");
+                }
+            }
+            catch (ArgumentException ae)
+            {
+                return Unauthorized("Có lỗi xảy ra.\n" + ae.Message);
+            }
+            catch (ApplicationException ae)
+            {
+                return Unauthorized("Có lỗi xảy ra.\n" + ae.Message);
+            }
+            catch
+            {
+                return Unauthorized("Có lỗi xảy ra. Vui lòng thử lại sau.");
             }
         }
     }
