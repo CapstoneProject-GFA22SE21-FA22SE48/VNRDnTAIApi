@@ -188,7 +188,7 @@ namespace BusinessObjectLibrary
 
                 entity.Property(e => e.Latitude).HasColumnType("decimal(18, 15)");
 
-                entity.Property(e => e.Longtitude).HasColumnType("decimal(18, 15)");
+                entity.Property(e => e.Longitude).HasColumnType("decimal(18, 15)");
 
                 entity.HasOne(d => d.Sign)
                     .WithMany(p => p.Gpssigns)

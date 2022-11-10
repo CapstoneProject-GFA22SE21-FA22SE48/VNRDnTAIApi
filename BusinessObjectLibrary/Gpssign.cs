@@ -14,7 +14,7 @@ namespace BusinessObjectLibrary
         public Guid Id { get; set; }
         public Guid? SignId { get; set; }
         public decimal Latitude { get; set; }
-        public decimal Longtitude { get; set; }
+        public decimal Longitude { get; set; }
         public int Status { get; set; }
         public bool IsDeleted { get; set; }
 
