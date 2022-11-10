@@ -69,14 +69,14 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // PUT: api/SignModificationRequests/GPSSigns/5
-        [HttpPut("GPSSigns/{gpsSignRomId}/{status}")]
+        // PUT: api/SignModificationRequests/GPSSigns/5/10
+        [HttpPut("GPSSigns/{gpsSignRomId}/{status}/{adminId}")]
         [ProducesResponseType(typeof(SignModificationRequest), 200)]
         [ProducesResponseType(500)]
         [ProducesResponseType(400)]
         public async Task<IActionResult>
-            ConfirmSignModificationRequest(Guid gpsSignRomId, int status, [FromBody] string imageUrl)
-        {   // Expected: { status: 3 (Status.Confirmed), required imageUrl }
+            ConfirmSignModificationRequest(Guid gpsSignRomId, int status, Guid adminId, [FromBody] string imageUrl)
+        {
             SignModificationRequest signModificationRequest;
             try
             {
@@ -85,6 +85,7 @@ namespace VNRDnTAIApi.Controllers
                 {
                     signModificationRequest.ImageUrl = imageUrl;
                     signModificationRequest.Status = status;
+                    signModificationRequest.AdminId = adminId;
 
                     return StatusCode(200, await _entity.UpdateSignModificationRequest(signModificationRequest));
                 }
