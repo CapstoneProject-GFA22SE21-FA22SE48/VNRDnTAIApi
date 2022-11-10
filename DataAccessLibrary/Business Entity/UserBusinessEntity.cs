@@ -101,7 +101,7 @@ namespace DataAccessLibrary.Business_Entity
         {
             List<AdminDTO> admins =
                 (from admin in (await work.Users.GetAllAsync())
-                        .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.ADMIN)
+                        .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.ADMIN && user.Status == (int)Status.Active)
                  select new AdminDTO
                  {
                      Id = admin.Id,
@@ -303,6 +303,19 @@ namespace DataAccessLibrary.Business_Entity
             foreach (AssignedQuestionCategory assignedQuestionCategory in assignedQuestionCategories)
             {
                 work.AssignedQuestionCategories.Delete(assignedQuestionCategory);
+            }
+
+            //Release all GPSSign roms that are claimed by current scribe
+            IEnumerable<SignModificationRequest> claimedGpssignRoms =
+                (await work.SignModificationRequests.GetAllAsync())
+                .Where(rom => rom.ScribeId == deactivatingScribe.Id && rom.ModifyingGpssignId != null);
+            if (claimedGpssignRoms != null)
+            {
+                foreach (SignModificationRequest gpssignRom in claimedGpssignRoms)
+                {
+                    gpssignRom.Status = (int)Status.Pending;
+                    gpssignRom.ScribeId = null;
+                }
             }
 
             //Hard delete all Roms of scribe
