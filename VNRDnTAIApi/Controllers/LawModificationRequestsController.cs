@@ -20,22 +20,6 @@ namespace VNRDnTAIApi.Controllers
             _entity = new LawModificationRequestBusinessEntity(work);
         }
 
-        // GET: api/LawModificationRequests
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<LawModificationRequest>), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<LawModificationRequest>>> GetLawModificationRequests()
-        {
-            try
-            {
-                return StatusCode(200, await _entity.GetLawModificationRequestsAsync());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
         // GET: api/LawModificationRequests/AdminROMList/5
         [HttpGet("AdminROMList/{adminId}")]
         [ProducesResponseType(typeof(AdminRomListDTO), 200)]
@@ -61,115 +45,6 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.GetScribeRomList(scribeId));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        // GET: api/LawModificationRequests/ModifyingParagraphs/5
-        [HttpGet("ModifyingParagraphs/{modifyingParagraphId}")]
-        [ProducesResponseType(typeof(LawModificationRequest), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<LawModificationRequest>>
-            GetLawModificationRequestByModifyingParagraphId(Guid modifyingParagraphId)
-        {
-            try
-            {
-                return StatusCode(200,
-                    await _entity.GetLawModificationRequestByModifyingParagraphIdAsync(modifyingParagraphId));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        // GET: api/LawModificationRequests/ModifiedParagraphs/5
-        [HttpGet("ModifiedParagraphs/{modifiedParagraphId}")]
-        [ProducesResponseType(typeof(IEnumerable<LawModificationRequest>), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<LawModificationRequest>>>
-            GetLawModificationRequestsByModifiedParagraphId(Guid modifiedParagraphId)
-        {
-            try
-            {
-                return StatusCode(200,
-                    await _entity.GetLawModificationRequestsByModifiedParagraphIdAsync(modifiedParagraphId));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        // GET: api/LawModificationRequests/Scribes/5
-        [HttpGet("Scribes/{scribeId}")]
-        [ProducesResponseType(typeof(IEnumerable<LawModificationRequest>), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<LawModificationRequest>>>
-            GetLawModificationRequestsByScribeId(Guid scribeId)
-        {
-            try
-            {
-                return StatusCode(200, await _entity.GetLawModificationRequestsByScribeIdAsync(scribeId));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        // PUT: api/LawModificationRequests/Paragraphs/5/Users/5
-        [HttpPut("Paragraphs/{sectionId}/Users/{userid}")]
-        [ProducesResponseType(typeof(LawModificationRequest), 200)]
-        [ProducesResponseType(500)]
-        [ProducesResponseType(400)]
-        public async Task<IActionResult>
-            PutLawModificationRequest(Guid modifyingParagraphId, Guid scribeId, LawModificationRequest lawModificationRequest)
-        {
-            if (modifyingParagraphId != lawModificationRequest.ModifyingParagraphId || scribeId != lawModificationRequest.ScribeId)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                return StatusCode(200, await _entity.UpdateLawModificationRequest(lawModificationRequest));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        // POST: api/LawModificationRequests
-        [HttpPost]
-        [ProducesResponseType(typeof(LawModificationRequest), 201)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<LawModificationRequest>> PostLawModificationRequest(LawModificationRequest lawModificationRequest)
-        {
-            try
-            {
-                return StatusCode(201, await _entity.AddLawModificationRequest(lawModificationRequest));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        // DELETE: api/LawModificationRequests/5
-        [HttpDelete("{lawRomId}")]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> DeleteLawModificationRequest(Guid lawRomId)
-        {
-            try
-            {
-                await _entity.RemoveLawModificationRequest(lawRomId);
-                return StatusCode(204);
             }
             catch (Exception ex)
             {
@@ -210,6 +85,23 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
+
+        // POST: api/LawModificationRequests
+        [HttpPost]
+        [ProducesResponseType(typeof(LawModificationRequest), 201)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<LawModificationRequest>> PostLawModificationRequest(LawModificationRequest lawModificationRequest)
+        {
+            try
+            {
+                return StatusCode(201, await _entity.AddLawModificationRequest(lawModificationRequest));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         //---------------------------------------------------
         // POST: api/LawModificationRequests/Statue/Approve/5
         [HttpPost("Statue/Approve/{modifyingStatueId}")]
@@ -226,6 +118,7 @@ namespace VNRDnTAIApi.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
         //---------------------------------------------------
         // POST: api/LawModificationRequests/Statue/Deny/5
         [HttpPost("Statue/Deny/{modifyingStatueId}")]
@@ -316,6 +209,23 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.CancelLawRom(lawRomId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // DELETE: api/LawModificationRequests/5
+        [HttpDelete("{lawRomId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> DeleteLawModificationRequest(Guid lawRomId)
+        {
+            try
+            {
+                await _entity.RemoveLawModificationRequest(lawRomId);
+                return StatusCode(204);
             }
             catch (Exception ex)
             {

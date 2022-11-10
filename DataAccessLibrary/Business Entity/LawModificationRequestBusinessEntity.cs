@@ -18,33 +18,6 @@ namespace DataAccessLibrary.Business_Entity
         {
             this.work = work;
         }
-        public async Task<IEnumerable<LawModificationRequest>> GetLawModificationRequestsAsync()
-        {
-            return (await work.LawModificationRequests.GetAllAsync())
-                .Where(lawModificationRequest => !lawModificationRequest.IsDeleted);
-        }
-
-        public async Task<LawModificationRequest>
-            GetLawModificationRequestByModifyingParagraphIdAsync(Guid modifyingParagraphId)
-        {
-            return (await work.LawModificationRequests.GetAllAsync())
-                .Where(p => !p.IsDeleted && p.ModifyingParagraphId.Equals(modifyingParagraphId))
-                .FirstOrDefault();
-        }
-
-        public async Task<IEnumerable<LawModificationRequest>>
-            GetLawModificationRequestsByModifiedParagraphIdAsync(Guid modifiedParagraphId)
-        {
-            return (await work.LawModificationRequests.GetAllAsync())
-                .Where(p => !p.IsDeleted && p.ModifiedParagraphId.Equals(modifiedParagraphId));
-        }
-
-        public async Task<IEnumerable<LawModificationRequest>>
-            GetLawModificationRequestsByScribeIdAsync(Guid scribeId)
-        {
-            return (await work.LawModificationRequests.GetAllAsync())
-                .Where(p => !p.IsDeleted && p.ScribeId.Equals(scribeId));
-        }
 
         public async Task<LawModificationRequest>
             AddLawModificationRequest(LawModificationRequest lawModificationRequest)
@@ -63,13 +36,7 @@ namespace DataAccessLibrary.Business_Entity
             return lawModificationRequest;
         }
 
-        public async Task<LawModificationRequest>
-            UpdateLawModificationRequest(LawModificationRequest lawModificationRequest)
-        {
-            work.LawModificationRequests.Update(lawModificationRequest);
-            await work.Save();
-            return lawModificationRequest;
-        }
+
         public async Task RemoveLawModificationRequest(Guid lawRomId)
         {
             LawModificationRequest lawModificationRequest =

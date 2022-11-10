@@ -19,73 +19,6 @@ namespace VNRDnTAIApi.Controllers
             _entity = new SignModificationRequestBusinessEntity(work);
         }
 
-        // GET: api/SignModificationRequests
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<SignModificationRequest>), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<SignModificationRequest>>> GetSignModificationRequests()
-        {
-            try
-            {
-                return StatusCode(200, await _entity.GetSignModificationRequestsAsync());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        // GET: api/SignModificationRequests/Signs/5
-        [HttpGet("Signs/{modifyingSignId}")]
-        [ProducesResponseType(typeof(SignModificationRequest), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<SignModificationRequest>>
-            GetSignModificationRequestByModifyingSignId(Guid modifyingSignId)
-        {
-            try
-            {
-                return StatusCode(200, await _entity.GetSignModificationRequestByModifyingSignIdAsync(modifyingSignId));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        // GET: api/SignModificationRequests/Signs/5
-        [HttpGet("Signs/{modifiedSignId}")]
-        [ProducesResponseType(typeof(IEnumerable<SignModificationRequest>), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<SignModificationRequest>>>
-            GetSignModificationRequestsByModifiedSignId(Guid modifiedSignId)
-        {
-            try
-            {
-                return StatusCode(200, await _entity.GetSignModificationRequestsByModifiedSignIdAsync(modifiedSignId));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        // GET: api/SignModificationRequests/Scribes/5
-        [HttpGet("Scribes/{scribeId}")]
-        [ProducesResponseType(typeof(IEnumerable<SignModificationRequest>), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<SignModificationRequest>>>
-            GetSignModificationRequestsByScribeId(Guid scribeId)
-        {
-            try
-            {
-                return StatusCode(200, await _entity.GetSignModificationRequestsByScribeIdAsync(scribeId));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
         // GET: api/SignModificationRequests/Scribes/5/2
         [HttpGet("Scribes/{scribeId}/{status}")]
         [ProducesResponseType(typeof(IEnumerable<SignModificationRequest>), 200)]
@@ -102,23 +35,33 @@ namespace VNRDnTAIApi.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-
-        // PUT: api/SignModificationRequests/Signs/5/Users/5
-        [HttpPut("Signs/{signId}/Users/{userId}")]
-        [ProducesResponseType(typeof(SignModificationRequest), 200)]
+        //---------------------------------------------------
+        // GET: api/SignModificationRequests/SignROMDetail/5
+        [HttpGet("SignROMDetail/{modifyingSignId}")]
+        [ProducesResponseType(typeof(SignModificationRequestDTO), 200)]
         [ProducesResponseType(500)]
-        [ProducesResponseType(400)]
-        public async Task<IActionResult>
-            PutSignModificationRequest(Guid modifyingSignId, Guid scribeId, SignModificationRequest signModificationRequest)
+        public async Task<ActionResult<SignModificationRequestDTO>> GetSignRomDetail(Guid modifyingSignId)
         {
-            if (modifyingSignId != signModificationRequest.ModifyingSignId || scribeId != signModificationRequest.ScribeId)
-            {
-                return BadRequest();
-            }
-
             try
             {
-                return StatusCode(200, await _entity.UpdateSignModificationRequest(signModificationRequest));
+                return StatusCode(200, await _entity.GetSignRomDetail(modifyingSignId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        //---------------------------------------------------
+        // GET: api/SignModificationRequests/GpssignROMs
+        [HttpGet("GpssignROMs/{scribeId}")]
+        [ProducesResponseType(typeof(IEnumerable<SignModificationRequest>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<SignModificationRequest>>> GetGpssignRoms(Guid scribeId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetGpssignRoms(scribeId));
             }
             catch (Exception ex)
             {
@@ -153,6 +96,28 @@ namespace VNRDnTAIApi.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+        //---------------------------------------------------
+        // PUT: api/SignModificationRequests/GPSSign/Claim/5
+        [HttpPut("GPSSign/Claim/{modifyingGpssignId}")]
+        [ProducesResponseType(typeof(SignModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<SignModificationRequest>> ClaimGpssignRom(Guid modifyingGpssignId, SignModificationRequest gpsSignRom)
+        {
+            if (modifyingGpssignId != gpsSignRom.ModifyingGpssignId)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                return StatusCode(200, await _entity.ClaimGpssignRom(gpsSignRom));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
 
         // POST: api/SignModificationRequests
         [HttpPost]
@@ -170,56 +135,6 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // DELETE: api/SignModificationRequests/5
-        [HttpDelete("{signRomId}")]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> DeleteSignModificationRequest(Guid signRomId)
-        {
-            try
-            {
-                await _entity.RemoveSignModificationRequest(signRomId);
-                return StatusCode(204);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        //---------------------------------------------------
-        // GET: api/SignModificationRequests/SignROMDetail/5
-        [HttpGet("SignROMDetail/{modifyingSignId}")]
-        [ProducesResponseType(typeof(SignModificationRequestDTO), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<SignModificationRequestDTO>> GetSignRomDetail(Guid modifyingSignId)
-        {
-            try
-            {
-                return StatusCode(200, await _entity.GetSignRomDetail(modifyingSignId));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        //---------------------------------------------------
-        // GET: api/SignModificationRequests/GpssignROMs
-        [HttpGet("GpssignROMs/{scribeId}")]
-        [ProducesResponseType(typeof(IEnumerable<SignModificationRequest>), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<SignModificationRequest>>> GetGpssignRoms(Guid scribeId)
-        {
-            try
-            {
-                return StatusCode(200, await _entity.GetGpssignRoms(scribeId));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
         //---------------------------------------------------
         // POST: api/SignModificationRequests/Approve/5
         [HttpPost("Approve/{modifyingSignId}")]
@@ -268,22 +183,17 @@ namespace VNRDnTAIApi.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-        //---------------------------------------------------
-        // PUT: api/SignModificationRequests/GPSSign/Claim/5
-        [HttpPut("GPSSign/Claim/{modifyingGpssignId}")]
-        [ProducesResponseType(typeof(SignModificationRequest), 200)]
-        [ProducesResponseType(500)]
-        [ProducesResponseType(400)]
-        public async Task<ActionResult<SignModificationRequest>> ClaimGpssignRom(Guid modifyingGpssignId, SignModificationRequest gpsSignRom)
-        {
-            if (modifyingGpssignId != gpsSignRom.ModifyingGpssignId)
-            {
-                return BadRequest();
-            }
 
+        // DELETE: api/SignModificationRequests/5
+        [HttpDelete("{signRomId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> DeleteSignModificationRequest(Guid signRomId)
+        {
             try
             {
-                return StatusCode(200, await _entity.ClaimGpssignRom(gpsSignRom));
+                await _entity.RemoveSignModificationRequest(signRomId);
+                return StatusCode(204);
             }
             catch (Exception ex)
             {

@@ -15,12 +15,6 @@ namespace DataAccessLibrary.Business_Entity
         {
             this.work = work;
         }
-        public async Task<IEnumerable<TestResult>> GetTestResultsAsync()
-        {
-            return (await work.TestResults.GetAllAsync())
-                .Where(testResult => !testResult.IsDeleted);
-        }
-
         public async Task<IEnumerable<TestResult>> GetTestResultByUserId(Guid userId, Guid testCategoryId)
         {
             await work.TestResults.GetAllAsync();
@@ -100,12 +94,6 @@ namespace DataAccessLibrary.Business_Entity
             return res;
         }
 
-        public async Task<TestResult> GetTestResultAsync(Guid id)
-        {
-            return (await work.TestResults.GetAllAsync())
-                .Where(testResult => !testResult.IsDeleted && testResult.Id.Equals(id))
-                .FirstOrDefault();
-        }
         public async Task<TestResult> AddTestResult(TestResult testResult)
         {
             testResult.Id = Guid.NewGuid();
@@ -118,28 +106,6 @@ namespace DataAccessLibrary.Business_Entity
             await work.TestResults.AddAsync(testResult);
             await work.Save();
             return testResult;
-        }
-
-        public async Task<TestResult> UpdateTestResult(TestResult testResult)
-        {
-            work.TestResults.Update(testResult);
-            await work.Save();
-            return testResult;
-        }
-        public async Task RemoveTestResult(Guid id)
-        {
-            TestResult testResult = await work.TestResults.GetAsync(id);
-            testResult.IsDeleted = true;
-            work.TestResults.Update(testResult);
-            await work.Save();
-        }
-
-        public async Task<IEnumerable<dynamic>> GetIncorrectQuestionsOfTestResults(Guid userId, Guid testCategoryId)
-        {
-            List<TestResult> testResults = (await work.TestResults.GetAllAsync())
-                .Where(tr => !tr.IsDeleted && tr.TestCategoryId == testCategoryId)
-                .ToList();
-            return testResults;
         }
     }
 }

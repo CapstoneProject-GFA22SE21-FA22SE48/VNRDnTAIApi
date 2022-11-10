@@ -25,22 +25,6 @@ namespace VNRDnTAIApi.Controllers
             _entity = new UserBusinessEntity(work);
         }
 
-        // GET: api/Users
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<User>), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
-        {
-            try
-            {
-                return StatusCode(200, await _entity.GetUsersAsync());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
         // GET: api/Users/Members
         [HttpGet("Members")]
         [ProducesResponseType(typeof(IEnumerable<User>), 200)]
@@ -119,38 +103,6 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // GET: api/Users/Members/DateRange/
-        [HttpGet("Members/DateRange")]
-        [ProducesResponseType(typeof(IEnumerable<User>), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<User>>> GetMembers(DateTime startDate, DateTime endDate)
-        {
-            try
-            {
-                return StatusCode(200, await _entity.GetMembersByCreatedDateRangeAsync(startDate, endDate));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        // GET: api/Users/Scribes/DateRange/
-        [HttpGet("Scribes/DateRange")]
-        [ProducesResponseType(typeof(IEnumerable<User>), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<User>>> GetScribes(DateTime startDate, DateTime endDate)
-        {
-            try
-            {
-                return StatusCode(200, await _entity.GetScribesByCreatedDateRangeAsync(startDate, endDate));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
         // GET: api/Users/5
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(User), 200)]
@@ -160,28 +112,6 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.GetUserAsync(id));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        // PUT: api/Users/5
-        [HttpPut("{id}")]
-        [ProducesResponseType(typeof(User), 200)]
-        [ProducesResponseType(500)]
-        [ProducesResponseType(400)]
-        public async Task<IActionResult> PutUser(Guid id, User user)
-        {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                return StatusCode(200, await _entity.UpdateUser(user));
             }
             catch (Exception ex)
             {
@@ -310,22 +240,6 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // DELETE: api/Users/5
-        [HttpDelete("{id}")]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> DeleteUser(Guid id)
-        {
-            try
-            {
-                await _entity.RemoveUser(id);
-                return StatusCode(204);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
         // POST: api/Users/Register
         [HttpPost("Register")]
         [ProducesResponseType(typeof(User), 201)]
