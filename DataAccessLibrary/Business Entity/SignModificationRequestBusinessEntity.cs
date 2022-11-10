@@ -33,6 +33,7 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<SignModificationRequest> AddSignModificationRequest(SignModificationRequest signModificationRequest)
         {
             signModificationRequest.Id = Guid.NewGuid();
+            signModificationRequest.Status = signModificationRequest.Status == 1 ? (int)Status.Unclaimed : (int)Status.Pending;
             signModificationRequest.CreatedDate = DateTime.Now;
             signModificationRequest.IsDeleted = false;
             await work.SignModificationRequests.AddAsync(signModificationRequest);
