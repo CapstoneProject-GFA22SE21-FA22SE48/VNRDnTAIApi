@@ -101,7 +101,7 @@ namespace DataAccessLibrary.Business_Entity
         {
             List<AdminDTO> admins =
                 (from admin in (await work.Users.GetAllAsync())
-                        .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.ADMIN)
+                        .Where(user => !user.IsDeleted && user.Role == (int)UserRoles.ADMIN && user.Status == (int)Status.Active)
                  select new AdminDTO
                  {
                      Id = admin.Id,

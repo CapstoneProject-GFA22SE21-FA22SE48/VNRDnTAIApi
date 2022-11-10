@@ -381,7 +381,7 @@ namespace DataAccessLibrary.Business_Entity
                     .Where( //Get only Pending GPS Sign rom or scribe claimed GPS Sign Rom
                         rom => !rom.IsDeleted
                         && rom.ModifyingGpssignId != null
-                        && (rom.Status == (int)Status.Pending || rom.ScribeId == scribeId)
+                        && (rom.Status == (int)Status.Unclaimed || rom.ScribeId == scribeId)
                     );
             return gpssignRoms;
         }
