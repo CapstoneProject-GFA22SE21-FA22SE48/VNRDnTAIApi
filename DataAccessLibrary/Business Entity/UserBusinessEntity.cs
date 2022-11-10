@@ -17,12 +17,6 @@ namespace DataAccessLibrary.Business_Entity
         {
             this.work = work;
         }
-        public async Task<IEnumerable<User>> GetUsersAsync()
-        {
-            return (await work.Users.GetAllAsync())
-                .Where(user => !user.IsDeleted);
-        }
-
         public async Task<IEnumerable<User>> GetMembersAsync()
         {
             var user = (await work.Users.GetAllAsync())
@@ -37,20 +31,6 @@ namespace DataAccessLibrary.Business_Entity
                     user => !user.IsDeleted &&
                     user.Role == (int)UserRoles.MEMBER &&
                     user.Username.ToLower().Contains(keywordUserName.ToLower())
-                 );
-            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
-        }
-
-        public async Task<IEnumerable<User>> GetMembersByCreatedDateRangeAsync(
-            DateTime startDate,
-            DateTime endDate)
-        {
-            var user = (await work.Users.GetAllAsync())
-                .Where(
-                    user => !user.IsDeleted &&
-                    user.Role == (int)UserRoles.MEMBER &&
-                    user.CreatedDate.CompareTo(startDate) >= 0 &&
-                    user.CreatedDate.CompareTo(endDate) <= 0
                  );
             return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
         }
@@ -113,20 +93,6 @@ namespace DataAccessLibrary.Business_Entity
                     user => !user.IsDeleted &&
                     user.Role == (int)UserRoles.SCRIBE &&
                     user.Username.ToLower().Contains(keywordUserName.ToLower())
-                 );
-            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
-        }
-
-        public async Task<IEnumerable<User>> GetScribesByCreatedDateRangeAsync(
-            DateTime startDate,
-            DateTime endDate)
-        {
-            var user = (await work.Users.GetAllAsync())
-                .Where(
-                    user => !user.IsDeleted &&
-                    user.Role == (int)UserRoles.SCRIBE &&
-                    user.CreatedDate.CompareTo(startDate) >= 0 &&
-                    user.CreatedDate.CompareTo(endDate) <= 0
                  );
             return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
         }
@@ -393,14 +359,6 @@ namespace DataAccessLibrary.Business_Entity
             return reEnablingMember;
 
         }
-        public async Task RemoveUser(Guid id)
-        {
-            User user = await work.Users.GetAsync(id);
-            user.IsDeleted = true;
-            work.Users.Update(user);
-            await work.Save();
-        }
-
         public async Task<User> LoginWeb(string username, string password)
         {
             return (await work.Users.GetAllAsync())
@@ -414,7 +372,7 @@ namespace DataAccessLibrary.Business_Entity
         {
             return (await work.Users.GetAllAsync())
                 .Where((user) => !user.IsDeleted && user.Username == username
-                    && user.Password == password)
+                    && user.Password == password && user.Status == (int)Status.Active)
                 .FirstOrDefault();
         }
 
@@ -425,8 +383,10 @@ namespace DataAccessLibrary.Business_Entity
             user.CreatedDate = DateTime.Now;
             user.Username = username;
             user.Password = password;
+            user.DisplayName = String.IsNullOrEmpty(email) ? username : email;
+            user.Avatar = "https://firebasestorage.googleapis.com/v0/b/vnrdntai.appspot.com/o/images%2Favatar%2Fdefault_avatar_x025.png?alt=media";
             user.Gmail = email;
-            user.Status = 5;
+            user.Status = (int)Status.Active;
             user.Role = (int)UserRoles.MEMBER;
             user.IsDeleted = false;
 

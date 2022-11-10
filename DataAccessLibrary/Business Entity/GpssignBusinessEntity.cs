@@ -17,26 +17,6 @@ namespace DataAccessLibrary.Business_Entity
         {
             this.work = work;
         }
-        public async Task<IEnumerable<Gpssign>> GetGpssignsAsync()
-        {
-            return (await work.Gpssigns.GetAllAsync())
-                .Where(gpssign => !gpssign.IsDeleted);
-        }
-        public async Task<Gpssign> GetGpssignAsync(Guid id)
-        {
-            return (await work.Gpssigns.GetAllAsync())
-                .Where(gpssign => !gpssign.IsDeleted && gpssign.Id.Equals(id))
-                .FirstOrDefault();
-        }
-        public async Task<Gpssign> AddGpssign(Gpssign gpssign)
-        {
-            gpssign.Id = Guid.NewGuid();
-            gpssign.IsDeleted = false;
-            await work.Gpssigns.AddAsync(gpssign);
-            await work.Save();
-            return gpssign;
-        }
-
         public async Task<Gpssign> AddGpsSignDTO(GpsSignDTO gpsSignDTO)
         {
             Sign sign = (await work.Signs.GetAllAsync())
@@ -48,8 +28,8 @@ namespace DataAccessLibrary.Business_Entity
                 gpsSign.Id = Guid.NewGuid();
                 gpsSign.SignId = gpsSignDTO.SignId;
                 gpsSign.Latitude = gpsSignDTO.Latitude;
-                gpsSign.Longtitude = gpsSignDTO.Longtitude;
-                gpsSign.Status = (int)Status.Active;
+                gpsSign.Longitude = gpsSignDTO.Longitude;
+                gpsSign.Status = (int)Status.Deactivated;
                 //gpsSign.Status = (int)Status.Deactivated;
                 gpsSign.IsDeleted = false;
                 await work.Gpssigns.AddAsync(gpsSign);
@@ -61,49 +41,26 @@ namespace DataAccessLibrary.Business_Entity
                 return new Gpssign();
             }
         }
-        public async Task<Gpssign> UpdateGpssign(Gpssign gpssign)
-        {
-            work.Gpssigns.Update(gpssign);
-            await work.Save();
-            return gpssign;
-        }
-        public async Task RemoveGpssign(Guid id)
-        {
-            Gpssign gpssign = await work.Gpssigns.GetAsync(id);
-            gpssign.IsDeleted = true;
-            work.Gpssigns.Update(gpssign);
-            await work.Save();
-        }
 
-        public async Task<IEnumerable<GpsSignDTO>> GetGpssignsNearby(double latitude, double longtitude, double distance)
+        public async Task<IEnumerable<GpsSignDTO>> GetGpssignsNearby(double latitude, double longitude, double distance)
         {
-            // ko duoc
-            var detal = from gpssigns in
+            var detal = (from gpssigns in
                             (await work.Gpssigns.GetAllAsync())
                             .Where(g => !g.IsDeleted && g.Status == (int)Status.Active)
-                        join signs in (await work.Signs.GetAllAsync()).Where(s => !s.IsDeleted && s.Status == (int)Status.Active)
-                        on gpssigns.SignId equals signs.Id
-                        select new GpsSignDTO
-                        {
-                            Id = gpssigns.Id,
-                            SignId = signs.Id,
-                            ImageUrl = signs.ImageUrl,
-                            Latitude = gpssigns.Latitude,
-                            Longtitude = gpssigns.Longtitude
-                        };
-
-            //var data = (await work.Gpssigns.GetAllAsync()).Where(g => !g.IsDeleted && g.Status == (int)Status.Active).ToList();
-
-            //List<GpsSignDTO> gpsSigns = new();
-
-            //data.ForEach(d =>
-            //{
-            //    if (GpsUtils.GetDistance(latitude, longtitude, (double)d.Latitude, (double)d.Longtitude, "KM") >= distance)
-            //    {
-            //        gpsSigns.Add(new GpsSignDTO { Id = d.Id, Latitude = d.Latitude, Longtitude = d.Longtitude, SignId = (Guid)d.SignId, });
-            //    }
-            //});
-
+                         join signs in (await work.Signs.GetAllAsync()).Where(s => !s.IsDeleted && s.Status == (int)Status.Active)
+                         on gpssigns.SignId equals signs.Id
+                         select new GpsSignDTO
+                         {
+                             Id = gpssigns.Id,
+                             SignId = signs.Id,
+                             ImageUrl = signs.ImageUrl,
+                             Latitude = gpssigns.Latitude,
+                             Longitude = gpssigns.Longitude
+                         })
+                         .Where(g =>
+                            GpsUtils.GetDistance(latitude, longitude, (double)g.Latitude, (double)g.Longitude, "KM") <= distance)
+                        .ToList()
+                        ;
             return detal;
         }
     }

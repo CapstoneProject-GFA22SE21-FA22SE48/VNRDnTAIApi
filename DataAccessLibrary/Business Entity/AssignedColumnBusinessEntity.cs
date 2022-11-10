@@ -16,11 +16,7 @@ namespace DataAccessLibrary.Business_Entity
         {
             this.work = work;
         }
-        public async Task<IEnumerable<AssignedColumn>> GetAssignedColumnsAsync()
-        {
-            return (await work.AssignedColumns.GetAllAsync())
-                .Where(assignedColumn => !assignedColumn.IsDeleted);
-        }
+
         public async Task<IEnumerable<AssignedColumn>> GetAssignedColumnsByScribeIdAsync(Guid scribeId)
         {
             return (await work.AssignedColumns.GetAllAsync(nameof(AssignedColumn.Column)))

@@ -17,30 +17,17 @@ namespace DataAccessLibrary.Business_Entity
         {
             this.work = work;
         }
-        public async Task<IEnumerable<SignModificationRequest>> GetSignModificationRequestsAsync()
-        {
-            return await work.SignModificationRequests.GetAllAsync();
-        }
 
-        public async Task<SignModificationRequest> GetSignModificationRequestByModifyingSignIdAsync(Guid modifyingSignId)
+        public async Task<SignModificationRequest> GetSignModificationRequestAsyncById(Guid id)
         {
-            return (await work.SignModificationRequests.GetAllAsync())
-                .Where(p => p.ModifyingSignId.Equals(modifyingSignId))
-                .FirstOrDefault();
+            return await work.SignModificationRequests.GetAsync(id);
         }
 
         public async Task<IEnumerable<SignModificationRequest>>
-            GetSignModificationRequestsByModifiedSignIdAsync(Guid modifiedSignId)
+            GetSignModificationRequestsByScribeIdAndStatusAsync(Guid scribeId, int status)
         {
             return (await work.SignModificationRequests.GetAllAsync())
-                .Where(p => p.ModifiedSignId.Equals(modifiedSignId));
-        }
-
-        public async Task<IEnumerable<SignModificationRequest>>
-            GetSignModificationRequestsByScribeIdAsync(Guid scribeId)
-        {
-            return (await work.SignModificationRequests.GetAllAsync())
-                .Where(p => p.ScribeId.Equals(scribeId));
+                .Where(p => !p.IsDeleted && p.Status == status && p.ScribeId.Equals(scribeId));
         }
 
         public async Task<SignModificationRequest> AddSignModificationRequest(SignModificationRequest signModificationRequest)
@@ -380,18 +367,37 @@ namespace DataAccessLibrary.Business_Entity
             return signRomDTO;
         }
         //--------------------------------------------------
-        public async Task<SignModificationRequest> GetGpssignRomDetail(Guid modifyingGpssignId)
+        public async Task<IEnumerable<SignModificationRequest>> GetGpssignRoms(Guid scribeId)
         {
-            SignModificationRequest gpssignRom =
-                (await work.SignModificationRequests.GetAllAsync(nameof(SignModificationRequest.ModifyingGpssign), nameof(SignModificationRequest.ModifiedGpssign)))
-                .Where(s => s.ModifyingGpssignId == modifyingGpssignId).FirstOrDefault();
-            return gpssignRom;
+            IEnumerable<SignModificationRequest> gpssignRoms =
+                (await work.SignModificationRequests.GetAllMultiIncludeAsync(
+                    include: gpsSign => gpsSign
+                    .Include(g => g.ModifyingGpssign)
+                    .ThenInclude(m => m.Sign)
+                    .Include(g => g.ModifiedGpssign)
+                    .ThenInclude(m => m.Sign)
+                    .Include(g => g.User))
+                    )
+                    .Where( //Get only Pending GPS Sign rom or scribe claimed GPS Sign Rom
+                        rom => !rom.IsDeleted
+                        && rom.ModifyingGpssignId != null
+                        && (rom.Status == (int)Status.Pending || rom.ScribeId == scribeId)
+                    );
+            return gpssignRoms;
         }
         //--------------------------------------------------
         public async Task<SignModificationRequest> ApproveSignRom(Guid modifyingSignId)
         {
             SignModificationRequest signRom = (await work.SignModificationRequests.GetAllAsync())
                 .Where(s => s.ModifyingSignId == modifyingSignId).FirstOrDefault();
+
+            if (signRom != null)
+            {
+                if (signRom.Status == (int)Status.Cancelled)
+                {
+                    throw new Exception("Yêu cầu đã bị hủy");
+                }
+            }
 
             if (signRom != null)
             {
@@ -429,6 +435,19 @@ namespace DataAccessLibrary.Business_Entity
                         foreach (SignModificationRequest signMod in signRomsRefModifiedSign)
                         {
                             signMod.ModifiedSignId = modifyingSign.Id;
+                        }
+
+                        //Reference all SignParagraph of ModifiedSignId to ModifyingSignId
+                        IEnumerable<SignParagraph> modifiedSignIdSignParagraphs =
+                            (await work.SignParagraphs.GetAllAsync())
+                            .Where(sp => !sp.IsDeleted && sp.SignId == modifiedSign.Id);
+
+                        if (modifiedSignIdSignParagraphs != null)
+                        {
+                            foreach (SignParagraph signPara in modifiedSignIdSignParagraphs)
+                            {
+                                signPara.SignId = modifyingSign.Id;
+                            }
                         }
                     }
                 }
@@ -486,6 +505,15 @@ namespace DataAccessLibrary.Business_Entity
         {
             SignModificationRequest signRom = (await work.SignModificationRequests.GetAllAsync())
                 .Where(s => s.ModifyingSignId == modifyingSignId).FirstOrDefault();
+
+            if (signRom != null)
+            {
+                if (signRom.Status == (int)Status.Cancelled)
+                {
+                    throw new Exception("Yêu cầu đã bị hủy");
+                }
+            }
+
             if (signRom != null)
             {
                 signRom.Status = (int)Status.Denied;
@@ -507,38 +535,100 @@ namespace DataAccessLibrary.Business_Entity
                 .Where(s => s.ScribeId == signRom.ScribeId).Count()));
                 if (approvalRate < 0.65)
                 {
-                    User scribe = await work.Users.GetAsync((Guid)signRom.ScribeId);
-                    scribe.Status = (int)Status.Deactivated;
+                    //User scribe = await work.Users.GetAsync((Guid)signRom.ScribeId);
+                    //scribe.Status = (int)Status.Deactivated;
 
-                    //All pending roms Status of scribe will be set as Confirmed
-                    IEnumerable<LawModificationRequest> pendingLawRoms = (await work.LawModificationRequests.GetAllAsync())
-                        .Where(rom => !rom.IsDeleted && rom.Status == (int)Status.Pending && rom.ScribeId == scribe.Id);
-                    IEnumerable<SignModificationRequest> pendingSignRoms = (await work.SignModificationRequests.GetAllAsync())
-                        .Where(rom => !rom.IsDeleted && rom.Status == (int)Status.Pending && rom.ScribeId == scribe.Id);
-                    IEnumerable<QuestionModificationRequest> pendingQuestionRoms = (await work.QuestionModificationRequests.GetAllAsync())
-                        .Where(rom => !rom.IsDeleted && rom.Status == (int)Status.Pending && rom.ScribeId == scribe.Id);
+                    ////All pending roms Status of scribe will be set as Confirmed
+                    //IEnumerable<LawModificationRequest> pendingLawRoms = (await work.LawModificationRequests.GetAllAsync())
+                    //    .Where(rom => !rom.IsDeleted && rom.Status == (int)Status.Pending && rom.ScribeId == scribe.Id);
+                    //IEnumerable<SignModificationRequest> pendingSignRoms = (await work.SignModificationRequests.GetAllAsync())
+                    //    .Where(rom => !rom.IsDeleted && rom.Status == (int)Status.Pending && rom.ScribeId == scribe.Id);
+                    //IEnumerable<QuestionModificationRequest> pendingQuestionRoms = (await work.QuestionModificationRequests.GetAllAsync())
+                    //    .Where(rom => !rom.IsDeleted && rom.Status == (int)Status.Pending && rom.ScribeId == scribe.Id);
 
-                    if (pendingLawRoms != null)
+                    //if (pendingLawRoms != null)
+                    //{
+                    //    foreach (LawModificationRequest pendingLawRom in pendingLawRoms)
+                    //    {
+                    //        pendingLawRom.Status = (int)Status.Confirmed;
+                    //    }
+                    //}
+
+                    //if (pendingSignRoms != null)
+                    //{
+                    //    foreach (SignModificationRequest pendingSignRom in pendingSignRoms)
+                    //    {
+                    //        pendingSignRom.Status = (int)Status.Confirmed;
+                    //    }
+                    //}
+
+                    //if (pendingQuestionRoms != null)
+                    //{
+                    //    foreach (QuestionModificationRequest pendingQuestionRom in pendingQuestionRoms)
+                    //    {
+                    //        pendingQuestionRom.Status = (int)Status.Confirmed;
+                    //    }
+                    //}
+                    User deactivatingScribe = await work.Users.GetAsync((Guid)signRom.ScribeId);
+                    deactivatingScribe.Status = (int)Status.Deactivated;
+
+                    //Remove all assigned tasks of scribe
+                    IEnumerable<AssignedColumn> assignedColumns =
+                        (await work.AssignedColumns.GetAllAsync())
+                        .Where(l => !l.IsDeleted && l.ScribeId == deactivatingScribe.Id);
+
+                    IEnumerable<AssignedQuestionCategory> assignedQuestionCategories =
+                        (await work.AssignedQuestionCategories.GetAllAsync())
+                        .Where(l => !l.IsDeleted && l.ScribeId == deactivatingScribe.Id);
+
+                    IEnumerable<AssignedSignCategory> assignedSignCategories =
+                        (await work.AssignedSignCategories.GetAllAsync())
+                        .Where(l => !l.IsDeleted && l.ScribeId == deactivatingScribe.Id);
+
+                    foreach (AssignedColumn assignedColumn in assignedColumns)
                     {
-                        foreach (LawModificationRequest pendingLawRom in pendingLawRoms)
+                        work.AssignedColumns.Delete(assignedColumn);
+                    }
+
+                    foreach (AssignedSignCategory assignedSignCategory in assignedSignCategories)
+                    {
+                        work.AssignedSignCategories.Delete(assignedSignCategory);
+                    }
+
+                    foreach (AssignedQuestionCategory assignedQuestionCategory in assignedQuestionCategories)
+                    {
+                        work.AssignedQuestionCategories.Delete(assignedQuestionCategory);
+                    }
+
+                    //Hard delete all Roms of scribe
+                    IEnumerable<LawModificationRequest> lawRoms = (await work.LawModificationRequests.GetAllAsync())
+                                .Where(rom => rom.ScribeId == deactivatingScribe.Id);
+                    IEnumerable<SignModificationRequest> signRoms = (await work.SignModificationRequests.GetAllAsync())
+                        .Where(rom => rom.ScribeId == deactivatingScribe.Id);
+                    IEnumerable<QuestionModificationRequest> questionRoms = (await work.QuestionModificationRequests.GetAllAsync())
+                        .Where(rom => rom.ScribeId == deactivatingScribe.Id);
+
+                    if (lawRoms != null)
+                    {
+                        foreach (LawModificationRequest lawRom in lawRoms)
                         {
-                            pendingLawRom.Status = (int)Status.Confirmed;
+                            work.LawModificationRequests.Delete(lawRom);
                         }
                     }
 
-                    if (pendingSignRoms != null)
+                    if (signRoms != null)
                     {
-                        foreach (SignModificationRequest pendingSignRom in pendingSignRoms)
+                        foreach (SignModificationRequest sRom in signRoms)
                         {
-                            pendingSignRom.Status = (int)Status.Confirmed;
+                            work.SignModificationRequests.Delete(sRom);
                         }
                     }
 
-                    if (pendingQuestionRoms != null)
+                    if (questionRoms != null)
                     {
-                        foreach (QuestionModificationRequest pendingQuestionRom in pendingQuestionRoms)
+                        foreach (QuestionModificationRequest questionRom in questionRoms)
                         {
-                            pendingQuestionRom.Status = (int)Status.Confirmed;
+                            work.QuestionModificationRequests.Delete(questionRom);
                         }
                     }
                 }
@@ -576,10 +666,37 @@ namespace DataAccessLibrary.Business_Entity
 
             if (signRom != null)
             {
+                if (signRom.Status == (int)Status.Approved || signRom.Status == (int)Status.Denied)
+                {
+                    throw new Exception("Yêu cầu đã được xử lý");
+                }
+            }
+
+            if (signRom != null)
+            {
                 signRom.Status = (int)Status.Cancelled;
             }
             await work.Save();
             return signRom;
+        }
+        //---------------------------------------------------
+        public async Task<SignModificationRequest> ClaimGpssignRom(SignModificationRequest gpsSignRom)
+        {
+            SignModificationRequest rom = (await work.SignModificationRequests.GetAllAsync())
+                .Where(rom => !rom.IsDeleted && rom.ModifyingGpssignId == gpsSignRom.ModifyingGpssignId)
+                .FirstOrDefault();
+            if (rom.ScribeId != null)
+            {
+                throw new Exception("Yêu cầu không còn khả dụng");
+            }
+            if (rom != null)
+            {
+                rom.ScribeId = gpsSignRom.ScribeId;
+                rom.Status = (int)Status.Claimed;
+            }
+            work.SignModificationRequests.Update(rom);
+            await work.Save();
+            return gpsSignRom;
         }
     }
 }

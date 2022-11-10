@@ -72,7 +72,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<AssignedColumn>(entity =>
             {
                 entity.HasKey(e => new { e.ColumnId, e.ScribeId })
-                    .HasName("PK__Assigned__C05B11FD9976174A");
+                    .HasName("PK__Assigned__C05B11FD6A71F19C");
 
                 entity.ToTable("AssignedColumn");
 
@@ -92,7 +92,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<AssignedQuestionCategory>(entity =>
             {
                 entity.HasKey(e => new { e.QuestionCategoryId, e.ScribeId })
-                    .HasName("PK__Assigned__92041373DF5B0E71");
+                    .HasName("PK__Assigned__920413735CBA70FF");
 
                 entity.ToTable("AssignedQuestionCategory");
 
@@ -112,7 +112,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<AssignedSignCategory>(entity =>
             {
                 entity.HasKey(e => new { e.SignCategoryId, e.ScribeId })
-                    .HasName("PK__Assigned__E7CAD648A811294C");
+                    .HasName("PK__Assigned__E7CAD64878483356");
 
                 entity.ToTable("AssignedSignCategory");
 
@@ -186,9 +186,9 @@ namespace BusinessObjectLibrary
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.Latitude).HasColumnType("decimal(12, 9)");
+                entity.Property(e => e.Latitude).HasColumnType("decimal(18, 15)");
 
-                entity.Property(e => e.Longtitude).HasColumnType("decimal(12, 9)");
+                entity.Property(e => e.Longitude).HasColumnType("decimal(18, 15)");
 
                 entity.HasOne(d => d.Sign)
                     .WithMany(p => p.Gpssigns)
@@ -210,7 +210,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<KeywordParagraph>(entity =>
             {
                 entity.HasKey(e => new { e.KeywordId, e.ParagraphId })
-                    .HasName("PK__KeywordP__852C78FC3DE8F450");
+                    .HasName("PK__KeywordP__852C78FC872E9943");
 
                 entity.ToTable("KeywordParagraph");
 
@@ -344,7 +344,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<QuestionModificationRequest>(entity =>
             {
                 entity.HasKey(e => e.ModifyingQuestionId)
-                    .HasName("PK__Question__94B14AC71B079C6C");
+                    .HasName("PK__Question__94B14AC7B0799865");
 
                 entity.ToTable("QuestionModificationRequest");
 
@@ -381,7 +381,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<Reference>(entity =>
             {
                 entity.HasKey(e => new { e.ParagraphId, e.ReferenceParagraphId })
-                    .HasName("PK__Referenc__44419EC04F30B63A");
+                    .HasName("PK__Referenc__44419EC0AF56CCB0");
 
                 entity.ToTable("Reference");
 
@@ -619,7 +619,11 @@ namespace BusinessObjectLibrary
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
+                entity.Property(e => e.Avatar).HasMaxLength(500);
+
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DisplayName).HasMaxLength(255);
 
                 entity.Property(e => e.Gmail)
                     .HasMaxLength(255)
@@ -639,7 +643,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<UserModificationRequest>(entity =>
             {
                 entity.HasKey(e => new { e.ModifyingUserId, e.ModifiedUserId })
-                    .HasName("PK__UserModi__C95E86612B795B9F");
+                    .HasName("PK__UserModi__C95E8661E41BF29E");
 
                 entity.ToTable("UserModificationRequest");
 
