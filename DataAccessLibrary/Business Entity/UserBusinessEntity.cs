@@ -305,6 +305,19 @@ namespace DataAccessLibrary.Business_Entity
                 work.AssignedQuestionCategories.Delete(assignedQuestionCategory);
             }
 
+            //Release all GPSSign roms that are claimed by current scribe
+            IEnumerable<SignModificationRequest> claimedGpssignRoms =
+                (await work.SignModificationRequests.GetAllAsync())
+                .Where(rom => rom.ScribeId == deactivatingScribe.Id && rom.ModifyingGpssignId != null);
+            if (claimedGpssignRoms != null)
+            {
+                foreach (SignModificationRequest gpssignRom in claimedGpssignRoms)
+                {
+                    gpssignRom.Status = (int)Status.Pending;
+                    gpssignRom.ScribeId = null;
+                }
+            }
+
             //Hard delete all Roms of scribe
             IEnumerable<LawModificationRequest> lawRoms = (await work.LawModificationRequests.GetAllAsync())
                         .Where(rom => rom.ScribeId == scribe.Id);
