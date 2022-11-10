@@ -119,7 +119,7 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // PUT: api/Users/Members/Deactivate
+        // PUT: api/Users/Members/Deactivate/5
         [HttpPut("Members/Deactivate/{id}")]
         [ProducesResponseType(typeof(User), 200)]
         [ProducesResponseType(500)]
@@ -141,7 +141,7 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // PUT: api/Users/Scribes/Deactivate
+        // PUT: api/Users/Scribes/Deactivate/3
         [HttpPut("Scribes/Deactivate/{id}")]
         [ProducesResponseType(typeof(User), 200)]
         [ProducesResponseType(500)]
@@ -371,7 +371,7 @@ namespace VNRDnTAIApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> AppLogin(LoginUserDTO loginUserDTO)
         {
-            User user = null;
+            User? user = null;
             try
             {
                 if (loginUserDTO.Username != null && loginUserDTO.Password != null
@@ -443,7 +443,7 @@ namespace VNRDnTAIApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ChangePassword(Guid id, string oldPassword, string newPassword)
         {
-            User user = null;
+            User? user = null;
             try
             {
                 user = await _entity.GetUserAsync(id);
@@ -464,8 +464,11 @@ namespace VNRDnTAIApi.Controllers
                         var authClaims = new List<Claim>
                         {
                             new Claim("Id", user.Id.ToString()),
-                            new Claim("Username", String.IsNullOrEmpty(user.Username) ? "": user.Username),
-                            new Claim("Email", String.IsNullOrEmpty(user.Gmail)? "": user.Gmail),
+                            new Claim("Username", String.IsNullOrEmpty(user.Username) ? "" : user.Username),
+                            new Claim("Email", String.IsNullOrEmpty(user.Gmail) ? "" : user.Gmail),
+                            new Claim("Role", user.Role.ToString()),
+                            new Claim("Avatar", String.IsNullOrEmpty(user.Avatar) ? "" : user.Avatar),
+                            new Claim("DisplayName", String.IsNullOrEmpty(user.DisplayName) ? "" : user.DisplayName),
                             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                         };
 
@@ -560,8 +563,11 @@ namespace VNRDnTAIApi.Controllers
                         var authClaims = new List<Claim>
                         {
                             new Claim("Id", user.Id.ToString()),
-                            new Claim("Username", String.IsNullOrEmpty(user.Username) ? "": user.Username),
-                            new Claim("Email", String.IsNullOrEmpty(user.Gmail)? "": user.Gmail),
+                            new Claim("Username", String.IsNullOrEmpty(user.Username) ? "" : user.Username),
+                            new Claim("Email", String.IsNullOrEmpty(user.Gmail) ? "" : user.Gmail),
+                            new Claim("Role", user.Role.ToString()),
+                            new Claim("Avatar", String.IsNullOrEmpty(user.Avatar) ? "" : user.Avatar),
+                            new Claim("DisplayName", String.IsNullOrEmpty(user.DisplayName) ? "" : user.DisplayName),
                             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                         };
 
@@ -598,6 +604,27 @@ namespace VNRDnTAIApi.Controllers
             catch (ApplicationException ae)
             {
                 return StatusCode(500, ae.Message);
+            }
+        }
+
+        // PUT: api/Users/SelfDeactivate/5
+        [HttpPut("SelfDeactivate/{id}")]
+        [ProducesResponseType(typeof(User), 200)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> selfDeactivate(Guid id)
+        {
+            try
+            {
+                User? member = (await _entity.GetMembersAsync()).Where(m => m.Id == id).FirstOrDefault();
+                if (member != null)
+                    return StatusCode(200, await _entity.DeactivateMember(member));
+                else
+                    return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
 
