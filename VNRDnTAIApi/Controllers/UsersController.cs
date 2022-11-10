@@ -508,6 +508,76 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
+        //PUT api/Users/5/UpdateProfile
+        [HttpPut("{id}/UpdateProfile")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateProfile(Guid id, string? email, string? avatar, string? displayName)
+        {
+            User? user = null;
+            try
+            {
+                user = await _entity.GetUserAsync(id);
+                if (user == null)
+                {
+                    return StatusCode(404, "Không tim thấy người dùng.");
+                }
+                else
+                {
+                    if (email != null) user.Gmail = email;
+                    if (avatar != null) user.Avatar = avatar;
+                    if (displayName != null) user.DisplayName = displayName;
+                    user = await _entity.UpdateUser(user);
+                    if (user != null)
+                    {
+                        var authClaims = new List<Claim>
+                        {
+                            new Claim("Id", user.Id.ToString()),
+                            new Claim("Username", String.IsNullOrEmpty(user.Username) ? "" : user.Username),
+                            new Claim("Email", String.IsNullOrEmpty(user.Gmail) ? "" : user.Gmail),
+                            new Claim("Role", user.Role.ToString()),
+                            new Claim("Avatar", String.IsNullOrEmpty(user.Avatar) ? "" : user.Avatar),
+                            new Claim("DisplayName", String.IsNullOrEmpty(user.DisplayName) ? "" : user.DisplayName),
+                            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                        };
+
+                        var authSignature = new SymmetricSecurityKey(
+                                Encoding.UTF8.GetBytes(VNRDnTAIConfiguration.Secret)
+                            );
+
+                        //Token generate
+                        var token = new JwtSecurityToken(
+                            issuer: VNRDnTAIConfiguration.JwtIssuer,
+                            audience: VNRDnTAIConfiguration.JwtAudience,
+                            //expires: DateTime.Now.AddHours(2),
+                            expires: DateTime.MaxValue,
+                            claims: authClaims,
+                            signingCredentials:
+                                new SigningCredentials(authSignature, SecurityAlgorithms.HmacSha256)
+                            );
+
+                        return StatusCode(200, new
+                        {
+                            token = new JwtSecurityTokenHandler().WriteToken(token),
+                        });
+                    }
+                    else
+                    {
+                        return StatusCode(405, "Cập nhật mật thất bại.");
+                    }
+                }
+            }
+            catch (ArgumentException ae)
+            {
+                return StatusCode(400, ae.Message);
+            }
+            catch (ApplicationException ae)
+            {
+                return StatusCode(500, ae.Message);
+            }
+        }
+
         //POST api/Users/GetUserByEmail
         [HttpPost("GetUserByEmail")]
         [ProducesResponseType(400)]
