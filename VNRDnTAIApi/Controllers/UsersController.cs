@@ -119,7 +119,7 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // PUT: api/Users/Members/Deactivate
+        // PUT: api/Users/Members/Deactivate/5
         [HttpPut("Members/Deactivate/{id}")]
         [ProducesResponseType(typeof(User), 200)]
         [ProducesResponseType(500)]
@@ -141,7 +141,7 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // PUT: api/Users/Scribes/Deactivate
+        // PUT: api/Users/Scribes/Deactivate/3
         [HttpPut("Scribes/Deactivate/{id}")]
         [ProducesResponseType(typeof(User), 200)]
         [ProducesResponseType(500)]
@@ -371,7 +371,7 @@ namespace VNRDnTAIApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> AppLogin(LoginUserDTO loginUserDTO)
         {
-            User user = null;
+            User? user = null;
             try
             {
                 if (loginUserDTO.Username != null && loginUserDTO.Password != null
@@ -394,6 +394,8 @@ namespace VNRDnTAIApi.Controllers
                         new Claim("Username", String.IsNullOrEmpty(user.Username) ? "" : user.Username),
                         new Claim("Email", String.IsNullOrEmpty(user.Gmail) ? "" : user.Gmail),
                         new Claim("Role", user.Role.ToString()),
+                        new Claim("Avatar", String.IsNullOrEmpty(user.Avatar) ? "" : user.Avatar),
+                        new Claim("DisplayName", String.IsNullOrEmpty(user.DisplayName) ? "" : user.DisplayName),
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                     };
 
@@ -441,7 +443,7 @@ namespace VNRDnTAIApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ChangePassword(Guid id, string oldPassword, string newPassword)
         {
-            User user = null;
+            User? user = null;
             try
             {
                 user = await _entity.GetUserAsync(id);
@@ -462,8 +464,11 @@ namespace VNRDnTAIApi.Controllers
                         var authClaims = new List<Claim>
                         {
                             new Claim("Id", user.Id.ToString()),
-                            new Claim("Username", String.IsNullOrEmpty(user.Username) ? "": user.Username),
-                            new Claim("Email", String.IsNullOrEmpty(user.Gmail)? "": user.Gmail),
+                            new Claim("Username", String.IsNullOrEmpty(user.Username) ? "" : user.Username),
+                            new Claim("Email", String.IsNullOrEmpty(user.Gmail) ? "" : user.Gmail),
+                            new Claim("Role", user.Role.ToString()),
+                            new Claim("Avatar", String.IsNullOrEmpty(user.Avatar) ? "" : user.Avatar),
+                            new Claim("DisplayName", String.IsNullOrEmpty(user.DisplayName) ? "" : user.DisplayName),
                             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                         };
 
@@ -558,8 +563,11 @@ namespace VNRDnTAIApi.Controllers
                         var authClaims = new List<Claim>
                         {
                             new Claim("Id", user.Id.ToString()),
-                            new Claim("Username", String.IsNullOrEmpty(user.Username) ? "": user.Username),
-                            new Claim("Email", String.IsNullOrEmpty(user.Gmail)? "": user.Gmail),
+                            new Claim("Username", String.IsNullOrEmpty(user.Username) ? "" : user.Username),
+                            new Claim("Email", String.IsNullOrEmpty(user.Gmail) ? "" : user.Gmail),
+                            new Claim("Role", user.Role.ToString()),
+                            new Claim("Avatar", String.IsNullOrEmpty(user.Avatar) ? "" : user.Avatar),
+                            new Claim("DisplayName", String.IsNullOrEmpty(user.DisplayName) ? "" : user.DisplayName),
                             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                         };
 
@@ -596,6 +604,89 @@ namespace VNRDnTAIApi.Controllers
             catch (ApplicationException ae)
             {
                 return StatusCode(500, ae.Message);
+            }
+        }
+
+        // PUT: api/Users/SelfDeactivate/5
+        [HttpPut("SelfDeactivate/{id}")]
+        [ProducesResponseType(typeof(User), 200)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> selfDeactivate(Guid id)
+        {
+            try
+            {
+                User? member = (await _entity.GetMembersAsync()).Where(m => m.Id == id).FirstOrDefault();
+                if (member != null)
+                    return StatusCode(200, await _entity.DeactivateMember(member));
+                else
+                    return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        //POST api/Users/5/Refresh
+        [HttpPost("{userId}/Refresh")]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200)]
+        [AllowAnonymous]
+        public async Task<IActionResult> RefreshSession(Guid userId)
+        {
+            User user;
+            try
+            {
+                user = await _entity.GetUserAsync(userId);
+
+                if (user != null)
+                {
+                    var authClaims = new List<Claim>
+                    {
+                        new Claim("Id", user.Id.ToString()),
+                        new Claim("Username", String.IsNullOrEmpty(user.Username) ? "" : user.Username),
+                        new Claim("Email", String.IsNullOrEmpty(user.Gmail) ? "" : user.Gmail),
+                        new Claim("Role", user.Role.ToString()),
+                        new Claim("Avatar", String.IsNullOrEmpty(user.Avatar) ? "" : user.Avatar),
+                        new Claim("DisplayName", String.IsNullOrEmpty(user.DisplayName) ? "" : user.DisplayName),
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                    };
+
+                    var authSignature = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(VNRDnTAIConfiguration.Secret));
+
+                    //Token generate
+                    var token = new JwtSecurityToken(
+                        issuer: VNRDnTAIConfiguration.JwtIssuer,
+                        audience: VNRDnTAIConfiguration.JwtAudience,
+                        //expires: DateTime.Now.AddHours(2),
+                        expires: DateTime.MaxValue,
+                        claims: authClaims,
+                        signingCredentials:
+                            new SigningCredentials(authSignature, SecurityAlgorithms.HmacSha256)
+                        );
+
+                    return StatusCode(200, new
+                    {
+                        token = new JwtSecurityTokenHandler().WriteToken(token),
+                    });
+                }
+                else
+                {
+                    throw new ApplicationException("Sai tên đăng nhập hoặc mật khẩu");
+                }
+            }
+            catch (ArgumentException ae)
+            {
+                return Unauthorized("Có lỗi xảy ra.\n" + ae.Message);
+            }
+            catch (ApplicationException ae)
+            {
+                return Unauthorized("Có lỗi xảy ra.\n" + ae.Message);
+            }
+            catch
+            {
+                return Unauthorized("Có lỗi xảy ra. Vui lòng thử lại sau.");
             }
         }
     }
