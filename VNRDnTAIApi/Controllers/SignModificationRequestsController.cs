@@ -168,6 +168,38 @@ namespace VNRDnTAIApi.Controllers
             }
         }
         //---------------------------------------------------
+        // POST: api/SignModificationRequests/GPS/Approve/5
+        [HttpPost("GPS/Approve/{modifyingGpssignId}")]
+        [ProducesResponseType(typeof(SignModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<SignModificationRequest>> ApproveGpssignROM(Guid modifyingGpssignId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.ApproveGpssignRom(modifyingGpssignId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        //---------------------------------------------------
+        // POST: api/SignModificationRequests/GPS/Deny/5
+        [HttpPost("GPS/Deny/{modifyingGpssignId}")]
+        [ProducesResponseType(typeof(SignModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<SignModificationRequest>> DenyGpssignROM(Guid modifyingGpssignId, [FromBody] string deniedReason)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.DenyGpssignRom(modifyingGpssignId, deniedReason));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        //---------------------------------------------------
         // POST: api/SignModificationRequests/Cancel/5
         [HttpPost("Cancel")]
         [ProducesResponseType(typeof(SignModificationRequest), 200)]

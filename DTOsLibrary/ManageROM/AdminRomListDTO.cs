@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using BusinessObjectLibrary;
+using System.Collections.Generic;
 
 namespace DTOsLibrary.ManageROM
 {
@@ -8,6 +9,7 @@ namespace DTOsLibrary.ManageROM
         public List<SignRomDTO> SignRoms { get; set; }
         public List<QuestionRomDTO> QuestionRoms { get; set; }
         public List<UserRomDTO> UserRoms { get; set; }
+        public List<SignModificationRequest> GPSSignRoms { get; set; }
 
     }
 }
