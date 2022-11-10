@@ -31,21 +31,6 @@ namespace DataAccessLibrary.Business_Entity
 
             return statues;
         }
-        public async Task<Statue> GetStatueAsync(Guid id)
-        {
-            Statue statue = (await work.Statues.GetAllAsync())
-                .Where(statue => !statue.IsDeleted
-                        && statue.Status == (int)Status.Active
-                        && statue.Id.Equals(id))
-                .FirstOrDefault();
-
-            List<Section> sections = (await work.Sections.GetAllAsync())
-                .Where(section => !section.IsDeleted
-                        && section.Status == (int)Status.Active
-                        && section.StatueId == statue.Id).ToList();
-            statue.Sections = sections;
-            return statue;
-        }
 
         //This new section is created for ROM of update, delete 
         public async Task<Statue> AddStatueForROM(Statue statue)
@@ -63,19 +48,6 @@ namespace DataAccessLibrary.Business_Entity
             await work.Statues.AddAsync(statue);
             await work.Save();
             return statue;
-        }
-        public async Task<Statue> UpdateStatue(Statue statue)
-        {
-            work.Statues.Update(statue);
-            await work.Save();
-            return statue;
-        }
-        public async Task RemoveStatue(Guid id)
-        {
-            Statue statue = await work.Statues.GetAsync(id);
-            statue.IsDeleted = true;
-            work.Statues.Update(statue);
-            await work.Save();
         }
     }
 }

@@ -18,22 +18,6 @@ namespace VNRDnTAIApi.Controllers
             _entity = new AssignedColumnBusinessEntity(work);
         }
 
-        // GET: api/AssignedColumns
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<AssignedColumn>), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<AssignedColumn>>> GetAssignedColumns()
-        {
-            try
-            {
-                return StatusCode(200, await _entity.GetAssignedColumnsAsync());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
         // GET: api/AssignedColumns/Scribes/5
         [HttpGet("Scribes/{scribeId}")]
         [ProducesResponseType(typeof(IEnumerable<AssignedColumn>), 200)]
@@ -51,6 +35,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         //-----------------------------------------
+        // GET: api/AssignedColumns/Tasks
         [HttpGet("Tasks")]
         [ProducesResponseType(typeof(IEnumerable<TaskDTO>), 200)]
         [ProducesResponseType(500)]
@@ -66,6 +51,7 @@ namespace VNRDnTAIApi.Controllers
             }
         }
         //-----------------------------------------
+        //POST: api/AssignedColumns/TasksUpdate
         [HttpPost("TasksUpdate")]
         [ProducesResponseType(typeof(IEnumerable<TaskDTO>), 200)]
         [ProducesResponseType(500)]

@@ -2,9 +2,6 @@
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace VNRDnTAIApi.Controllers
 {
@@ -19,22 +16,6 @@ namespace VNRDnTAIApi.Controllers
         public CommentsController(IUnitOfWork work)
         {
             _entity = new CommentBusinessEntity(work);
-        }
-
-        // GET: api/Comments
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<Comment>), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<Comment>>> GetComments()
-        {
-            try
-            {
-                return StatusCode(200, await _entity.GetCommentsAsync());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
         }
 
         // GET: api/Comments/Members/5
@@ -90,22 +71,6 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.UpdateComment(comment));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        // POST: api/Comments
-        [HttpPost]
-        [ProducesResponseType(typeof(Comment), 201)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<Comment>> PostComment(Comment comment)
-        {
-            try
-            {
-                return StatusCode(201, await _entity.AddComment(comment));
             }
             catch (Exception ex)
             {

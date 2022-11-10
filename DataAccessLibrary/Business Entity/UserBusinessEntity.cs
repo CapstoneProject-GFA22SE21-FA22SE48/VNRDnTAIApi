@@ -17,12 +17,6 @@ namespace DataAccessLibrary.Business_Entity
         {
             this.work = work;
         }
-        public async Task<IEnumerable<User>> GetUsersAsync()
-        {
-            return (await work.Users.GetAllAsync())
-                .Where(user => !user.IsDeleted);
-        }
-
         public async Task<IEnumerable<User>> GetMembersAsync()
         {
             var user = (await work.Users.GetAllAsync())
@@ -37,20 +31,6 @@ namespace DataAccessLibrary.Business_Entity
                     user => !user.IsDeleted &&
                     user.Role == (int)UserRoles.MEMBER &&
                     user.Username.ToLower().Contains(keywordUserName.ToLower())
-                 );
-            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
-        }
-
-        public async Task<IEnumerable<User>> GetMembersByCreatedDateRangeAsync(
-            DateTime startDate,
-            DateTime endDate)
-        {
-            var user = (await work.Users.GetAllAsync())
-                .Where(
-                    user => !user.IsDeleted &&
-                    user.Role == (int)UserRoles.MEMBER &&
-                    user.CreatedDate.CompareTo(startDate) >= 0 &&
-                    user.CreatedDate.CompareTo(endDate) <= 0
                  );
             return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
         }
@@ -113,20 +93,6 @@ namespace DataAccessLibrary.Business_Entity
                     user => !user.IsDeleted &&
                     user.Role == (int)UserRoles.SCRIBE &&
                     user.Username.ToLower().Contains(keywordUserName.ToLower())
-                 );
-            return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
-        }
-
-        public async Task<IEnumerable<User>> GetScribesByCreatedDateRangeAsync(
-            DateTime startDate,
-            DateTime endDate)
-        {
-            var user = (await work.Users.GetAllAsync())
-                .Where(
-                    user => !user.IsDeleted &&
-                    user.Role == (int)UserRoles.SCRIBE &&
-                    user.CreatedDate.CompareTo(startDate) >= 0 &&
-                    user.CreatedDate.CompareTo(endDate) <= 0
                  );
             return user.OrderBy(u => u.Status).ThenBy(u => u.Username);
         }
@@ -393,14 +359,6 @@ namespace DataAccessLibrary.Business_Entity
             return reEnablingMember;
 
         }
-        public async Task RemoveUser(Guid id)
-        {
-            User user = await work.Users.GetAsync(id);
-            user.IsDeleted = true;
-            work.Users.Update(user);
-            await work.Save();
-        }
-
         public async Task<User> LoginWeb(string username, string password)
         {
             return (await work.Users.GetAllAsync())

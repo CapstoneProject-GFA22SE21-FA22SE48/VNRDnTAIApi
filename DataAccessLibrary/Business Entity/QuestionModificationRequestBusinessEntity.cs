@@ -16,41 +16,6 @@ namespace DataAccessLibrary.Business_Entity
         {
             this.work = work;
         }
-        public async Task<IEnumerable<QuestionModificationRequest>> GetQuestionModificationRequestsAsync()
-        {
-            return (await work.QuestionModificationRequests.GetAllAsync())
-                .Where(questionModificationRequest => !questionModificationRequest.IsDeleted);
-        }
-
-        public async Task<QuestionModificationRequest>
-            GetQuestionModificationRequestByModifyingQuestionIdAsync(Guid modifyingQuestionId)
-        {
-            return (await work.QuestionModificationRequests.GetAllAsync())
-                .Where(q => !q.IsDeleted && q.ModifyingQuestionId.Equals(modifyingQuestionId))
-                .FirstOrDefault();
-        }
-
-        public async Task<IEnumerable<QuestionModificationRequest>>
-            GetQuestionModificationRequestsByModifiedQuestionIdAsync(Guid modifiedQuestionId)
-        {
-            return (await work.QuestionModificationRequests.GetAllAsync())
-                .Where(q => !q.IsDeleted && q.ModifiedQuestionId.Equals(modifiedQuestionId));
-        }
-
-        public async Task<IEnumerable<QuestionModificationRequest>>
-            GetQuestionModificationRequestsByScribeIdAsync(Guid scribeId)
-        {
-            return (await work.QuestionModificationRequests.GetAllAsync())
-                .Where(q => !q.IsDeleted && q.ScribeId.Equals(scribeId));
-        }
-
-        public async Task<QuestionModificationRequest>
-            UpdateQuestionModificationRequest(QuestionModificationRequest questionModificationRequest)
-        {
-            work.QuestionModificationRequests.Update(questionModificationRequest);
-            await work.Save();
-            return questionModificationRequest;
-        }
         public async Task RemoveQuestionModificationRequest(Guid modifyingQuestionId)
         {
             QuestionModificationRequest questionModificationRequest =

@@ -16,24 +16,6 @@ namespace DataAccessLibrary.Business_Entity
         {
             this.work = work;
         }
-        public async Task<IEnumerable<Sign>> GetSignsAsync()
-        {
-            return (await work.Signs.GetAllAsync())
-                .Where(sign => !sign.IsDeleted && sign.Status == (int)Status.Active);
-        }
-        public async Task<Sign> GetSignAsync(Guid id)
-        {
-            return (await work.Signs.GetAllAsync())
-                .Where(sign => !sign.IsDeleted && sign.Id.Equals(id) && sign.Status == (int)Status.Active)
-                .FirstOrDefault();
-        }
-
-        public async Task<IEnumerable<Sign>> GetSignsBySignCategoryIdAsync(Guid signCategoryId)
-        {
-            return (await work.Signs.GetAllAsync())
-                .Where(sign => !sign.IsDeleted && sign.Status == (int)Status.Active && sign.SignCategoryId == signCategoryId);
-        }
-
         public async Task<IEnumerable<SignDTO>> GetScribeAssignedSignsAsync(Guid scribeId)
         {
             var tmpData1 = from assignedSignCategory in
@@ -230,19 +212,6 @@ namespace DataAccessLibrary.Business_Entity
             await work.Signs.AddAsync(sign);
             await work.Save();
             return signDTO;
-        }
-        public async Task<Sign> UpdateSign(Sign sign)
-        {
-            work.Signs.Update(sign);
-            await work.Save();
-            return sign;
-        }
-        public async Task RemoveSign(Guid id)
-        {
-            Sign sign = await work.Signs.GetAsync(id);
-            sign.IsDeleted = true;
-            work.Signs.Update(sign);
-            await work.Save();
         }
     }
 }

@@ -4,10 +4,8 @@ using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
 using DTOsLibrary.CreateNewLaw;
 using DTOsLibrary.SearchLaw;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using static VNRDnTAILibrary.Utilities.StringUtils;
@@ -21,23 +19,6 @@ namespace DataAccessLibrary.Business_Entity
         {
             this.work = work;
         }
-        public async Task<IEnumerable<Section>> GetSectionsAsync()
-        {
-            IEnumerable<Section> sections = (await work.Sections.GetAllAsync())
-                .Where(section => !section.IsDeleted && section.Status == (int)Status.Active);
-
-            List<Paragraph> paragraphs = (await work.Paragraphs.GetAllAsync())
-                .Where(paragraph => !paragraph.IsDeleted
-                        && paragraph.Status == (int)Status.Active).ToList();
-
-            foreach (Section section in sections)
-            {
-                section.Paragraphs = paragraphs
-                    .Where(paragraph => paragraph.SectionId == section.Id).ToList();
-            }
-            return sections;
-        }
-
         public async Task<IEnumerable<Section>> GetSectionsByStatueIdAsync(Guid statueId)
         {
             IEnumerable<Section> sections =
@@ -57,20 +38,6 @@ namespace DataAccessLibrary.Business_Entity
                 section.VehicleCategory.Sections = null;
             }
             return sections;
-        }
-
-        public async Task<Section> GetSectionAsync(Guid id)
-        {
-            Section section = (await work.Sections.GetAllAsync())
-                .Where(section => !section.IsDeleted && section.Id.Equals(id))
-                .FirstOrDefault();
-
-            List<Paragraph> paragraphs = (await work.Paragraphs.GetAllAsync())
-                .Where(paragraph => !paragraph.IsDeleted
-                        && paragraph.Status == (int)Status.Active
-                        && paragraph.SectionId == section.Id).ToList();
-            section.Paragraphs = paragraphs;
-            return section;
         }
 
         public async Task<IEnumerable<SearchLawDTO>> GetSearchListByQuery(string query, string vehicleCategory)
@@ -352,20 +319,6 @@ namespace DataAccessLibrary.Business_Entity
 
             await work.Save();
             return newSection;
-        }
-
-        public async Task<Section> UpdateSection(Section section)
-        {
-            work.Sections.Update(section);
-            await work.Save();
-            return section;
-        }
-        public async Task RemoveSection(Guid id)
-        {
-            Section section = await work.Sections.GetAsync(id);
-            section.IsDeleted = true;
-            work.Sections.Update(section);
-            await work.Save();
         }
     }
 }

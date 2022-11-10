@@ -3,9 +3,6 @@ using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace VNRDnTAIApi.Controllers
 {
@@ -41,7 +38,7 @@ namespace VNRDnTAIApi.Controllers
         [HttpGet("GetStudySetByCategoryAndSeparator")]
         [ProducesResponseType(typeof(IEnumerable<Question>), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<Question>>> GetStudySetByCategoryAndSeparator([FromQuery] string categoryId, [FromQuery] string questionCategoryId,[FromQuery] int separator)
+        public async Task<ActionResult<IEnumerable<Question>>> GetStudySetByCategoryAndSeparator([FromQuery] string categoryId, [FromQuery] string questionCategoryId, [FromQuery] int separator)
         {
             try
             {
@@ -68,44 +65,6 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        // GET: api/Questions/5
-        [HttpGet("{id}")]
-        [ProducesResponseType(typeof(Question), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<Question>> GetQuestion(Guid id)
-        {
-            try
-            {
-                return StatusCode(200, await _entity.GetQuestionAsync(id));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        // PUT: api/Questions/5
-        [HttpPut("{id}")]
-        [ProducesResponseType(typeof(Question), 200)]
-        [ProducesResponseType(500)]
-        [ProducesResponseType(400)]
-        public async Task<IActionResult> PutQuestion(Guid id, Question question)
-        {
-            if (id != question.Id)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                return StatusCode(200, await _entity.UpdateQuestion(question));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
         // POST: api/Questions
         [HttpPost]
         [ProducesResponseType(typeof(Question), 201)]
@@ -115,23 +74,6 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(201, await _entity.AddQuestionForROM(question));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        // DELETE: api/Questions/5
-        [HttpDelete("{id}")]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> DeleteQuestion(Guid id)
-        {
-            try
-            {
-                await _entity.RemoveQuestion(id);
-                return StatusCode(204);
             }
             catch (Exception ex)
             {

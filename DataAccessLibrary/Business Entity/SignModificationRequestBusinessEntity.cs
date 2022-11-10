@@ -17,34 +17,10 @@ namespace DataAccessLibrary.Business_Entity
         {
             this.work = work;
         }
-        public async Task<IEnumerable<SignModificationRequest>> GetSignModificationRequestsAsync()
-        {
-            return await work.SignModificationRequests.GetAllAsync();
-        }
+
         public async Task<SignModificationRequest> GetSignModificationRequestAsyncById(Guid id)
         {
             return await work.SignModificationRequests.GetAsync(id);
-        }
-
-        public async Task<SignModificationRequest> GetSignModificationRequestByModifyingSignIdAsync(Guid modifyingSignId)
-        {
-            return (await work.SignModificationRequests.GetAllAsync())
-                .Where(p => p.ModifyingSignId.Equals(modifyingSignId))
-                .FirstOrDefault();
-        }
-
-        public async Task<IEnumerable<SignModificationRequest>>
-            GetSignModificationRequestsByModifiedSignIdAsync(Guid modifiedSignId)
-        {
-            return (await work.SignModificationRequests.GetAllAsync())
-                .Where(p => p.ModifiedSignId.Equals(modifiedSignId));
-        }
-
-        public async Task<IEnumerable<SignModificationRequest>>
-            GetSignModificationRequestsByScribeIdAsync(Guid scribeId)
-        {
-            return (await work.SignModificationRequests.GetAllAsync())
-                .Where(p => p.ScribeId.Equals(scribeId));
         }
 
         public async Task<IEnumerable<SignModificationRequest>>

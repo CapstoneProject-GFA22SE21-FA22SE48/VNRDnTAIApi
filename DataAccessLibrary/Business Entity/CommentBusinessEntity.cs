@@ -3,7 +3,6 @@ using DataAccessLibrary.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Business_Entity
@@ -14,11 +13,6 @@ namespace DataAccessLibrary.Business_Entity
         public CommentBusinessEntity(IUnitOfWork work)
         {
             this.work = work;
-        }
-        public async Task<IEnumerable<Comment>> GetCommentsAsync()
-        {
-            return (await work.Comments.GetAllAsync())
-                .Where(comment => !comment.IsDeleted);
         }
         public async Task<Comment> GetCommentAsync(Guid id)
         {
@@ -33,15 +27,7 @@ namespace DataAccessLibrary.Business_Entity
                 .Where(c => !c.IsDeleted && c.UserId.Equals(memberId));
             return comments.OrderBy(c => c.CreatedDate);
         }
-        public async Task<Comment> AddComment(Comment comment)
-        {
-            comment.Id = Guid.NewGuid();
-            comment.CreatedDate = DateTime.Now;
-            comment.IsDeleted = false;
-            await work.Comments.AddAsync(comment);
-            await work.Save();
-            return comment;
-        }
+
         public async Task<Comment> AddUserComment(Guid userId, string content)
         {
             Comment comment = new Comment();

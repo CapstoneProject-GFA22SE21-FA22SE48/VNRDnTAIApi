@@ -48,17 +48,6 @@ namespace DataAccessLibrary.Business_Entity
             return questionDTOs;
         }
 
-        //public async Task<IEnumerable<Question> GetAllStudySets(string testCatId) //questioncate
-        //{
-        //    var res = (await work.Questions.GetAllAsync(nameof(Question.Answers)))
-        //        .Where(question => !question.IsDeleted
-        //                && question.Status == (int)Status.Active
-        //                && question.TestCategoryId.ToString()
-        //                .Equals(testCatId.ToString()))
-        //        .OrderBy(u => int.Parse(u.Name.Split(" ")[1]));
-        //    return res;
-        //}
-
         public async Task<IEnumerable<Question>> GetStudySetByCategoryAndSeparator(string testCatId, string questionCategoryId, int separator)
         {
             var res = (await work.Questions.GetAllAsync(nameof(Question.Answers)))
@@ -72,7 +61,6 @@ namespace DataAccessLibrary.Business_Entity
             return res;
         }
 
-        //***
         public async Task<IEnumerable<Question>> GetRandomTestSetByCategory(string testCatId)
         {
             List<Question> res = new List<Question>();
@@ -119,36 +107,6 @@ namespace DataAccessLibrary.Business_Entity
                 question.QuestionCategory = null;
             }
             return res;
-        }
-        public async Task<Question> GetQuestionAsync(Guid id)
-        {
-            return (await work.Questions.GetAllAsync())
-                .Where(question => !question.IsDeleted
-                        && question.Status == (int)Status.Active
-                        && question.Id.Equals(id))
-                .FirstOrDefault();
-        }
-        public async Task<Question> AddQuestion(Question question)
-        {
-            question.Id = Guid.NewGuid();
-            question.IsDeleted = false;
-            await work.Questions.AddAsync(question);
-            await work.Save();
-            return question;
-        }
-
-        public async Task<Question> UpdateQuestion(Question question)
-        {
-            work.Questions.Update(question);
-            await work.Save();
-            return question;
-        }
-        public async Task RemoveQuestion(Guid id)
-        {
-            Question question = await work.Questions.GetAsync(id);
-            question.IsDeleted = true;
-            work.Questions.Update(question);
-            await work.Save();
         }
 
         //----------------------------------------------------
