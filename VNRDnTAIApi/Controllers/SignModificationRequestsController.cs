@@ -137,6 +137,28 @@ namespace VNRDnTAIApi.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+        //---------------------------------------------------
+        // PUT: api/SignModificationRequests/Retrain/Claim/5
+        [HttpPut("Retrain/Claim/{id}")]
+        [ProducesResponseType(typeof(SignModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<SignModificationRequest>> ClaimRetrainRom(Guid id, SignModificationRequest retrainRom)
+        {
+            if (id != retrainRom.Id)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                return StatusCode(200, await _entity.ClaimRetrainRom(retrainRom));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
 
         // POST: api/SignModificationRequests
         [HttpPost]

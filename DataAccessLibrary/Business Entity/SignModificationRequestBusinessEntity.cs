@@ -677,7 +677,7 @@ namespace DataAccessLibrary.Business_Entity
             SignModificationRequest rom = (await work.SignModificationRequests.GetAllAsync())
                 .Where(rom => !rom.IsDeleted && rom.ModifyingGpssignId == gpsSignRom.ModifyingGpssignId)
                 .FirstOrDefault();
-            if (rom.ScribeId != null)
+            if (rom.ScribeId != null || rom == null)
             {
                 throw new Exception("Yêu cầu không còn khả dụng");
             }
@@ -689,6 +689,25 @@ namespace DataAccessLibrary.Business_Entity
             work.SignModificationRequests.Update(rom);
             await work.Save();
             return gpsSignRom;
+        }
+        //---------------------------------------------------
+        public async Task<SignModificationRequest> ClaimRetrainRom(SignModificationRequest retrainRom)
+        {
+            SignModificationRequest rom = (await work.SignModificationRequests.GetAllAsync())
+                .Where(rom => !rom.IsDeleted && rom.Id == retrainRom.Id)
+                .FirstOrDefault();
+            if (rom.ScribeId != null || rom == null)
+            {
+                throw new Exception("Yêu cầu không còn khả dụng");
+            }
+            if (rom != null)
+            {
+                rom.ScribeId = retrainRom.ScribeId;
+                rom.Status = (int)Status.Claimed;
+            }
+            work.SignModificationRequests.Update(rom);
+            await work.Save();
+            return retrainRom;
         }
         //--------------------------------------------------
         public async Task<SignModificationRequest> ApproveGpssignRom(Guid modifyingGpssignId)
