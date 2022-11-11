@@ -36,7 +36,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/SignCategories/AssignedSignCategories/Scribes/5
-        [HttpGet("AssigedSignCategories/Scribes/{scribeId}")]
+        [HttpGet("AssignedSignCategories/Scribes/{scribeId}")]
         [ProducesResponseType(typeof(IEnumerable<SignCategory>), 200)]
         [ProducesResponseType(500)]
         public async Task<ActionResult<IEnumerable<SignCategory>>> GetScribeAssignedSignCategoriesAsync(Guid scribeId)
