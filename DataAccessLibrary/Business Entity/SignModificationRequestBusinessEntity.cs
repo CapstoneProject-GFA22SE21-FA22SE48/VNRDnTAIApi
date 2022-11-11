@@ -32,6 +32,19 @@ namespace DataAccessLibrary.Business_Entity
 
         public async Task<SignModificationRequest> AddSignModificationRequest(SignModificationRequest signModificationRequest)
         {
+            //check if modifiedSign is still active
+            if (signModificationRequest.ModifiedSignId != null)
+            {
+                Sign modifiedSign = await work.Signs.GetAsync((Guid)signModificationRequest.ModifiedSignId);
+                if (modifiedSign != null)
+                {
+                    if (modifiedSign.Status == (int)Status.Deactivated || modifiedSign.IsDeleted == true)
+                    {
+                        throw new Exception("Biển báo không còn khả dụng");
+                    }
+                }
+            }
+
             signModificationRequest.Id = Guid.NewGuid();
             signModificationRequest.Status = signModificationRequest.Status == 1 ? (int)Status.Unclaimed : (int)Status.Pending;
             signModificationRequest.CreatedDate = DateTime.Now;
