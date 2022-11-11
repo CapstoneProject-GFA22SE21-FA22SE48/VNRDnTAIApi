@@ -385,6 +385,19 @@ namespace DataAccessLibrary.Business_Entity
                     );
             return gpssignRoms;
         }
+
+        //--------------------------------------------------
+        public async Task<IEnumerable<SignModificationRequest>> GetRetrainRoms(Guid scribeId)
+        {
+            IEnumerable<SignModificationRequest> retrainRoms =
+                (await work.SignModificationRequests.GetAllAsync())
+                    .Where( //Get only Pending retrain roms or scribe claimed retrain Roms
+                        rom => !rom.IsDeleted
+                        && rom.OperationType == (int)OperationType.Retrain
+                        && (rom.Status == (int)Status.Unclaimed || rom.ScribeId == scribeId)
+                    );
+            return retrainRoms;
+        }
         //--------------------------------------------------
         public async Task<SignModificationRequest> ApproveSignRom(Guid modifyingSignId)
         {
