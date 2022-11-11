@@ -5,6 +5,6 @@
         Add = 0,
         Update = 1,
         Delete = 2,
-        Retain = 3,
+        Retrain = 3,
     }
 }

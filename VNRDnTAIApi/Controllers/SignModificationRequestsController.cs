@@ -68,6 +68,22 @@ namespace VNRDnTAIApi.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+        //---------------------------------------------------
+        // GET: api/SignModificationRequests/RetrainROMs
+        [HttpGet("RetrainROMs/{scribeId}")]
+        [ProducesResponseType(typeof(IEnumerable<SignModificationRequest>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<SignModificationRequest>>> GetRetrainRoms(Guid scribeId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetRetrainRoms(scribeId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
 
         // PUT: api/SignModificationRequests/GPSSigns/5/10
         [HttpPut("GPSSigns/{gpsSignRomId}/{status}/{adminId}")]
@@ -115,6 +131,28 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.ClaimGpssignRom(gpsSignRom));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        //---------------------------------------------------
+        // PUT: api/SignModificationRequests/Retrain/Claim/5
+        [HttpPut("Retrain/Claim/{id}")]
+        [ProducesResponseType(typeof(SignModificationRequest), 200)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<SignModificationRequest>> ClaimRetrainRom(Guid id, SignModificationRequest retrainRom)
+        {
+            if (id != retrainRom.Id)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                return StatusCode(200, await _entity.ClaimRetrainRom(retrainRom));
             }
             catch (Exception ex)
             {

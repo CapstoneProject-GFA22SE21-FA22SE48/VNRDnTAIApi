@@ -385,6 +385,19 @@ namespace DataAccessLibrary.Business_Entity
                     );
             return gpssignRoms;
         }
+
+        //--------------------------------------------------
+        public async Task<IEnumerable<SignModificationRequest>> GetRetrainRoms(Guid scribeId)
+        {
+            IEnumerable<SignModificationRequest> retrainRoms =
+                (await work.SignModificationRequests.GetAllAsync())
+                    .Where( //Get only Pending retrain roms or scribe claimed retrain Roms
+                        rom => !rom.IsDeleted
+                        && rom.OperationType == (int)OperationType.Retrain
+                        && (rom.Status == (int)Status.Unclaimed || rom.ScribeId == scribeId)
+                    );
+            return retrainRoms;
+        }
         //--------------------------------------------------
         public async Task<SignModificationRequest> ApproveSignRom(Guid modifyingSignId)
         {
@@ -664,7 +677,7 @@ namespace DataAccessLibrary.Business_Entity
             SignModificationRequest rom = (await work.SignModificationRequests.GetAllAsync())
                 .Where(rom => !rom.IsDeleted && rom.ModifyingGpssignId == gpsSignRom.ModifyingGpssignId)
                 .FirstOrDefault();
-            if (rom.ScribeId != null)
+            if (rom.ScribeId != null || rom == null)
             {
                 throw new Exception("Yêu cầu không còn khả dụng");
             }
@@ -676,6 +689,25 @@ namespace DataAccessLibrary.Business_Entity
             work.SignModificationRequests.Update(rom);
             await work.Save();
             return gpsSignRom;
+        }
+        //---------------------------------------------------
+        public async Task<SignModificationRequest> ClaimRetrainRom(SignModificationRequest retrainRom)
+        {
+            SignModificationRequest rom = (await work.SignModificationRequests.GetAllAsync())
+                .Where(rom => !rom.IsDeleted && rom.Id == retrainRom.Id)
+                .FirstOrDefault();
+            if (rom.ScribeId != null || rom == null)
+            {
+                throw new Exception("Yêu cầu không còn khả dụng");
+            }
+            if (rom != null)
+            {
+                rom.ScribeId = retrainRom.ScribeId;
+                rom.Status = (int)Status.Claimed;
+            }
+            work.SignModificationRequests.Update(rom);
+            await work.Save();
+            return retrainRom;
         }
         //--------------------------------------------------
         public async Task<SignModificationRequest> ApproveGpssignRom(Guid modifyingGpssignId)
