@@ -23,6 +23,30 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<LawModificationRequest>
             AddLawModificationRequest(LawModificationRequest lawModificationRequest)
         {
+            //check if modifiedSection/modifiedParagraph is still active
+            if (lawModificationRequest.ModifiedSectionId != null)
+            {
+                Section modifiedSection = await work.Sections.GetAsync((Guid)lawModificationRequest.ModifiedSectionId);
+                if (modifiedSection != null)
+                {
+                    if (modifiedSection.Status == (int)Status.Deactivated || modifiedSection.IsDeleted == true)
+                    {
+                        throw new Exception("Khoản này không còn khả dụng");
+                    }
+                }
+            }
+            else if (lawModificationRequest.ModifiedParagraphId != null)
+            {
+                Paragraph modifiedParagraph = await work.Paragraphs.GetAsync((Guid)lawModificationRequest.ModifiedParagraphId);
+                if (modifiedParagraph != null)
+                {
+                    if (modifiedParagraph.Status == (int)Status.Deactivated || modifiedParagraph.IsDeleted == true)
+                    {
+                        throw new Exception("Điểm này không còn khả dụng");
+                    }
+                }
+            }
+
             lawModificationRequest.Id = Guid.NewGuid();
             lawModificationRequest.Status = (int)Status.Pending;
             lawModificationRequest.CreatedDate = DateTime.Now;
