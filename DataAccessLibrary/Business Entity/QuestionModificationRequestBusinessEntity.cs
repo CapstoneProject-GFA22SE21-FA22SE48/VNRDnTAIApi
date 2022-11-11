@@ -43,6 +43,19 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<QuestionModificationRequest>
             CreateQuestionModificationRequest(QuestionModificationRequest questionModificationRequest)
         {
+            //check if modifiedQuestion is still active
+            if (questionModificationRequest.ModifiedQuestionId != null)
+            {
+                Question modifiedQuestion = await work.Questions.GetAsync((Guid)questionModificationRequest.ModifiedQuestionId);
+                if (modifiedQuestion != null)
+                {
+                    if (modifiedQuestion.Status == (int)Status.Deactivated || modifiedQuestion.IsDeleted == true)
+                    {
+                        throw new Exception("Câu hỏi không còn khả dụng");
+                    }
+                }
+            }
+
             questionModificationRequest.Status = (int)Status.Pending;
             questionModificationRequest.CreatedDate = DateTime.Now;
             questionModificationRequest.IsDeleted = false;
