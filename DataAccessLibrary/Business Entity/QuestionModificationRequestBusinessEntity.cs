@@ -43,6 +43,39 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<QuestionModificationRequest>
             CreateQuestionModificationRequest(QuestionModificationRequest questionModificationRequest)
         {
+            //check if scribe is still in charge of this questionCategory
+            IEnumerable<AssignedQuestionCategory> assignedQuestionCateogries =
+                (await work.AssignedQuestionCategories.GetAllMultiIncludeAsync(
+                    include: aqc => aqc
+                    .Include(a => a.QuestionCategory)
+                    .ThenInclude(qc => qc.Questions)
+                    ))
+                .Where(a => !a.IsDeleted && a.ScribeId == questionModificationRequest.ScribeId);
+            bool isStillIncharge = false;
+            if (assignedQuestionCateogries != null)
+            {
+                foreach (AssignedQuestionCategory assignedQuestionCategory in assignedQuestionCateogries)
+                {
+                    if (assignedQuestionCategory.QuestionCategory != null)
+                    {
+                        if (assignedQuestionCategory.QuestionCategory.Questions != null)
+                        {
+                            foreach (Question question in assignedQuestionCategory.QuestionCategory.Questions)
+                            {
+                                if (question.Id == questionModificationRequest.ModifyingQuestionId)
+                                {
+                                    isStillIncharge = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (!isStillIncharge)
+            {
+                throw new Exception("Câu hỏi này không còn thuộc phạm vi quản lý của bạn");
+            }
+
             //check if modifiedQuestion is still active
             if (questionModificationRequest.ModifiedQuestionId != null)
             {
