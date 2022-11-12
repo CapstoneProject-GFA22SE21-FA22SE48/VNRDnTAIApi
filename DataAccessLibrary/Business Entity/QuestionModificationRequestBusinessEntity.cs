@@ -73,7 +73,7 @@ namespace DataAccessLibrary.Business_Entity
             }
             if (!isStillIncharge)
             {
-                throw new Exception("Câu hỏi này không còn thuộc phạm vi quản lý của bạn");
+                throw new Exception("Loại câu hỏi này không còn thuộc phạm vi quản lý của bạn");
             }
 
             //check if modifiedQuestion is still active
