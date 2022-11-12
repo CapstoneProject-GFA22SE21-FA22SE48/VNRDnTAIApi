@@ -23,6 +23,131 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<LawModificationRequest>
             AddLawModificationRequest(LawModificationRequest lawModificationRequest)
         {
+            //check if scribe is still in charge of this statue or section or paragraph
+            if (lawModificationRequest.ModifyingStatueId != null)
+            {
+                IEnumerable<AssignedColumn> assignedColumns =
+                    (await work.AssignedColumns.GetAllMultiIncludeAsync(
+                        include: a => a
+                        .Include(a => a.Column)
+                        .ThenInclude(c => c.Statues)
+                        ))
+                    .Where(a => !a.IsDeleted && a.ScribeId == lawModificationRequest.ScribeId);
+                bool isStillIncharge = false;
+                if (assignedColumns != null)
+                {
+                    foreach (AssignedColumn assignedColumn in assignedColumns)
+                    {
+                        if (assignedColumn.Column != null)
+                        {
+                            if (assignedColumn.Column.Statues != null)
+                            {
+                                foreach (Statue statue in assignedColumn.Column.Statues)
+                                {
+                                    if (statue.Id == lawModificationRequest.ModifyingStatueId)
+                                    {
+                                        isStillIncharge = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!isStillIncharge)
+                {
+                    throw new Exception("Điều này không còn thuộc phạm vi quản lý của bạn");
+                }
+            }
+            else if (lawModificationRequest.ModifyingSectionId != null)
+            {
+                IEnumerable<AssignedColumn> assignedColumns =
+                    (await work.AssignedColumns.GetAllMultiIncludeAsync(
+                        include: a => a
+                        .Include(a => a.Column)
+                        .ThenInclude(c => c.Statues)
+                        .ThenInclude(s => s.Sections)
+                        ))
+                    .Where(a => !a.IsDeleted && a.ScribeId == lawModificationRequest.ScribeId);
+                bool isStillIncharge = false;
+                if (assignedColumns != null)
+                {
+                    foreach (AssignedColumn assignedColumn in assignedColumns)
+                    {
+                        if (assignedColumn.Column != null)
+                        {
+                            if (assignedColumn.Column.Statues != null)
+                            {
+                                foreach (Statue statue in assignedColumn.Column.Statues)
+                                {
+                                    if (statue.Sections != null)
+                                    {
+                                        foreach (Section section in statue.Sections)
+                                        {
+                                            if (section.Id == lawModificationRequest.ModifyingSectionId)
+                                            {
+                                                isStillIncharge = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!isStillIncharge)
+                {
+                    throw new Exception("Khoản này không còn thuộc phạm vi quản lý của bạn");
+                }
+            }
+            else if (lawModificationRequest.ModifyingParagraphId != null)
+            {
+                IEnumerable<AssignedColumn> assignedColumns =
+                    (await work.AssignedColumns.GetAllMultiIncludeAsync(
+                        include: a => a
+                        .Include(a => a.Column)
+                        .ThenInclude(c => c.Statues)
+                        .ThenInclude(s => s.Sections)
+                        .ThenInclude(s => s.Paragraphs)
+                        ))
+                    .Where(a => !a.IsDeleted && a.ScribeId == lawModificationRequest.ScribeId);
+                bool isStillIncharge = false;
+                if (assignedColumns != null)
+                {
+                    foreach (AssignedColumn assignedColumn in assignedColumns)
+                    {
+                        if (assignedColumn.Column != null)
+                        {
+                            if (assignedColumn.Column.Statues != null)
+                            {
+                                foreach (Statue statue in assignedColumn.Column.Statues)
+                                {
+                                    if (statue.Sections != null)
+                                    {
+                                        foreach (Section section in statue.Sections)
+                                        {
+                                            if (section.Paragraphs != null)
+                                            {
+                                                foreach (Paragraph paragraph in section.Paragraphs)
+                                                {
+                                                    if (paragraph.Id == lawModificationRequest.ModifyingParagraphId)
+                                                    {
+                                                        isStillIncharge = true;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!isStillIncharge)
+                {
+                    throw new Exception("Điểm này không còn thuộc phạm vi quản lý của bạn");
+                }
+            }
+
             //check if modifiedSection/modifiedParagraph is still active
             if (lawModificationRequest.ModifiedSectionId != null)
             {

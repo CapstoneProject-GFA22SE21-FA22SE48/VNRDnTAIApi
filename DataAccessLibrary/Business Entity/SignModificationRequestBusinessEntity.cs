@@ -32,6 +32,39 @@ namespace DataAccessLibrary.Business_Entity
 
         public async Task<SignModificationRequest> AddSignModificationRequest(SignModificationRequest signModificationRequest)
         {
+            //check if scribe is still in charge of this signCategory
+            IEnumerable<AssignedSignCategory> assignedSignCategories =
+                (await work.AssignedSignCategories.GetAllMultiIncludeAsync(
+                    include: asc => asc
+                    .Include(a => a.SignCategory)
+                    .ThenInclude(sc => sc.Signs)
+                    ))
+                .Where(a => !a.IsDeleted && a.ScribeId == signModificationRequest.ScribeId);
+            bool isStillIncharge = false;
+            if (assignedSignCategories != null)
+            {
+                foreach (AssignedSignCategory assignedSignCategory in assignedSignCategories)
+                {
+                    if (assignedSignCategory.SignCategory != null)
+                    {
+                        if (assignedSignCategory.SignCategory.Signs != null)
+                        {
+                            foreach (Sign sign in assignedSignCategory.SignCategory.Signs)
+                            {
+                                if (sign.Id == signModificationRequest.ModifyingSignId)
+                                {
+                                    isStillIncharge = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (!isStillIncharge)
+            {
+                throw new Exception("Biển báo này không còn thuộc phạm vi quản lý của bạn");
+            }
+
             //check if modifiedSign is still active
             if (signModificationRequest.ModifiedSignId != null)
             {
