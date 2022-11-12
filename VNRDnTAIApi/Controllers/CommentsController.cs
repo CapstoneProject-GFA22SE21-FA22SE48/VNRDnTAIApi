@@ -18,15 +18,31 @@ namespace VNRDnTAIApi.Controllers
             _entity = new CommentBusinessEntity(work);
         }
 
-        // GET: api/Comments/Members/5
-        [HttpGet("Members/{memberId}")]
+        // GET: api/Comments/Members
+        [HttpGet("Members")]
         [ProducesResponseType(typeof(IEnumerable<Comment>), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<Comment>>> GetCommentsByMemberId(Guid memberId)
+        public async Task<ActionResult<IEnumerable<Comment>>> GetMembersComments(Guid memberId)
         {
             try
             {
-                return StatusCode(200, await _entity.GetCommentsByMemberId(memberId));
+                return StatusCode(200, await _entity.GetCommentsAsync());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // GET: api/Comments/Members/5
+        [HttpGet("Members/{memberId}")]
+        [ProducesResponseType(typeof(Comment), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<Comment>> GetCommentByMemberId(Guid memberId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetCommentByMemberId(memberId));
             }
             catch (Exception ex)
             {
@@ -43,6 +59,22 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.GetCommentAsync(id));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // GET: api/Comments/AverageRating
+        [HttpGet("AverageRating")]
+        [ProducesResponseType(typeof(Comment), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<Comment>> GetAverageRating()
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetAverageRating());
             }
             catch (Exception ex)
             {
@@ -82,11 +114,11 @@ namespace VNRDnTAIApi.Controllers
         [HttpPost("{userId}")]
         [ProducesResponseType(typeof(Comment), 201)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<Comment>> AddUserComment(Guid userId, [FromBody] string content)
+        public async Task<ActionResult<Comment>> AddUserComment(Guid userId, Comment commentDTO)
         {
             try
             {
-                return StatusCode(201, await _entity.AddUserComment(userId, content));
+                return StatusCode(201, await _entity.AddUserComment(userId, commentDTO));
             }
             catch (Exception ex)
             {
