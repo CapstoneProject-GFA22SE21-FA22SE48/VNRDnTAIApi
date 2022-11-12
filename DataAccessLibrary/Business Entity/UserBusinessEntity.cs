@@ -399,7 +399,7 @@ namespace DataAccessLibrary.Business_Entity
             user.CreatedDate = DateTime.Now;
             user.Username = username;
             user.Password = password;
-            user.DisplayName = String.IsNullOrEmpty(email) ? username : email;
+            user.DisplayName = !String.IsNullOrEmpty(username) ? username : email;
             user.Avatar = "https://firebasestorage.googleapis.com/v0/b/vnrdntai.appspot.com/o/images%2Favatar%2Fdefault_avatar_x025.png?alt=media";
             user.Gmail = email;
             user.Status = (int)Status.Active;
