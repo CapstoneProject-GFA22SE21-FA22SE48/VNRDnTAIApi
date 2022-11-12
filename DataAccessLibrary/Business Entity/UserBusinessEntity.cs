@@ -145,7 +145,8 @@ namespace DataAccessLibrary.Business_Entity
         {
             return (await work.Users.GetAllAsync())
                 .Where(user => user.Gmail != null
-                    && (!user.IsDeleted && user.Gmail.Equals(gmail)))
+                    && (!user.IsDeleted && user.Status != (int)Status.Deactivated
+                    && user.Gmail.Equals(gmail)))
                 .FirstOrDefault();
         }
 
@@ -153,8 +154,10 @@ namespace DataAccessLibrary.Business_Entity
         {
             return (await work.Users.GetAllAsync())
                 .Where(user =>
-                    (user.Username != null && !user.IsDeleted && user.Username.Equals(username))
-                    || (user.Gmail != null && !user.IsDeleted && user.Gmail.Equals(gmail))
+                    (user.Username != null && !user.IsDeleted
+                    && user.Status != (int)Status.Deactivated && user.Username.Equals(username))
+                    || (user.Gmail != null && !user.IsDeleted
+                        && user.Status != (int)Status.Deactivated && user.Gmail.Equals(gmail))
                  ).FirstOrDefault();
         }
 
