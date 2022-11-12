@@ -62,7 +62,7 @@ namespace DataAccessLibrary.Business_Entity
             }
             if (!isStillIncharge)
             {
-                throw new Exception("Biển báo này không còn thuộc phạm vi quản lý của bạn");
+                throw new Exception("Loại biển báo này không còn thuộc phạm vi quản lý của bạn");
             }
 
             //check if modifiedSign is still active
