@@ -252,19 +252,50 @@ namespace VNRDnTAIApi.Controllers
                 if (loginUserDTO.Email != null)
                 {
                     user = await _entity.GetUserAsyncByGmail(loginUserDTO.Email.Trim());
-                }
 
-                if (user == null)
+                    if (user == null)
+                    {
+                        user = await _entity
+                            .GetUserAsyncByUsername(loginUserDTO.Username.Trim());
+                        if (user == null)
+                        {
+                            user = await _entity
+                                .RegisterMember(
+                                    loginUserDTO.Username,
+                                    loginUserDTO.Password,
+                                    loginUserDTO.Email
+                                );
+
+                            if (user != null)
+                            {
+                                return StatusCode(201, user);
+                            }
+                            else
+                            {
+                                return StatusCode(400, "Có lỗi xảy ra.");
+                            }
+                        }
+                        else
+                        {
+                            return StatusCode(409, "Tên đăng nhập này đã được đăng ký.");
+                        }
+                    }
+                    else
+                    {
+                        return StatusCode(409, "Email này đã được đăng ký.");
+                    }
+                }
+                else
                 {
                     user = await _entity
-                        .GetUserAsyncByUsername(loginUserDTO.Username.Trim());
+                            .GetUserAsyncByUsername(loginUserDTO.Username.Trim());
                     if (user == null)
                     {
                         user = await _entity
                             .RegisterMember(
                                 loginUserDTO.Username,
                                 loginUserDTO.Password,
-                                loginUserDTO.Email
+                                null
                             );
 
                         if (user != null)
@@ -278,12 +309,8 @@ namespace VNRDnTAIApi.Controllers
                     }
                     else
                     {
-                        return StatusCode(409, "Username đã được đăng ký.");
+                        return StatusCode(409, "Tên đăng nhập này đã được đăng ký.");
                     }
-                }
-                else
-                {
-                    return StatusCode(409, "Email đã được đăng ký.");
                 }
             }
             catch (ArgumentException ae)
@@ -513,8 +540,13 @@ namespace VNRDnTAIApi.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [AllowAnonymous]
-        public async Task<IActionResult> UpdateProfile(Guid id, string? email, string? avatar, string? displayName)
+        public async Task<IActionResult> UpdateProfile(Guid id, ProfileDTO profileDTO)
         {
+            if (profileDTO is null)
+            {
+                throw new ArgumentNullException(nameof(profileDTO));
+            }
+
             User? user = null;
             try
             {
@@ -525,9 +557,9 @@ namespace VNRDnTAIApi.Controllers
                 }
                 else
                 {
-                    if (email != null) user.Gmail = email;
-                    if (avatar != null) user.Avatar = avatar;
-                    if (displayName != null) user.DisplayName = displayName;
+                    if (profileDTO.email != null) user.Gmail = profileDTO.email;
+                    if (profileDTO.avatar != null) user.Avatar = profileDTO.avatar;
+                    if (profileDTO.displayName != null) user.DisplayName = profileDTO.displayName;
                     user = await _entity.UpdateUser(user);
                     if (user != null)
                     {
