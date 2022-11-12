@@ -252,19 +252,50 @@ namespace VNRDnTAIApi.Controllers
                 if (loginUserDTO.Email != null)
                 {
                     user = await _entity.GetUserAsyncByGmail(loginUserDTO.Email.Trim());
-                }
 
-                if (user == null)
+                    if (user == null)
+                    {
+                        user = await _entity
+                            .GetUserAsyncByUsername(loginUserDTO.Username.Trim());
+                        if (user == null)
+                        {
+                            user = await _entity
+                                .RegisterMember(
+                                    loginUserDTO.Username,
+                                    loginUserDTO.Password,
+                                    loginUserDTO.Email
+                                );
+
+                            if (user != null)
+                            {
+                                return StatusCode(201, user);
+                            }
+                            else
+                            {
+                                return StatusCode(400, "Có lỗi xảy ra.");
+                            }
+                        }
+                        else
+                        {
+                            return StatusCode(409, "Tên đăng nhập này đã được đăng ký.");
+                        }
+                    }
+                    else
+                    {
+                        return StatusCode(409, "Email này đã được đăng ký.");
+                    }
+                }
+                else
                 {
                     user = await _entity
-                        .GetUserAsyncByUsername(loginUserDTO.Username.Trim());
+                            .GetUserAsyncByUsername(loginUserDTO.Username.Trim());
                     if (user == null)
                     {
                         user = await _entity
                             .RegisterMember(
                                 loginUserDTO.Username,
                                 loginUserDTO.Password,
-                                loginUserDTO.Email
+                                null
                             );
 
                         if (user != null)
@@ -278,12 +309,8 @@ namespace VNRDnTAIApi.Controllers
                     }
                     else
                     {
-                        return StatusCode(409, "Username đã được đăng ký.");
+                        return StatusCode(409, "Tên đăng nhập này đã được đăng ký.");
                     }
-                }
-                else
-                {
-                    return StatusCode(409, "Email đã được đăng ký.");
                 }
             }
             catch (ArgumentException ae)
@@ -458,6 +485,81 @@ namespace VNRDnTAIApi.Controllers
                 else
                 {
                     user.Password = newPassword;
+                    user = await _entity.UpdateUser(user);
+                    if (user != null)
+                    {
+                        var authClaims = new List<Claim>
+                        {
+                            new Claim("Id", user.Id.ToString()),
+                            new Claim("Username", String.IsNullOrEmpty(user.Username) ? "" : user.Username),
+                            new Claim("Email", String.IsNullOrEmpty(user.Gmail) ? "" : user.Gmail),
+                            new Claim("Role", user.Role.ToString()),
+                            new Claim("Avatar", String.IsNullOrEmpty(user.Avatar) ? "" : user.Avatar),
+                            new Claim("DisplayName", String.IsNullOrEmpty(user.DisplayName) ? "" : user.DisplayName),
+                            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                        };
+
+                        var authSignature = new SymmetricSecurityKey(
+                                Encoding.UTF8.GetBytes(VNRDnTAIConfiguration.Secret)
+                            );
+
+                        //Token generate
+                        var token = new JwtSecurityToken(
+                            issuer: VNRDnTAIConfiguration.JwtIssuer,
+                            audience: VNRDnTAIConfiguration.JwtAudience,
+                            //expires: DateTime.Now.AddHours(2),
+                            expires: DateTime.MaxValue,
+                            claims: authClaims,
+                            signingCredentials:
+                                new SigningCredentials(authSignature, SecurityAlgorithms.HmacSha256)
+                            );
+
+                        return StatusCode(200, new
+                        {
+                            token = new JwtSecurityTokenHandler().WriteToken(token),
+                        });
+                    }
+                    else
+                    {
+                        return StatusCode(405, "Cập nhật mật thất bại.");
+                    }
+                }
+            }
+            catch (ArgumentException ae)
+            {
+                return StatusCode(400, ae.Message);
+            }
+            catch (ApplicationException ae)
+            {
+                return StatusCode(500, ae.Message);
+            }
+        }
+
+        //PUT api/Users/5/UpdateProfile
+        [HttpPut("{id}/UpdateProfile")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateProfile(Guid id, ProfileDTO profileDTO)
+        {
+            if (profileDTO is null)
+            {
+                throw new ArgumentNullException(nameof(profileDTO));
+            }
+
+            User? user = null;
+            try
+            {
+                user = await _entity.GetUserAsync(id);
+                if (user == null)
+                {
+                    return StatusCode(404, "Không tim thấy người dùng.");
+                }
+                else
+                {
+                    if (profileDTO.email != null) user.Gmail = profileDTO.email;
+                    if (profileDTO.avatar != null) user.Avatar = profileDTO.avatar;
+                    if (profileDTO.displayName != null) user.DisplayName = profileDTO.displayName;
                     user = await _entity.UpdateUser(user);
                     if (user != null)
                     {
