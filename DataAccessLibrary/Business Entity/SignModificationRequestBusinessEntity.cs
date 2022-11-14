@@ -429,7 +429,7 @@ namespace DataAccessLibrary.Business_Entity
                     .ThenInclude(m => m.Sign)
                     .Include(g => g.User))
                     )
-                    .Where( //Get only Pending GPS Sign rom or scribe claimed GPS Sign Rom
+                    .Where( //Get only Unclaimed GPS Sign rom or scribe claimed GPS Sign Rom
                         rom => !rom.IsDeleted
                         && rom.ModifyingGpssignId != null
                         && (rom.Status == (int)Status.Unclaimed || rom.ScribeId == scribeId)
@@ -441,8 +441,11 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<IEnumerable<SignModificationRequest>> GetRetrainRoms(Guid scribeId)
         {
             IEnumerable<SignModificationRequest> retrainRoms =
-                (await work.SignModificationRequests.GetAllAsync())
-                    .Where( //Get only Pending retrain roms or scribe claimed retrain Roms
+                (await work.SignModificationRequests.GetAllMultiIncludeAsync(
+                    include: rom => rom
+                    .Include(r => r.User)
+                    ))
+                    .Where( //Get only Unclaimed retrain roms or scribe claimed retrain Roms
                         rom => !rom.IsDeleted
                         && rom.OperationType == (int)OperationType.Retrain
                         && (rom.Status == (int)Status.Unclaimed || rom.ScribeId == scribeId)
@@ -994,6 +997,19 @@ namespace DataAccessLibrary.Business_Entity
             }
 
             return gpssignRom;
+        }
+        //----------------------------------------------------
+        public async Task<SignModificationRequest> ResolveRetrainRom(SignModificationRequest rom)
+        {
+            SignModificationRequest signRom = await work.SignModificationRequests.GetAsync(rom.Id);
+            if(signRom != null)
+            {
+                signRom.Status = (int)Status.Confirmed;
+                signRom.ImageUrl = rom.ImageUrl;
+            }
+            work.SignModificationRequests.Update(signRom);
+            await work.Save();
+            return signRom;
         }
     }
 }
