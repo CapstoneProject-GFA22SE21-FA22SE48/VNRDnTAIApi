@@ -1,6 +1,7 @@
 ﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Implementations;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -46,6 +47,7 @@ namespace VNRDnTAIApi
             services.AddScoped<IGenericRepository<User>, GenericRepository<User>>();
             services.AddScoped<IGenericRepository<UserModificationRequest>, GenericRepository<UserModificationRequest>>();
             services.AddScoped<IGenericRepository<VehicleCategory>, GenericRepository<VehicleCategory>>();
+            services.AddScoped<IGenericRepository<MailDTO>, GenericRepository<MailDTO>>();
             #endregion
 
             #region UnitOfWork
