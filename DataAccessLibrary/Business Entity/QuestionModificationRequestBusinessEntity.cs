@@ -90,7 +90,7 @@ namespace DataAccessLibrary.Business_Entity
             }
 
             questionModificationRequest.Status = (int)Status.Pending;
-            questionModificationRequest.CreatedDate = DateTime.Now;
+            questionModificationRequest.CreatedDate = DateTime.Now.ToLocalTime();
             questionModificationRequest.IsDeleted = false;
             await work.QuestionModificationRequests.AddAsync(questionModificationRequest);
             await work.Save();

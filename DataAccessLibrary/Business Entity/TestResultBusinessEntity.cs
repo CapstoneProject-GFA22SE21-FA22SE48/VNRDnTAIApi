@@ -97,7 +97,7 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<TestResult> AddTestResult(TestResult testResult)
         {
             testResult.Id = Guid.NewGuid();
-            testResult.CreatedDate = DateTime.Now;
+            testResult.CreatedDate = DateTime.Now.ToLocalTime();
             testResult.IsDeleted = false;
             foreach (var trd in testResult.TestResultDetails)
             {

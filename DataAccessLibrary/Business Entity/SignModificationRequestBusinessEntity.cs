@@ -84,7 +84,7 @@ namespace DataAccessLibrary.Business_Entity
 
             signModificationRequest.Id = Guid.NewGuid();
             signModificationRequest.Status = signModificationRequest.Status == 1 ? (int)Status.Unclaimed : (int)Status.Pending;
-            signModificationRequest.CreatedDate = DateTime.Now;
+            signModificationRequest.CreatedDate = DateTime.Now.ToLocalTime();
             signModificationRequest.IsDeleted = false;
             await work.SignModificationRequests.AddAsync(signModificationRequest);
             await work.Save();
@@ -1002,7 +1002,7 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<SignModificationRequest> ResolveRetrainRom(SignModificationRequest rom)
         {
             SignModificationRequest signRom = await work.SignModificationRequests.GetAsync(rom.Id);
-            if(signRom != null)
+            if (signRom != null)
             {
                 signRom.Status = (int)Status.Confirmed;
                 signRom.ImageUrl = rom.ImageUrl;

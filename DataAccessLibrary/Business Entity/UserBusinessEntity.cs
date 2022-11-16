@@ -223,7 +223,7 @@ namespace DataAccessLibrary.Business_Entity
                     Password = existedScribe.Password,
                     Role = (int)UserRoles.ADMIN,
                     Status = 6,
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = DateTime.Now.ToLocalTime(),
                     IsDeleted = false
                 };
 
@@ -236,7 +236,7 @@ namespace DataAccessLibrary.Business_Entity
                     PromotingAdminId = scribePromotionDTO.PromotingAdminId,
                     ArbitratingAdminId = scribePromotionDTO.ArbitratingAdminId,
                     Status = (int)Status.Pending,
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = DateTime.Now.ToLocalTime(),
                     IsDeleted = false
                 };
                 await work.UserModificationRequests.AddAsync(userRom);
@@ -396,7 +396,7 @@ namespace DataAccessLibrary.Business_Entity
         {
             User user = new User();
             user.Id = Guid.NewGuid();
-            user.CreatedDate = DateTime.Now;
+            user.CreatedDate = DateTime.Now.ToLocalTime();
             user.Username = username;
             user.Password = password;
             user.DisplayName = !String.IsNullOrEmpty(username) ? username : email;
