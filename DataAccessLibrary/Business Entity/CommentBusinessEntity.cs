@@ -1,5 +1,7 @@
 ﻿using BusinessObjectLibrary;
+using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,6 +46,23 @@ namespace DataAccessLibrary.Business_Entity
                 .Where(c => !c.IsDeleted && c.UserId.Equals(memberId));
             return comments.OrderByDescending(c => c.CreatedDate).FirstOrDefault();
         }
+        public async Task<IEnumerable<UserCommentDTO>> GetUsersComments()
+        {
+            var data = (from comments in (await work.Comments.GetAllAsync()).Where(c => !c.IsDeleted)
+                        join users in (await work.Users.GetAllAsync())
+                         .Where(u => !u.IsDeleted && u.Role == (int)UserRoles.MEMBER)
+                        on comments.UserId equals users.Id
+                        select new UserCommentDTO
+                        {
+                            UserId = users.Id,
+                            Avatar = users.Avatar,
+                            DisplayName = users.DisplayName,
+                            Content = comments.Content,
+                            Rating = comments.Rating,
+                            CreatedDate = comments.CreatedDate
+                        }).ToList();
+            return data;
+        }
 
         public async Task<Comment> AddUserComment(Guid userId, Comment commentDTO)
         {
@@ -51,6 +70,7 @@ namespace DataAccessLibrary.Business_Entity
             Comment comment = await GetCommentByMemberId(userId);
             if (comment == null)
             {
+                comment = new Comment();
                 comment.Id = Guid.NewGuid();
                 comment.UserId = userId;
                 comment.Content = commentDTO.Content;

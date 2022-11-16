@@ -1,6 +1,7 @@
 ﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
+using DTOsLibrary;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VNRDnTAIApi.Controllers
@@ -27,6 +28,22 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.GetCommentsAsync());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        // GET: api/Comments/All
+        [HttpGet("All")]
+        [ProducesResponseType(typeof(IEnumerable<UserCommentDTO>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<UserCommentDTO>>> GetMembersCommentsMobile()
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetUsersComments());
             }
             catch (Exception ex)
             {
