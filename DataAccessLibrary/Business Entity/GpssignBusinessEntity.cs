@@ -19,27 +19,19 @@ namespace DataAccessLibrary.Business_Entity
         }
         public async Task<Gpssign> AddGpsSignDTO(GpsSignDTO gpsSignDTO)
         {
-            Sign sign = (await work.Signs.GetAllAsync())
-                .Where(s => !s.IsDeleted && s.Status == (int)Status.Active && s.Id == gpsSignDTO.SignId)
-                .FirstOrDefault();
-            if (sign != null)
+            Gpssign gpsSign = new Gpssign();
+            gpsSign.Id = Guid.NewGuid();
+            if(gpsSignDTO.SignId != Guid.Empty)
             {
-                Gpssign gpsSign = new Gpssign();
-                gpsSign.Id = Guid.NewGuid();
                 gpsSign.SignId = gpsSignDTO.SignId;
-                gpsSign.Latitude = gpsSignDTO.Latitude;
-                gpsSign.Longitude = gpsSignDTO.Longitude;
-                gpsSign.Status = (int)Status.Deactivated;
-                //gpsSign.Status = (int)Status.Deactivated;
-                gpsSign.IsDeleted = false;
-                await work.Gpssigns.AddAsync(gpsSign);
-                await work.Save();
-                return gpsSign;
             }
-            else
-            {
-                return new Gpssign();
-            }
+            gpsSign.Latitude = gpsSignDTO.Latitude;
+            gpsSign.Longitude = gpsSignDTO.Longitude;
+            gpsSign.Status = (int)Status.Deactivated;
+            gpsSign.IsDeleted = gpsSignDTO.IsDeleted;
+            await work.Gpssigns.AddAsync(gpsSign);
+            await work.Save();
+            return gpsSign;
         }
 
         public async Task<IEnumerable<GpsSignDTO>> GetGpssignsNearby(double latitude, double longitude, double distance)
