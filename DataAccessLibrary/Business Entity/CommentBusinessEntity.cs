@@ -40,11 +40,11 @@ namespace DataAccessLibrary.Business_Entity
             return average;
         }
 
-        public async Task<Comment> GetCommentByMemberId(Guid memberId)
+        public async Task<IEnumerable<Comment>> GetCommentByMemberId(Guid memberId)
         {
             IEnumerable<Comment> comments = (await work.Comments.GetAllAsync())
                 .Where(c => !c.IsDeleted && c.UserId.Equals(memberId));
-            return comments.OrderByDescending(c => c.CreatedDate).FirstOrDefault();
+            return comments.OrderByDescending(c => c.CreatedDate);
         }
         public async Task<IEnumerable<UserCommentDTO>> GetUsersComments()
         {
@@ -66,38 +66,17 @@ namespace DataAccessLibrary.Business_Entity
 
         public async Task<Comment> AddUserComment(Guid userId, Comment commentDTO)
         {
+            Comment newComment = new Comment();
+            newComment.Id = Guid.NewGuid();
+            newComment.UserId = userId;
+            newComment.Content = commentDTO.Content;
+            newComment.Rating = commentDTO.Rating;
+            newComment.CreatedDate = DateTime.Now;
+            newComment.IsDeleted = false;
+            await work.Comments.AddAsync(newComment);
+            await work.Save();
 
-            Comment comment = await GetCommentByMemberId(userId);
-            if (comment == null)
-            {
-                comment = new Comment();
-                comment.Id = Guid.NewGuid();
-                comment.UserId = userId;
-                comment.Content = commentDTO.Content;
-                comment.Rating = commentDTO.Rating;
-                comment.CreatedDate = DateTime.Now;
-                comment.IsDeleted = false;
-                await work.Comments.AddAsync(comment);
-                await work.Save();
-
-                return comment;
-            }
-            else
-            {
-                await RemoveComment(comment.Id);
-
-                Comment newComment = new Comment();
-                newComment.Id = Guid.NewGuid();
-                newComment.UserId = userId;
-                newComment.Content = commentDTO.Content;
-                newComment.Rating = commentDTO.Rating;
-                newComment.CreatedDate = DateTime.Now;
-                newComment.IsDeleted = false;
-                await work.Comments.AddAsync(newComment);
-                await work.Save();
-
-                return newComment;
-            }
+            return newComment;
         }
         public async Task<Comment> UpdateComment(Comment comment)
         {

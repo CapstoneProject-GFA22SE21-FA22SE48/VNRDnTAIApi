@@ -53,29 +53,13 @@ namespace VNRDnTAIApi.Controllers
 
         // GET: api/Comments/Members/5
         [HttpGet("Members/{memberId}")]
-        [ProducesResponseType(typeof(Comment), 200)]
+        [ProducesResponseType(typeof(IEnumerable<Comment>), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<Comment>> GetCommentByMemberId(Guid memberId)
+        public async Task<ActionResult<IEnumerable<Comment>>> GetCommentByMemberId(Guid memberId)
         {
             try
             {
                 return StatusCode(200, await _entity.GetCommentByMemberId(memberId));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
-        // GET: api/Comments/5
-        [HttpGet("{id}")]
-        [ProducesResponseType(typeof(Comment), 200)]
-        [ProducesResponseType(500)]
-        public async Task<ActionResult<Comment>> GetComment(Guid id)
-        {
-            try
-            {
-                return StatusCode(200, await _entity.GetCommentAsync(id));
             }
             catch (Exception ex)
             {
