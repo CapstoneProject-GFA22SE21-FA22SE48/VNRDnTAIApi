@@ -482,6 +482,7 @@ namespace DataAccessLibrary.Business_Entity
                     {
                         modifyingSign.Status = (int)Status.Active;
                     }
+                    await work.Save();
                 }
                 else if (signRom.OperationType == (int)OperationType.Update)
                 {
@@ -490,6 +491,8 @@ namespace DataAccessLibrary.Business_Entity
                     {
                         modifyingSign.Status = (int)Status.Active;
                     }
+                    await work.Save();
+
                     if (modifiedSign != null)
                     {
                         modifiedSign.IsDeleted = true;
@@ -503,19 +506,40 @@ namespace DataAccessLibrary.Business_Entity
                         {
                             signMod.ModifiedSignId = modifyingSign.Id;
                         }
+                        await work.Save();
 
-                        //Reference all SignParagraph of ModifiedSignId to ModifyingSignId
+                        //Updated: 2022-11-17 change "reference" to "create new" for keeping old signParagraphs data for comparision
+                        ////Reference all SignParagraph of ModifiedSignId to ModifyingSignId
+                        //IEnumerable<SignParagraph> modifiedSignIdSignParagraphs =
+                        //    (await work.SignParagraphs.GetAllAsync())
+                        //    .Where(sp => !sp.IsDeleted && sp.SignId == modifiedSign.Id);
+
+                        //if (modifiedSignIdSignParagraphs != null)
+                        //{
+                        //    foreach (SignParagraph signPara in modifiedSignIdSignParagraphs)
+                        //    {
+                        //        signPara.SignId = modifyingSign.Id;
+                        //    }
+                        //}
+
+                        //Create new signParagraphs for modifyingSign
                         IEnumerable<SignParagraph> modifiedSignIdSignParagraphs =
                             (await work.SignParagraphs.GetAllAsync())
                             .Where(sp => !sp.IsDeleted && sp.SignId == modifiedSign.Id);
-
-                        if (modifiedSignIdSignParagraphs != null)
+                        if(modifiedSignIdSignParagraphs != null)
                         {
-                            foreach (SignParagraph signPara in modifiedSignIdSignParagraphs)
+                            foreach (SignParagraph oldSignParagraph in modifiedSignIdSignParagraphs)
                             {
-                                signPara.SignId = modifyingSign.Id;
+                                await work.SignParagraphs.AddAsync(new SignParagraph
+                                {
+                                    Id = Guid.NewGuid(),
+                                    SignId = modifyingSign.Id,
+                                    ParagraphId = oldSignParagraph.ParagraphId,
+                                    IsDeleted = false
+                                });
                             }
                         }
+                      
                     }
                 }
                 else if (signRom.OperationType == (int)OperationType.Delete)
@@ -540,9 +564,9 @@ namespace DataAccessLibrary.Business_Entity
                             signMod.Status = (int)Status.Confirmed;
                         }
                     }
+                    await work.Save();
                 }
             }
-            await work.Save();
 
             //include in return to use in notification
             if (signRom.ScribeId != null)
@@ -565,6 +589,7 @@ namespace DataAccessLibrary.Business_Entity
             {
                 signRom.ModifyingGpssign = (await work.Gpssigns.GetAsync((Guid)signRom.ModifyingGpssignId)); ;
             }
+
             return signRom;
         }
         //----------------------------------------------------
