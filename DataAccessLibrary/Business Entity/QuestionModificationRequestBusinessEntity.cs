@@ -234,14 +234,14 @@ namespace DataAccessLibrary.Business_Entity
                 double approvalRate = 1 - ((double)((await work.LawModificationRequests.GetAllAsync())
                     .Where(l => l.ScribeId == questionRom.ScribeId && l.Status == (int)Status.Denied).Count()
                 + (await work.SignModificationRequests.GetAllAsync())
-                    .Where(s => s.ScribeId == questionRom.ScribeId && s.Status == (int)Status.Denied).Count()
+                    .Where(s => s.ScribeId == questionRom.ScribeId && s.Status == (int)Status.Denied && s.OperationType != (int)OperationType.Retrain).Count()
                 + (await work.QuestionModificationRequests.GetAllAsync())
                 .Where(q => q.ScribeId == questionRom.ScribeId && q.Status == (int)Status.Denied).Count())
                     /
                 ((await work.LawModificationRequests.GetAllAsync())
                     .Where(l => l.ScribeId == questionRom.ScribeId).Count()
                 + (await work.SignModificationRequests.GetAllAsync())
-                    .Where(s => s.ScribeId == questionRom.ScribeId).Count()
+                    .Where(s => s.ScribeId == questionRom.ScribeId && s.OperationType != (int)OperationType.Retrain).Count()
                 + (await work.QuestionModificationRequests.GetAllAsync())
                 .Where(q => q.ScribeId == questionRom.ScribeId).Count()));
                 if (approvalRate < 0.65)

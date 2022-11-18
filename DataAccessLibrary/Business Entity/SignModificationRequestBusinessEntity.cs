@@ -615,14 +615,14 @@ namespace DataAccessLibrary.Business_Entity
                 double approvalRate = 1 - ((double)((await work.LawModificationRequests.GetAllAsync())
                     .Where(l => l.ScribeId == signRom.ScribeId && l.Status == (int)Status.Denied).Count()
                 + (await work.SignModificationRequests.GetAllAsync())
-                    .Where(s => s.ScribeId == signRom.ScribeId && s.Status == (int)Status.Denied).Count()
+                    .Where(s => s.ScribeId == signRom.ScribeId && s.Status == (int)Status.Denied && s.OperationType != (int)OperationType.Retrain).Count()
                 + (await work.QuestionModificationRequests.GetAllAsync())
                 .Where(s => s.ScribeId == signRom.ScribeId && s.Status == (int)Status.Denied).Count())
                     /
                 ((await work.LawModificationRequests.GetAllAsync())
                     .Where(l => l.ScribeId == signRom.ScribeId).Count()
                 + (await work.SignModificationRequests.GetAllAsync())
-                    .Where(s => s.ScribeId == signRom.ScribeId).Count()
+                    .Where(s => s.ScribeId == signRom.ScribeId && s.OperationType != (int)OperationType.Retrain).Count()
                 + (await work.QuestionModificationRequests.GetAllAsync())
                 .Where(s => s.ScribeId == signRom.ScribeId).Count()));
                 if (approvalRate < 0.65)
@@ -911,14 +911,14 @@ namespace DataAccessLibrary.Business_Entity
                 double approvalRate = 1 - ((double)((await work.LawModificationRequests.GetAllAsync())
                     .Where(l => l.ScribeId == gpssignRom.ScribeId && l.Status == (int)Status.Denied).Count()
                 + (await work.SignModificationRequests.GetAllAsync())
-                    .Where(s => s.ScribeId == gpssignRom.ScribeId && s.Status == (int)Status.Denied).Count()
+                    .Where(s => s.ScribeId == gpssignRom.ScribeId && s.Status == (int)Status.Denied && s.OperationType != (int)OperationType.Retrain).Count()
                 + (await work.QuestionModificationRequests.GetAllAsync())
                 .Where(s => s.ScribeId == gpssignRom.ScribeId && s.Status == (int)Status.Denied).Count())
                     /
                 ((await work.LawModificationRequests.GetAllAsync())
                     .Where(l => l.ScribeId == gpssignRom.ScribeId).Count()
                 + (await work.SignModificationRequests.GetAllAsync())
-                    .Where(s => s.ScribeId == gpssignRom.ScribeId).Count()
+                    .Where(s => s.ScribeId == gpssignRom.ScribeId && s.OperationType != (int)OperationType.Retrain).Count()
                 + (await work.QuestionModificationRequests.GetAllAsync())
                 .Where(s => s.ScribeId == gpssignRom.ScribeId).Count()));
                 if (approvalRate < 0.65)
