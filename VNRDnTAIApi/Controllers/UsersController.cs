@@ -87,6 +87,22 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
+        // GET: api/Users/Scribes/ApprovalRate/5
+        [HttpGet("Scribes/ApprovalRate/{scribeId}")]
+        [ProducesResponseType(typeof(User), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<User>> GetApprovalRateInformation(Guid scribeId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.ScribeGetApprovalRateInformation(scribeId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         // GET: api/Users/Admins
         [HttpGet("Admins")]
         [ProducesResponseType(typeof(IEnumerable<AdminDTO>), 200)]

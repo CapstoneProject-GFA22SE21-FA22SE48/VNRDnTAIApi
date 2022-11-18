@@ -472,5 +472,27 @@ namespace DataAccessLibrary.Business_Entity
             };
             return scribeReportDTO;
         }
+        //--------------------------------------------------
+        public async Task<ApprovalRateDTO> ScribeGetApprovalRateInformation(Guid scribeId)
+        {
+            return new ApprovalRateDTO
+            {
+                DeniedRomCount = 
+                    (await work.LawModificationRequests.GetAllAsync())
+                    .Where(l => l.ScribeId == scribeId && l.Status == (int)Status.Denied).Count()
+                    + (await work.SignModificationRequests.GetAllAsync())
+                        .Where(s => s.ScribeId == scribeId && s.Status == (int)Status.Denied && s.OperationType != (int)OperationType.Retrain).Count()
+                    + (await work.QuestionModificationRequests.GetAllAsync())
+                    .Where(s => s.ScribeId == scribeId && s.Status == (int)Status.Denied).Count(),
+
+                TotalRomCount = 
+                    (await work.LawModificationRequests.GetAllAsync())
+                    .Where(l => l.ScribeId == scribeId).Count()
+                    + (await work.SignModificationRequests.GetAllAsync())
+                        .Where(s => s.ScribeId == scribeId && s.OperationType != (int)OperationType.Retrain).Count()
+                    + (await work.QuestionModificationRequests.GetAllAsync())
+                    .Where(s => s.ScribeId == scribeId).Count()
+            };
+        }
     }
 }
