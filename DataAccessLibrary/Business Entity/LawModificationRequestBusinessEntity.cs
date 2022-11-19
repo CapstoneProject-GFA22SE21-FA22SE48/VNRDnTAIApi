@@ -958,6 +958,17 @@ namespace DataAccessLibrary.Business_Entity
                             relatedlawRom.Status = (int)Status.Confirmed;
                         }
 
+                        //Set all paragraph of current deleting section to deactivated
+                        IEnumerable<Paragraph> relatedParagraphs = (await work.Paragraphs.GetAllAsync())
+                            .Where(p => p.SectionId == modifiedSection.Id);
+                        if (relatedParagraphs != null)
+                        {
+                            foreach(Paragraph para in relatedParagraphs)
+                            {
+                                para.Status = (int)Status.Deactivated;
+                                para.IsDeleted = true;
+                            }
+                        }
                     }
                 }
             }
