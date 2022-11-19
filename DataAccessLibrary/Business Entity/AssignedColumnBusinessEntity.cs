@@ -277,11 +277,13 @@ namespace DataAccessLibrary.Business_Entity
                 foreach (TaskDTO taskDTO in taskDTOList)
                 {
                     User assignedScribe = await work.Users.GetAsync((Guid)taskDTO.ScribeId);
-                    if(assignedScribe != null) { 
-                        if(assignedScribe.IsDeleted || assignedScribe.Status == (int)Status.Deactivated)
+                    if (assignedScribe != null)
+                    {
+                        if (assignedScribe.IsDeleted || assignedScribe.Status == (int)Status.Deactivated)
                         {
                             throw new Exception($"{assignedScribe.Username} đã bị ngưng hoạt động");
                         }
+                    }
                     if (columns.Where(s => s.Id == taskDTO.TaskId).FirstOrDefault() != null)
                     {
                         await work.AssignedColumns.AddAsync(new AssignedColumn
