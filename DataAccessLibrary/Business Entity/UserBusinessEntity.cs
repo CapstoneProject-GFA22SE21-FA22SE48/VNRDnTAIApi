@@ -278,6 +278,13 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<User> DeactivateScribe(User scribe)
         {
             User deactivatingScribe = await work.Users.GetAsync(scribe.Id);
+            if(deactivatingScribe != null)
+            {
+                if(deactivatingScribe.Status == (int)Status.Deactivated)
+                {
+                    throw new Exception("Tài khoản nhân viên đã bị ngưng hoạt động bởi Quản trị viên khác");
+                }
+            }
             deactivatingScribe.Status = (int)Status.Deactivated;
 
             //Remove all assigned tasks of scribe
