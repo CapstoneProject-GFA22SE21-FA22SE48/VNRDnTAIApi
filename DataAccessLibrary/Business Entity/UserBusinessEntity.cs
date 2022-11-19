@@ -262,6 +262,13 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<User> DeactivateMember(User member)
         {
             User deactivatingMember = await work.Users.GetAsync(member.Id);
+            if (deactivatingMember != null)
+            {
+                if (deactivatingMember.Status == (int)Status.Deactivated)
+                {
+                    throw new Exception("Tài khoản thành viên đã bị ngưng hoạt động bởi Quản trị viên khác");
+                }
+            }
             deactivatingMember.Status = (int)Status.Deactivated;
             IEnumerable<Comment> comments = (await work.Comments.GetAllAsync())
                 .Where(c => !c.IsDeleted && c.UserId == member.Id);
@@ -368,6 +375,13 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<User> ReEnableScribe(User scribe)
         {
             User reEnablingScribe = await work.Users.GetAsync(scribe.Id);
+            if (reEnablingScribe != null)
+            {
+                if (reEnablingScribe.Status == (int)Status.Active)
+                {
+                    throw new Exception("Tài khoản nhân viên đã được kích hoạt lại bởi Quản trị viên khác");
+                }
+            }
             reEnablingScribe.Status = (int)Status.Active;
             await work.Save();
             return reEnablingScribe;
@@ -377,6 +391,13 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<User> ReEnableMember(User member)
         {
             User reEnablingMember = await work.Users.GetAsync(member.Id);
+            if (reEnablingMember != null)
+            {
+                if (reEnablingMember.Status == (int)Status.Active)
+                {
+                    throw new Exception("Tài khoản thành viên đã được kích hoạt lại bởi Quản trị viên khác");
+                }
+            }
             reEnablingMember.Status = (int)Status.Active;
             await work.Save();
             return reEnablingMember;
