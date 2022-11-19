@@ -282,35 +282,32 @@ namespace DataAccessLibrary.Business_Entity
                         {
                             throw new Exception($"{assignedScribe.Username} đã bị ngưng hoạt động");
                         }
-                    } else
+                    if (columns.Where(s => s.Id == taskDTO.TaskId).FirstOrDefault() != null)
                     {
-                        if (columns.Where(s => s.Id == taskDTO.TaskId).FirstOrDefault() != null)
+                        await work.AssignedColumns.AddAsync(new AssignedColumn
                         {
-                            await work.AssignedColumns.AddAsync(new AssignedColumn
-                            {
-                                ColumnId = taskDTO.TaskId,
-                                ScribeId = (Guid)taskDTO.ScribeId,
-                                IsDeleted = false
-                            });
-                        }
-                        else if (questionCategories.Where(q => q.Id == taskDTO.TaskId).FirstOrDefault() != null)
+                            ColumnId = taskDTO.TaskId,
+                            ScribeId = (Guid)taskDTO.ScribeId,
+                            IsDeleted = false
+                        });
+                    }
+                    else if (questionCategories.Where(q => q.Id == taskDTO.TaskId).FirstOrDefault() != null)
+                    {
+                        await work.AssignedQuestionCategories.AddAsync(new AssignedQuestionCategory
                         {
-                            await work.AssignedQuestionCategories.AddAsync(new AssignedQuestionCategory
-                            {
-                                QuestionCategoryId = taskDTO.TaskId,
-                                ScribeId = (Guid)taskDTO.ScribeId,
-                                IsDeleted = false
-                            });
-                        }
-                        else if (signCategories.Where(s => s.Id == taskDTO.TaskId).FirstOrDefault() != null)
+                            QuestionCategoryId = taskDTO.TaskId,
+                            ScribeId = (Guid)taskDTO.ScribeId,
+                            IsDeleted = false
+                        });
+                    }
+                    else if (signCategories.Where(s => s.Id == taskDTO.TaskId).FirstOrDefault() != null)
+                    {
+                        await work.AssignedSignCategories.AddAsync(new AssignedSignCategory
                         {
-                            await work.AssignedSignCategories.AddAsync(new AssignedSignCategory
-                            {
-                                SignCategoryId = taskDTO.TaskId,
-                                ScribeId = (Guid)taskDTO.ScribeId,
-                                IsDeleted = false
-                            });
-                        }
+                            SignCategoryId = taskDTO.TaskId,
+                            ScribeId = (Guid)taskDTO.ScribeId,
+                            IsDeleted = false
+                        });
                     }
                 }
             }
