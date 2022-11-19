@@ -276,32 +276,41 @@ namespace DataAccessLibrary.Business_Entity
 
                 foreach (TaskDTO taskDTO in taskDTOList)
                 {
-                    if (columns.Where(s => s.Id == taskDTO.TaskId).FirstOrDefault() != null)
-                    {
-                        await work.AssignedColumns.AddAsync(new AssignedColumn
+                    User assignedScribe = await work.Users.GetAsync((Guid)taskDTO.ScribeId);
+                    if(assignedScribe != null) { 
+                        if(assignedScribe.IsDeleted || assignedScribe.Status == (int)Status.Deactivated)
                         {
-                            ColumnId = taskDTO.TaskId,
-                            ScribeId = (Guid)taskDTO.ScribeId,
-                            IsDeleted = false
-                        });
-                    }
-                    else if (questionCategories.Where(q => q.Id == taskDTO.TaskId).FirstOrDefault() != null)
+                            throw new Exception($"{assignedScribe.Username} đã bị ngưng hoạt động");
+                        }
+                    } else
                     {
-                        await work.AssignedQuestionCategories.AddAsync(new AssignedQuestionCategory
+                        if (columns.Where(s => s.Id == taskDTO.TaskId).FirstOrDefault() != null)
                         {
-                            QuestionCategoryId = taskDTO.TaskId,
-                            ScribeId = (Guid)taskDTO.ScribeId,
-                            IsDeleted = false
-                        });
-                    }
-                    else if (signCategories.Where(s => s.Id == taskDTO.TaskId).FirstOrDefault() != null)
-                    {
-                        await work.AssignedSignCategories.AddAsync(new AssignedSignCategory
+                            await work.AssignedColumns.AddAsync(new AssignedColumn
+                            {
+                                ColumnId = taskDTO.TaskId,
+                                ScribeId = (Guid)taskDTO.ScribeId,
+                                IsDeleted = false
+                            });
+                        }
+                        else if (questionCategories.Where(q => q.Id == taskDTO.TaskId).FirstOrDefault() != null)
                         {
-                            SignCategoryId = taskDTO.TaskId,
-                            ScribeId = (Guid)taskDTO.ScribeId,
-                            IsDeleted = false
-                        });
+                            await work.AssignedQuestionCategories.AddAsync(new AssignedQuestionCategory
+                            {
+                                QuestionCategoryId = taskDTO.TaskId,
+                                ScribeId = (Guid)taskDTO.ScribeId,
+                                IsDeleted = false
+                            });
+                        }
+                        else if (signCategories.Where(s => s.Id == taskDTO.TaskId).FirstOrDefault() != null)
+                        {
+                            await work.AssignedSignCategories.AddAsync(new AssignedSignCategory
+                            {
+                                SignCategoryId = taskDTO.TaskId,
+                                ScribeId = (Guid)taskDTO.ScribeId,
+                                IsDeleted = false
+                            });
+                        }
                     }
                 }
             }
