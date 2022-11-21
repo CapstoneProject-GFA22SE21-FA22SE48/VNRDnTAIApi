@@ -180,6 +180,7 @@ namespace DataAccessLibrary.Business_Entity
             {
                 res.Add(new SearchLawDTO
                 {
+                    Name = paragraph.Section.Statue.Name + " " + paragraph.Section.Name + " " + paragraph.Name,
                     StatueDesc = char.ToUpper(paragraph.Section.Statue.Description.Remove(0, 8)[0]) + paragraph.Section.Statue.Description.Remove(0, 8).Substring(1),
                     ParagraphDesc = paragraph.Description,
                     SectionDesc = paragraph.Section.Description,
