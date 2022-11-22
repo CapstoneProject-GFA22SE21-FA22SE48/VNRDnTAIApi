@@ -84,7 +84,7 @@ namespace VNRDnTAIApi.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-
+        //---------------------------------------------------
         // PUT: api/SignModificationRequests/GPSSigns/5/10
         [HttpPut("GPSSigns/{gpsSignRomId}/{status}/{adminId}")]
         [ProducesResponseType(typeof(SignModificationRequest), 200)]
@@ -99,11 +99,21 @@ namespace VNRDnTAIApi.Controllers
                 signModificationRequest = await _entity.GetSignModificationRequestAsyncById(gpsSignRomId);
                 if (signModificationRequest != null)
                 {
-                    signModificationRequest.ImageUrl = imageUrl;
                     signModificationRequest.Status = status;
                     signModificationRequest.AdminId = adminId;
+                    if (imageUrl.Contains("%2F%"))
+                    {
+                        var arr = imageUrl.Split("%2F%");
+                        signModificationRequest.ImageUrl = arr[0];
+                        return StatusCode(200,
+                            await _entity.UpdateGPSSignModificationRequest(signModificationRequest, arr[1].Trim()));
+                    }
+                    else
+                    {
+                        signModificationRequest.ImageUrl = imageUrl;
 
-                    return StatusCode(200, await _entity.UpdateSignModificationRequest(signModificationRequest));
+                        return StatusCode(200, await _entity.UpdateSignModificationRequest(signModificationRequest));
+                    }
                 }
                 else
                 {
