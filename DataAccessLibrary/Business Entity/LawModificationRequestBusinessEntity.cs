@@ -747,14 +747,14 @@ namespace DataAccessLibrary.Business_Entity
                 double approvalRate = 1 - ((double)((await work.LawModificationRequests.GetAllAsync())
                     .Where(l => l.ScribeId == statueRom.ScribeId && l.Status == (int)Status.Denied).Count()
                 + (await work.SignModificationRequests.GetAllAsync())
-                    .Where(s => s.ScribeId == statueRom.ScribeId && s.Status == (int)Status.Denied).Count()
+                    .Where(s => s.ScribeId == statueRom.ScribeId && s.Status == (int)Status.Denied && s.OperationType != (int)OperationType.Retrain).Count()
                 + (await work.QuestionModificationRequests.GetAllAsync())
                 .Where(s => s.ScribeId == statueRom.ScribeId && s.Status == (int)Status.Denied).Count())
                     /
                 ((await work.LawModificationRequests.GetAllAsync())
                     .Where(l => l.ScribeId == statueRom.ScribeId).Count()
                 + (await work.SignModificationRequests.GetAllAsync())
-                    .Where(s => s.ScribeId == statueRom.ScribeId).Count()
+                    .Where(s => s.ScribeId == statueRom.ScribeId && s.OperationType != (int)OperationType.Retrain).Count()
                 + (await work.QuestionModificationRequests.GetAllAsync())
                 .Where(s => s.ScribeId == statueRom.ScribeId).Count()));
                 if (approvalRate < 0.65)
@@ -958,6 +958,17 @@ namespace DataAccessLibrary.Business_Entity
                             relatedlawRom.Status = (int)Status.Confirmed;
                         }
 
+                        //Set all paragraph of current deleting section to deactivated
+                        IEnumerable<Paragraph> relatedParagraphs = (await work.Paragraphs.GetAllAsync())
+                            .Where(p => p.SectionId == modifiedSection.Id);
+                        if (relatedParagraphs != null)
+                        {
+                            foreach(Paragraph para in relatedParagraphs)
+                            {
+                                para.Status = (int)Status.Deactivated;
+                                para.IsDeleted = true;
+                            }
+                        }
                     }
                 }
             }
@@ -992,14 +1003,14 @@ namespace DataAccessLibrary.Business_Entity
                 double approvalRate = 1 - ((double)((await work.LawModificationRequests.GetAllAsync())
                     .Where(l => l.ScribeId == sectionRom.ScribeId && l.Status == (int)Status.Denied).Count()
                 + (await work.SignModificationRequests.GetAllAsync())
-                    .Where(s => s.ScribeId == sectionRom.ScribeId && s.Status == (int)Status.Denied).Count()
+                    .Where(s => s.ScribeId == sectionRom.ScribeId && s.Status == (int)Status.Denied && s.OperationType != (int)OperationType.Retrain).Count()
                 + (await work.QuestionModificationRequests.GetAllAsync())
                 .Where(s => s.ScribeId == sectionRom.ScribeId && s.Status == (int)Status.Denied).Count())
                     /
                 ((await work.LawModificationRequests.GetAllAsync())
                     .Where(l => l.ScribeId == sectionRom.ScribeId).Count()
                 + (await work.SignModificationRequests.GetAllAsync())
-                    .Where(s => s.ScribeId == sectionRom.ScribeId).Count()
+                    .Where(s => s.ScribeId == sectionRom.ScribeId && s.OperationType != (int)OperationType.Retrain).Count()
                 + (await work.QuestionModificationRequests.GetAllAsync())
                 .Where(s => s.ScribeId == sectionRom.ScribeId).Count()));
                 if (approvalRate < 0.65)
@@ -1212,14 +1223,14 @@ namespace DataAccessLibrary.Business_Entity
                 double approvalRate = 1 - ((double)((await work.LawModificationRequests.GetAllAsync())
                     .Where(l => l.ScribeId == paraRom.ScribeId && l.Status == (int)Status.Denied).Count()
                 + (await work.SignModificationRequests.GetAllAsync())
-                    .Where(s => s.ScribeId == paraRom.ScribeId && s.Status == (int)Status.Denied).Count()
+                    .Where(s => s.ScribeId == paraRom.ScribeId && s.Status == (int)Status.Denied && s.OperationType != (int)OperationType.Retrain).Count()
                 + (await work.QuestionModificationRequests.GetAllAsync())
                 .Where(s => s.ScribeId == paraRom.ScribeId && s.Status == (int)Status.Denied).Count())
                     /
                 ((await work.LawModificationRequests.GetAllAsync())
                     .Where(l => l.ScribeId == paraRom.ScribeId).Count()
                 + (await work.SignModificationRequests.GetAllAsync())
-                    .Where(s => s.ScribeId == paraRom.ScribeId).Count()
+                    .Where(s => s.ScribeId == paraRom.ScribeId && s.OperationType != (int)OperationType.Retrain).Count()
                 + (await work.QuestionModificationRequests.GetAllAsync())
                 .Where(s => s.ScribeId == paraRom.ScribeId).Count()));
                 if (approvalRate < 0.65)
