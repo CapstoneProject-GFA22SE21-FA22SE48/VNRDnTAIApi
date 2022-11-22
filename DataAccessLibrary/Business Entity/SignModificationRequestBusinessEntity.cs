@@ -26,6 +26,11 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<IEnumerable<SignModificationRequest>>
             GetSignModificationRequestsByScribeIdAndStatusAsync(Guid scribeId, int status)
         {
+            if (status == (int)Status.Claimed)
+            {
+                return (await work.SignModificationRequests.GetAllAsync())
+                .Where(p => !p.IsDeleted && p.Status == status && p.AdminId == null && p.ScribeId.Equals(scribeId));
+            }
             return (await work.SignModificationRequests.GetAllAsync())
                 .Where(p => !p.IsDeleted && p.Status == status && p.ScribeId.Equals(scribeId));
         }
@@ -98,6 +103,35 @@ namespace DataAccessLibrary.Business_Entity
 
         public async Task<SignModificationRequest> UpdateSignModificationRequest(SignModificationRequest signModificationRequest)
         {
+            work.SignModificationRequests.Update(signModificationRequest);
+            await work.Save();
+            return signModificationRequest;
+        }
+        public async Task<SignModificationRequest> UpdateGPSSignModificationRequest(SignModificationRequest signModificationRequest, string? signName)
+        {
+            if (!String.IsNullOrEmpty(signName))
+            {
+                Gpssign gps = await work.Gpssigns.GetAsync(signModificationRequest.ModifyingGpssignId.Value);
+                if (gps != null)
+                {
+                    Sign sign = (await work.Signs.GetAllAsync())
+                            .FirstOrDefault(s => s.Name.Contains(signName.Split(" ")[2]));
+                    if (sign != null)
+                    {
+                        gps.SignId = sign.Id;
+                        work.Gpssigns.Update(gps);
+                        await work.Save();
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+            }
             work.SignModificationRequests.Update(signModificationRequest);
             await work.Save();
             return signModificationRequest;
@@ -526,7 +560,7 @@ namespace DataAccessLibrary.Business_Entity
                         IEnumerable<SignParagraph> modifiedSignIdSignParagraphs =
                             (await work.SignParagraphs.GetAllAsync())
                             .Where(sp => !sp.IsDeleted && sp.SignId == modifiedSign.Id);
-                        if(modifiedSignIdSignParagraphs != null)
+                        if (modifiedSignIdSignParagraphs != null)
                         {
                             foreach (SignParagraph oldSignParagraph in modifiedSignIdSignParagraphs)
                             {
@@ -539,7 +573,7 @@ namespace DataAccessLibrary.Business_Entity
                                 });
                             }
                         }
-                      
+
                     }
                 }
                 else if (signRom.OperationType == (int)OperationType.Delete)
