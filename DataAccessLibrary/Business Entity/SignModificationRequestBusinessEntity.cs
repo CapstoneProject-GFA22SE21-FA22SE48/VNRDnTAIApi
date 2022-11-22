@@ -104,7 +104,6 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<SignModificationRequest> ScribeAddGpsSignModificationRequest(SignModificationRequest signModificationRequest)
         {
             signModificationRequest.Id = Guid.NewGuid();
-            signModificationRequest.Status = signModificationRequest.Status;
             signModificationRequest.CreatedDate = DateTime.Now.ToLocalTime();
             signModificationRequest.IsDeleted = false;
             await work.SignModificationRequests.AddAsync(signModificationRequest);

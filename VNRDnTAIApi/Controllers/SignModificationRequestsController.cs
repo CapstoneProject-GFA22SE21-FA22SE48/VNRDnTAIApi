@@ -210,7 +210,7 @@ namespace VNRDnTAIApi.Controllers
 
         //---------------------------------------------------
         // POST: api/SignModificationRequests/AddGps
-        [HttpPost("{scribeId}/AddGps")]
+        [HttpPost("AddGps")]
         [ProducesResponseType(typeof(SignModificationRequest), 201)]
         [ProducesResponseType(500)]
         public async Task<ActionResult<SignModificationRequest>> ScribeAddSignModificationRequest(SignModificationRequest signModificationRequest)
