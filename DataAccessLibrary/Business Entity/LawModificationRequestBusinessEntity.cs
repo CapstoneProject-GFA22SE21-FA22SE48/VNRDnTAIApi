@@ -1440,7 +1440,7 @@ namespace DataAccessLibrary.Business_Entity
             // 2. Sign Roms
             List<SignModificationRequest> signRoms = (await work.SignModificationRequests.GetAllAsync())
                 .Where(s => !s.IsDeleted && s.ScribeId == ScribeId
-                && s.ScribeId != null & s.UserId == null).ToList();  //Scribe only handle ROM from scribe, ROM from handle will be handled by scribe
+                && s.ScribeId != null && s.AdminId != null).ToList();
 
             List<SignRomDTO> signRomDTOs = new List<SignRomDTO>();
             foreach (SignModificationRequest signRom in signRoms)
