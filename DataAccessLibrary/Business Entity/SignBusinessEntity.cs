@@ -16,6 +16,12 @@ namespace DataAccessLibrary.Business_Entity
         {
             this.work = work;
         }
+
+        public async Task<Sign> GetSignByName(string signName)
+        {
+            return (await work.Signs.GetAllAsync())
+                .FirstOrDefault(s => !s.IsDeleted && s.Name.Contains(signName.Split(" ")[2]));
+        }
         public async Task<IEnumerable<SignDTO>> GetScribeAssignedSignsAsync(Guid scribeId)
         {
             var tmpData1 = from assignedSignCategory in
