@@ -19,6 +19,22 @@ namespace VNRDnTAIApi.Controllers
             _entity = new SignBusinessEntity(work);
         }
 
+        // GET: api/Signs/GetSignByName
+        [HttpGet("GetSignByName")]
+        [ProducesResponseType(typeof(Sign), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<Sign>> GetSignByName(string signName)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetSignByName(signName));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         // GET: api/Signs/AssignedSigns/Scribes/5
         [HttpGet("AssignedSigns/Scribes/{scribeId}")]
         [ProducesResponseType(typeof(IEnumerable<Sign>), 200)]

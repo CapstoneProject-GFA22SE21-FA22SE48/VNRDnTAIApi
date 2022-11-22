@@ -209,6 +209,23 @@ namespace VNRDnTAIApi.Controllers
         }
 
         //---------------------------------------------------
+        // POST: api/SignModificationRequests/AddGps
+        [HttpPost("{scribeId}/AddGps")]
+        [ProducesResponseType(typeof(SignModificationRequest), 201)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<SignModificationRequest>> ScribeAddSignModificationRequest(SignModificationRequest signModificationRequest)
+        {
+            try
+            {
+                return StatusCode(201, await _entity.ScribeAddGpsSignModificationRequest(signModificationRequest));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        //---------------------------------------------------
         // POST: api/SignModificationRequests/Approve/5
         [HttpPost("Approve/{modifyingSignId}")]
         [ProducesResponseType(typeof(SignModificationRequest), 200)]

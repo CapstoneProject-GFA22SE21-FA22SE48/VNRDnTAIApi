@@ -101,6 +101,22 @@ namespace DataAccessLibrary.Business_Entity
             return signModificationRequest;
         }
 
+        public async Task<SignModificationRequest> ScribeAddGpsSignModificationRequest(SignModificationRequest signModificationRequest)
+        {
+            signModificationRequest.Id = Guid.NewGuid();
+            signModificationRequest.Status = signModificationRequest.Status;
+            signModificationRequest.CreatedDate = DateTime.Now.ToLocalTime();
+            signModificationRequest.IsDeleted = false;
+            await work.SignModificationRequests.AddAsync(signModificationRequest);
+            await work.Save();
+
+            //Get data in return for notification adding
+            signModificationRequest.Scribe = (await work.Users.GetAllAsync())
+                .Where(u => u.Id == signModificationRequest.ScribeId)
+                .FirstOrDefault();
+            return signModificationRequest;
+        }
+
         public async Task<SignModificationRequest> UpdateSignModificationRequest(SignModificationRequest signModificationRequest)
         {
             work.SignModificationRequests.Update(signModificationRequest);
