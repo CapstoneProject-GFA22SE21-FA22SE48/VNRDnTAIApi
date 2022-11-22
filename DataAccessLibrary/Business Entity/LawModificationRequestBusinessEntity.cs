@@ -1119,6 +1119,22 @@ namespace DataAccessLibrary.Business_Entity
             if (paraRom != null)
             {
                 Paragraph modifyingParagraph = await work.Paragraphs.GetAsync((Guid)paraRom.ModifyingParagraphId);
+
+                //check if is a section with no paragraph -> delete empty paragraph && referenceParagraph
+                Section modifiedSection = (await work.Sections.GetAllAsync(nameof(Section.Paragraphs)))
+                    .Where(s => s.Id == modifyingParagraph.SectionId).FirstOrDefault();
+                Paragraph emptyParagraph = modifiedSection.Paragraphs.ToList().Where(p => string.IsNullOrEmpty(p.Name)).FirstOrDefault();
+                if(emptyParagraph != null)
+                {
+                    emptyParagraph.IsDeleted = true;
+                    IEnumerable<Reference> references = (await work.References.GetAllAsync())
+                        .Where(r => r.ParagraphId == emptyParagraph.Id);
+                    foreach(Reference r in references)
+                    {
+                        work.References.Delete(r);
+                    }
+                }
+
                 Paragraph modifiedPargraph = null;
                 if (paraRom.ModifiedParagraphId != null)
                 {
