@@ -277,9 +277,9 @@ namespace VNRDnTAIApi.Controllers
                         {
                             user = await _entity
                                 .RegisterMember(
-                                    loginUserDTO.Username,
-                                    loginUserDTO.Password,
-                                    loginUserDTO.Email
+                                    loginUserDTO.Username.Trim(),
+                                    loginUserDTO.Password.Trim(),
+                                    loginUserDTO.Email.Trim()
                                 );
 
                             if (user != null)
@@ -573,9 +573,9 @@ namespace VNRDnTAIApi.Controllers
                 }
                 else
                 {
-                    if (profileDTO.email != null) user.Gmail = profileDTO.email;
-                    if (profileDTO.avatar != null) user.Avatar = profileDTO.avatar;
-                    if (profileDTO.displayName != null) user.DisplayName = profileDTO.displayName;
+                    if (profileDTO.email != null) user.Gmail = profileDTO.email.Trim();
+                    if (profileDTO.avatar != null) user.Avatar = profileDTO.avatar.Trim();
+                    if (profileDTO.displayName != null) user.DisplayName = profileDTO.displayName.Trim();
                     user = await _entity.UpdateUser(user);
                     if (user != null)
                     {
@@ -636,7 +636,7 @@ namespace VNRDnTAIApi.Controllers
             User user;
             try
             {
-                user = await _entity.GetUserAsyncByGmail(email);
+                user = await _entity.GetUserAsyncByGmail(email.Trim());
 
                 if (user != null)
                 {
