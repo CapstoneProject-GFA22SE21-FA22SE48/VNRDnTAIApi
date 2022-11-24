@@ -47,6 +47,7 @@ namespace DataAccessLibrary.Business_Entity
                         ImageUrl = s.ImageUrl,
                         searchLawDTOs = s.SignParagraphs.Where(sp => !sp.IsDeleted).Select(sp => new SearchLawDTO
                         {
+                            Name = sp.Paragraph.Section.Statue.Name + " " + sp.Paragraph.Section.Name + " " + sp.Paragraph.Name,
                             StatueDesc = sp.Paragraph.Section.Statue.Description,
                             SectionDesc = sp.Paragraph.Section.Description,
                             ParagraphDesc = sp.Paragraph.Description,
