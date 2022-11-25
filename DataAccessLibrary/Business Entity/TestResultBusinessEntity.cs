@@ -101,6 +101,7 @@ namespace DataAccessLibrary.Business_Entity
             testResult.IsDeleted = false;
             foreach (var trd in testResult.TestResultDetails)
             {
+                trd.TestResultId = testResult.Id;
                 trd.IsDeleted = false;
             }
             await work.TestResults.AddAsync(testResult);
