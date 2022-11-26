@@ -722,6 +722,17 @@ namespace DataAccessLibrary.Business_Entity
             statueRom.Scribe = (await work.Users.GetAsync(statueRom.ScribeId));
             statueRom.Admin = (await work.Users.GetAsync(statueRom.AdminId));
             statueRom.ModifyingStatue = (await work.Statues.GetAsync((Guid)statueRom.ModifyingStatueId));
+
+            statueRom.Admin.LawModificationRequestAdmins = null;
+            statueRom.Admin.QuestionModificationRequestAdmins = null;
+            statueRom.Admin.SignModificationRequestAdmins = null;
+            statueRom.Admin.UserModificationRequestArbitratingAdmins = null;
+            statueRom.Admin.UserModificationRequestPromotingAdmins = null;
+
+            statueRom.Scribe.LawModificationRequestScribes = null;
+            statueRom.Scribe.QuestionModificationRequestScribes = null;
+            statueRom.Scribe.SignModificationRequestScribes = null;
+
             return statueRom;
         }
         //--------------------------------------------------
@@ -844,6 +855,17 @@ namespace DataAccessLibrary.Business_Entity
             statueRom.Scribe = (await work.Users.GetAsync(statueRom.ScribeId));
             statueRom.Admin = (await work.Users.GetAsync(statueRom.AdminId));
             statueRom.ModifyingStatue = (await work.Statues.GetAsync((Guid)statueRom.ModifyingStatueId));
+
+            statueRom.Admin.LawModificationRequestAdmins = null;
+            statueRom.Admin.QuestionModificationRequestAdmins = null;
+            statueRom.Admin.SignModificationRequestAdmins = null;
+            statueRom.Admin.UserModificationRequestArbitratingAdmins = null;
+            statueRom.Admin.UserModificationRequestPromotingAdmins = null;
+
+            statueRom.Scribe.LawModificationRequestScribes = null;
+            statueRom.Scribe.QuestionModificationRequestScribes = null;
+            statueRom.Scribe.SignModificationRequestScribes = null;
+
             return statueRom;
         }
         //--------------------------------------------------
@@ -978,6 +1000,18 @@ namespace DataAccessLibrary.Business_Entity
             sectionRom.Scribe = (await work.Users.GetAsync(sectionRom.ScribeId));
             sectionRom.Admin = (await work.Users.GetAsync(sectionRom.AdminId));
             sectionRom.ModifyingSection = (await work.Sections.GetAsync((Guid)sectionRom.ModifyingSectionId));
+
+            sectionRom.Admin.LawModificationRequestAdmins = null;
+            sectionRom.Admin.QuestionModificationRequestAdmins = null;
+            sectionRom.Admin.SignModificationRequestAdmins = null;
+            sectionRom.Admin.UserModificationRequestArbitratingAdmins = null;
+            sectionRom.Admin.UserModificationRequestPromotingAdmins = null;
+
+            sectionRom.Scribe.LawModificationRequestScribes = null;
+            sectionRom.Scribe.QuestionModificationRequestScribes = null;
+            sectionRom.Scribe.SignModificationRequestScribes = null;
+
+            sectionRom.ModifyingSection.Statue = null;
             return sectionRom;
         }
         //--------------------------------------------------
@@ -1100,6 +1134,18 @@ namespace DataAccessLibrary.Business_Entity
             sectionRom.Scribe = (await work.Users.GetAsync(sectionRom.ScribeId));
             sectionRom.Admin = (await work.Users.GetAsync(sectionRom.AdminId));
             sectionRom.ModifyingSection = (await work.Sections.GetAsync((Guid)sectionRom.ModifyingSectionId));
+
+            sectionRom.Admin.LawModificationRequestAdmins = null;
+            sectionRom.Admin.QuestionModificationRequestAdmins = null;
+            sectionRom.Admin.SignModificationRequestAdmins = null;
+            sectionRom.Admin.UserModificationRequestArbitratingAdmins = null;
+            sectionRom.Admin.UserModificationRequestPromotingAdmins = null;
+
+            sectionRom.Scribe.LawModificationRequestScribes = null;
+            sectionRom.Scribe.QuestionModificationRequestScribes = null;
+            sectionRom.Scribe.SignModificationRequestScribes = null;
+
+            sectionRom.ModifyingSection.Statue = null;
             return sectionRom;
         }
         //--------------------------------------------------
@@ -1119,6 +1165,22 @@ namespace DataAccessLibrary.Business_Entity
             if (paraRom != null)
             {
                 Paragraph modifyingParagraph = await work.Paragraphs.GetAsync((Guid)paraRom.ModifyingParagraphId);
+
+                //check if is a section with no paragraph -> delete empty paragraph && referenceParagraph
+                Section modifiedSection = (await work.Sections.GetAllAsync(nameof(Section.Paragraphs)))
+                    .Where(s => s.Id == modifyingParagraph.SectionId).FirstOrDefault();
+                Paragraph emptyParagraph = modifiedSection.Paragraphs.ToList().Where(p => string.IsNullOrEmpty(p.Name)).FirstOrDefault();
+                if(emptyParagraph != null)
+                {
+                    emptyParagraph.IsDeleted = true;
+                    IEnumerable<Reference> references = (await work.References.GetAllAsync())
+                        .Where(r => r.ParagraphId == emptyParagraph.Id);
+                    foreach(Reference r in references)
+                    {
+                        work.References.Delete(r);
+                    }
+                }
+
                 Paragraph modifiedPargraph = null;
                 if (paraRom.ModifiedParagraphId != null)
                 {
@@ -1198,6 +1260,18 @@ namespace DataAccessLibrary.Business_Entity
             paraRom.Scribe = (await work.Users.GetAsync(paraRom.ScribeId));
             paraRom.Admin = (await work.Users.GetAsync(paraRom.AdminId));
             paraRom.ModifyingParagraph = (await work.Paragraphs.GetAsync((Guid)paraRom.ModifyingParagraphId));
+
+            paraRom.Admin.LawModificationRequestAdmins = null;
+            paraRom.Admin.QuestionModificationRequestAdmins = null;
+            paraRom.Admin.SignModificationRequestAdmins = null;
+            paraRom.Admin.UserModificationRequestArbitratingAdmins = null;
+            paraRom.Admin.UserModificationRequestPromotingAdmins = null;
+
+            paraRom.Scribe.LawModificationRequestScribes = null;
+            paraRom.Scribe.QuestionModificationRequestScribes = null;
+            paraRom.Scribe.SignModificationRequestScribes = null;
+
+            paraRom.ModifyingParagraph.Section = null;
             return paraRom;
         }
         //--------------------------------------------------
@@ -1319,6 +1393,18 @@ namespace DataAccessLibrary.Business_Entity
             paraRom.Scribe = (await work.Users.GetAsync(paraRom.ScribeId));
             paraRom.Admin = (await work.Users.GetAsync(paraRom.AdminId));
             paraRom.ModifyingParagraph = (await work.Paragraphs.GetAsync((Guid)paraRom.ModifyingParagraphId));
+
+            paraRom.Admin.LawModificationRequestAdmins = null;
+            paraRom.Admin.QuestionModificationRequestAdmins = null;
+            paraRom.Admin.SignModificationRequestAdmins = null;
+            paraRom.Admin.UserModificationRequestArbitratingAdmins = null;
+            paraRom.Admin.UserModificationRequestPromotingAdmins = null;
+
+            paraRom.Scribe.LawModificationRequestScribes = null;
+            paraRom.Scribe.QuestionModificationRequestScribes = null;
+            paraRom.Scribe.SignModificationRequestScribes = null;
+
+            paraRom.ModifyingParagraph.Section = null;
             return paraRom;
         }
         //--------------------------------------------------
@@ -1424,7 +1510,7 @@ namespace DataAccessLibrary.Business_Entity
             // 2. Sign Roms
             List<SignModificationRequest> signRoms = (await work.SignModificationRequests.GetAllAsync())
                 .Where(s => !s.IsDeleted && s.ScribeId == ScribeId
-                && s.ScribeId != null & s.UserId == null).ToList();  //Scribe only handle ROM from scribe, ROM from handle will be handled by scribe
+                && s.ScribeId != null && s.AdminId != null).ToList();
 
             List<SignRomDTO> signRomDTOs = new List<SignRomDTO>();
             foreach (SignModificationRequest signRom in signRoms)
