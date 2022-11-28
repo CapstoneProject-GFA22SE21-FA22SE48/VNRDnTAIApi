@@ -2,6 +2,7 @@
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,8 @@ namespace VNRDnTAIApi.Controllers
             _entity = new QuestionCategoryBusinessEntity(work);
         }
 
+        //GET: api/QuestionCategories/GetQuestionCategoriesByTestCategoryId/5
+        [AllowAnonymous]
         [HttpGet("GetQuestionCategoriesByTestCategoryId/{testCategoryId}")]
         [ProducesResponseType(typeof(IEnumerable<QuestionCategoryDTO>), 200)]
         [ProducesResponseType(500)]

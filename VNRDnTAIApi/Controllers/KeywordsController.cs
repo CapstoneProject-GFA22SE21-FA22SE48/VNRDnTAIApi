@@ -1,6 +1,7 @@
 ﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VNRDnTAIApi.Controllers
@@ -19,6 +20,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/Keywords
+        [AllowAnonymous]
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<Keyword>), 200)]
         [ProducesResponseType(500)]

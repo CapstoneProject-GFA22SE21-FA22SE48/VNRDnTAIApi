@@ -2,6 +2,7 @@
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VNRDnTAIApi.Controllers
@@ -20,6 +21,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/Comments/Members
+        [Authorize]
         [HttpGet("Members")]
         [ProducesResponseType(typeof(IEnumerable<Comment>), 200)]
         [ProducesResponseType(500)]
@@ -36,6 +38,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/Comments/All
+        [AllowAnonymous]
         [HttpGet("All")]
         [ProducesResponseType(typeof(IEnumerable<UserCommentDTO>), 200)]
         [ProducesResponseType(500)]
@@ -52,6 +55,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/Comments/Members/5
+        [Authorize]
         [HttpGet("Members/{memberId}")]
         [ProducesResponseType(typeof(IEnumerable<Comment>), 200)]
         [ProducesResponseType(500)]
@@ -68,6 +72,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/Comments/AverageRating
+        [AllowAnonymous]
         [HttpGet("AverageRating")]
         [ProducesResponseType(typeof(Comment), 200)]
         [ProducesResponseType(500)]
@@ -84,6 +89,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // PUT: api/Comments/5
+        [Authorize]
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(Comment), 200)]
         [ProducesResponseType(500)]
@@ -112,6 +118,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // POST: api/Comments/5
+        [Authorize]
         [HttpPost("{userId}")]
         [ProducesResponseType(typeof(Comment), 201)]
         [ProducesResponseType(500)]
@@ -128,6 +135,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // DELETE: api/Comments/5
+        [Authorize]
         [HttpDelete("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(500)]
