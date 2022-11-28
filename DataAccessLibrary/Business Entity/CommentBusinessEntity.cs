@@ -74,7 +74,7 @@ namespace DataAccessLibrary.Business_Entity
             newComment.CreatedDate = DateTime.Now.ToLocalTime();
             newComment.IsDeleted = false;
             await work.Comments.AddAsync(newComment);
-            //await work.Save();
+            await work.Save();
 
             return newComment;
         }
