@@ -26,6 +26,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/Users/Members
+        [Authorize]
         [HttpGet("Members")]
         [ProducesResponseType(typeof(IEnumerable<User>), 200)]
         [ProducesResponseType(500)]
@@ -49,6 +50,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/Users/Scribes
+        [Authorize]
         [HttpGet("Scribes")]
         [ProducesResponseType(typeof(IEnumerable<User>), 200)]
         [ProducesResponseType(500)]
@@ -72,6 +74,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/Users/Scribes/Detail/5
+        [Authorize]
         [HttpGet("Scribes/Detail/{month}/{year}/{scribeId}")]
         [ProducesResponseType(typeof(ScribeDTO), 200)]
         [ProducesResponseType(500)]
@@ -88,6 +91,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/Users/Scribes/ApprovalRate/5
+        [Authorize]
         [HttpGet("Scribes/ApprovalRate/{scribeId}")]
         [ProducesResponseType(typeof(User), 200)]
         [ProducesResponseType(500)]
@@ -104,6 +108,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/Users/Admins
+        [Authorize]
         [HttpGet("Admins")]
         [ProducesResponseType(typeof(IEnumerable<AdminDTO>), 200)]
         [ProducesResponseType(500)]
@@ -120,6 +125,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/Users/5
+        [Authorize]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(User), 200)]
         [ProducesResponseType(500)]
@@ -136,6 +142,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // PUT: api/Users/Members/Deactivate/5
+        [Authorize]
         [HttpPut("Members/Deactivate/{id}")]
         [ProducesResponseType(typeof(User), 200)]
         [ProducesResponseType(500)]
@@ -158,6 +165,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // PUT: api/Users/Scribes/Deactivate/3
+        [Authorize]
         [HttpPut("Scribes/Deactivate/{id}")]
         [ProducesResponseType(typeof(User), 200)]
         [ProducesResponseType(500)]
@@ -180,6 +188,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // PUT: api/Users/Scribes/ReEnable
+        [Authorize]
         [HttpPut("Scribes/ReEnable/{id}")]
         [ProducesResponseType(typeof(User), 200)]
         [ProducesResponseType(500)]
@@ -202,6 +211,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // PUT: api/Users/Scribes/Promote
+        [Authorize]
         [HttpPost("Scribes/Promote")]
         [ProducesResponseType(typeof(User), 200)]
         [ProducesResponseType(500)]
@@ -219,6 +229,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // PUT: api/Users/Members/ReEnable
+        [Authorize]
         [HttpPut("Members/ReEnable/{id}")]
         [ProducesResponseType(typeof(User), 200)]
         [ProducesResponseType(500)]
@@ -241,6 +252,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // POST: api/Users
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(typeof(User), 201)]
         [ProducesResponseType(500)]
@@ -257,6 +269,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // POST: api/Users/Register
+        [AllowAnonymous]
         [HttpPost("Register")]
         [ProducesResponseType(typeof(User), 201)]
         [ProducesResponseType(500)]
@@ -339,11 +352,11 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        //POST api/Users/Login
-        [HttpPost("Login")]
+        //POST api/Users/WebLogin
+        [AllowAnonymous]
+        [HttpPost("WebLogin")]
         [ProducesResponseType(401)]
         [ProducesResponseType(200)]
-        [AllowAnonymous]
         public async Task<IActionResult> Login(LoginUserDTO loginUserDTO)
         {
             try
@@ -407,11 +420,11 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
-        //POST api/Users/AppLogin
-        [HttpPost("AppLogin")]
+        //POST api/Users/MobileLogin
+        [AllowAnonymous]
+        [HttpPost("MobileLogin")]
         [ProducesResponseType(401)]
         [ProducesResponseType(200)]
-        [AllowAnonymous]
         public async Task<IActionResult> AppLogin(LoginUserDTO loginUserDTO)
         {
             User? user = null;
@@ -480,10 +493,10 @@ namespace VNRDnTAIApi.Controllers
         }
 
         //PUT api/Users/5/ChangePassword
+        [Authorize]
         [HttpPut("{id}/ChangePassword")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
-        [AllowAnonymous]
         public async Task<IActionResult> ChangePassword(Guid id, string oldPassword, string newPassword)
         {
             User? user = null;
@@ -552,10 +565,10 @@ namespace VNRDnTAIApi.Controllers
         }
 
         //PUT api/Users/5/UpdateProfile
+        [Authorize]
         [HttpPut("{id}/UpdateProfile")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
-        [AllowAnonymous]
         public async Task<IActionResult> UpdateProfile(Guid id, ProfileDTO profileDTO)
         {
             if (profileDTO is null)
@@ -726,6 +739,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // PUT: api/Users/SelfDeactivate/5
+        [Authorize]
         [HttpPut("SelfDeactivate/{id}")]
         [ProducesResponseType(typeof(User), 200)]
         [ProducesResponseType(500)]
@@ -743,68 +757,6 @@ namespace VNRDnTAIApi.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
-            }
-        }
-
-        //POST api/Users/5/Refresh
-        [HttpPost("{userId}/Refresh")]
-        [ProducesResponseType(401)]
-        [ProducesResponseType(200)]
-        [AllowAnonymous]
-        public async Task<IActionResult> RefreshSession(Guid userId)
-        {
-            User user;
-            try
-            {
-                user = await _entity.GetUserAsync(userId);
-
-                if (user != null)
-                {
-                    var authClaims = new List<Claim>
-                    {
-                        new Claim("Id", user.Id.ToString()),
-                        new Claim("Username", String.IsNullOrEmpty(user.Username) ? "" : user.Username),
-                        new Claim("Email", String.IsNullOrEmpty(user.Gmail) ? "" : user.Gmail),
-                        new Claim("Role", user.Role.ToString()),
-                        new Claim("Avatar", String.IsNullOrEmpty(user.Avatar) ? "" : user.Avatar),
-                        new Claim("DisplayName", String.IsNullOrEmpty(user.DisplayName) ? "" : user.DisplayName),
-                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-                    };
-
-                    var authSignature = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(VNRDnTAIConfiguration.Secret));
-
-                    //Token generate
-                    var token = new JwtSecurityToken(
-                        issuer: VNRDnTAIConfiguration.JwtIssuer,
-                        audience: VNRDnTAIConfiguration.JwtAudience,
-                        //expires: DateTime.Now.AddHours(2),
-                        expires: DateTime.MaxValue,
-                        claims: authClaims,
-                        signingCredentials:
-                            new SigningCredentials(authSignature, SecurityAlgorithms.HmacSha256)
-                        );
-
-                    return StatusCode(200, new
-                    {
-                        token = new JwtSecurityTokenHandler().WriteToken(token),
-                    });
-                }
-                else
-                {
-                    throw new ApplicationException("Sai tên đăng nhập hoặc mật khẩu");
-                }
-            }
-            catch (ArgumentException ae)
-            {
-                return Unauthorized("Có lỗi xảy ra.\n" + ae.Message);
-            }
-            catch (ApplicationException ae)
-            {
-                return Unauthorized("Có lỗi xảy ra.\n" + ae.Message);
-            }
-            catch
-            {
-                return Unauthorized("Có lỗi xảy ra. Vui lòng thử lại sau.");
             }
         }
     }

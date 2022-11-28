@@ -2,6 +2,7 @@
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VNRDnTAIApi.Controllers
@@ -20,6 +21,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/TestResults/GetTestResultByUserId
+        [Authorize]
         [HttpGet("GetTestResultByUserId")]
         [ProducesResponseType(typeof(TestResult), 200)]
         [ProducesResponseType(500)]
@@ -36,6 +38,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/TestResults/GetTestAttemptDTOs
+        [Authorize]
         [HttpGet("GetTestAttemptDTOs")]
         [ProducesResponseType(typeof(TestResult), 200)]
         [ProducesResponseType(500)]
@@ -52,6 +55,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // POST: api/TestResults
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(typeof(TestResult), 201)]
         [ProducesResponseType(500)]

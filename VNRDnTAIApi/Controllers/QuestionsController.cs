@@ -2,6 +2,7 @@
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VNRDnTAIApi.Controllers
@@ -20,6 +21,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/Questions/AssignedQuestions/Scribes/5
+        [Authorize]
         [HttpGet("AssignedQuestions/Scribes/{scribeId}")]
         [ProducesResponseType(typeof(IEnumerable<QuestionDTO>), 200)]
         [ProducesResponseType(500)]
@@ -35,6 +37,8 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
+        //GET: api/Questions/GetStudySetByCategoryAndSeparator
+        [AllowAnonymous]
         [HttpGet("GetStudySetByCategoryAndSeparator")]
         [ProducesResponseType(typeof(IEnumerable<Question>), 200)]
         [ProducesResponseType(500)]
@@ -50,6 +54,8 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
+        //GET: api/Questions/GetRandomTestSetByCategoryId
+        [Authorize]
         [HttpGet("GetRandomTestSetByCategoryId")]
         [ProducesResponseType(typeof(IEnumerable<Question>), 200)]
         [ProducesResponseType(500)]
@@ -66,6 +72,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // POST: api/Questions
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(typeof(Question), 201)]
         [ProducesResponseType(500)]

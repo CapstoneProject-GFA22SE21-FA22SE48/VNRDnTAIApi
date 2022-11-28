@@ -3,6 +3,7 @@ using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
 using DTOsLibrary.SearchLaw;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VNRDnTAIApi.Controllers
@@ -21,6 +22,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/Sections/ByStatue/5
+        [Authorize]
         [HttpGet("ByStatue/{statueId}")]
         [ProducesResponseType(typeof(IEnumerable<Section>), 200)]
         [ProducesResponseType(500)]
@@ -37,6 +39,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         //GET: api/Sections/GetSearchListByQuery
+        [AllowAnonymous]
         [HttpGet("GetSearchListByQuery")]
         [ProducesResponseType(typeof(SearchLawDTO), 200)]
         [ProducesResponseType(500)]
@@ -53,6 +56,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         //GET: api/Sections/GetSearchListByKeywordId
+        [AllowAnonymous]
         [HttpGet("GetSearchListByKeywordId")]
         [ProducesResponseType(typeof(SearchLawDTO), 200)]
         [ProducesResponseType(500)]
@@ -69,6 +73,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // POST: api/Sections
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(typeof(Section), 201)]
         [ProducesResponseType(500)]
@@ -85,6 +90,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // POST: api/Sections/NewSection
+        [Authorize]
         [HttpPost("NewSection")]
         [ProducesResponseType(typeof(Section), 201)]
         [ProducesResponseType(500)]

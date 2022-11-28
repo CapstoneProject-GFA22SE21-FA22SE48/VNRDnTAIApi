@@ -2,6 +2,7 @@
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VNRDnTAIApi.Controllers
@@ -20,6 +21,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/TestCategories
+        [Authorize]
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<TestCategory>), 200)]
         [ProducesResponseType(500)]
@@ -35,6 +37,7 @@ namespace VNRDnTAIApi.Controllers
             }
         }
         // GET: api/TestCategories/Count/5
+        [AllowAnonymous]
         [HttpGet("Count")]
         [ProducesResponseType(200)]
         [ProducesResponseType(500)]

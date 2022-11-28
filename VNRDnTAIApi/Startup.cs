@@ -71,6 +71,7 @@ namespace VNRDnTAIApi
                     {
                         ValidateIssuer = true,
                         ValidateAudience = true,
+                        ValidateLifetime = false,
                         ValidIssuer = VNRDnTAILibrary.VNRDnTAIConfiguration.JwtIssuer,
                         ValidAudience = VNRDnTAILibrary.VNRDnTAIConfiguration.JwtAudience,
                         IssuerSigningKey =
