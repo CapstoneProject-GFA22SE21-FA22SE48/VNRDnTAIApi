@@ -21,7 +21,6 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/TestResults/GetTestResultByUserId
-        [Authorize]
         [HttpGet("GetTestResultByUserId")]
         [ProducesResponseType(typeof(TestResult), 200)]
         [ProducesResponseType(500)]
