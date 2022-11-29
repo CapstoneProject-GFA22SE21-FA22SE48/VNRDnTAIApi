@@ -56,7 +56,7 @@ namespace DataAccessLibrary.Business_Entity
                         {
                             UserId = users.Id,
                             Avatar = users.Avatar,
-                            DisplayName = users.DisplayName,
+                            DisplayName = !String.IsNullOrEmpty(users.DisplayName) ? users.DisplayName : users.Username,
                             Content = comments.Content,
                             Rating = comments.Rating,
                             CreatedDate = comments.CreatedDate

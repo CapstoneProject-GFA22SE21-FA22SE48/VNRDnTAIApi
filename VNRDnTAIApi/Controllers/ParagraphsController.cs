@@ -2,6 +2,7 @@
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
 using DTOsLibrary.SearchLaw;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VNRDnTAIApi.Controllers
@@ -20,6 +21,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/Paragraphs/BySection/5
+        [Authorize]
         [HttpGet("BySection/{sectionId}")]
         [ProducesResponseType(typeof(IEnumerable<ParagraphDTO>), 200)]
         [ProducesResponseType(500)]
@@ -35,6 +37,8 @@ namespace VNRDnTAIApi.Controllers
             }
         }
 
+        //GET: api/Paragraphs/GetSearchParagraphDTOAsync
+        [AllowAnonymous]
         [HttpGet("GetSearchParagraphDTOAsync")]
         [ProducesResponseType(typeof(SearchLawDTO), 200)]
         [ProducesResponseType(500)]
@@ -51,6 +55,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // POST: api/Paragraphs
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(typeof(ParagraphDTO), 201)]
         [ProducesResponseType(500)]

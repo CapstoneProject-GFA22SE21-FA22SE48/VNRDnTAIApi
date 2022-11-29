@@ -285,9 +285,9 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<User> DeactivateScribe(User scribe)
         {
             User deactivatingScribe = await work.Users.GetAsync(scribe.Id);
-            if(deactivatingScribe != null)
+            if (deactivatingScribe != null)
             {
-                if(deactivatingScribe.Status == (int)Status.Deactivated)
+                if (deactivatingScribe.Status == (int)Status.Deactivated)
                 {
                     throw new Exception("Tài khoản nhân viên đã bị ngưng hoạt động bởi Quản trị viên khác");
                 }
@@ -435,7 +435,6 @@ namespace DataAccessLibrary.Business_Entity
             user.IsDeleted = false;
 
             await work.Users.AddAsync(user);
-            await work.Save();
 
             return user;
         }
@@ -505,7 +504,7 @@ namespace DataAccessLibrary.Business_Entity
         {
             return new ApprovalRateDTO
             {
-                DeniedRomCount = 
+                DeniedRomCount =
                     (await work.LawModificationRequests.GetAllAsync())
                     .Where(l => l.ScribeId == scribeId && l.Status == (int)Status.Denied).Count()
                     + (await work.SignModificationRequests.GetAllAsync())
@@ -513,7 +512,7 @@ namespace DataAccessLibrary.Business_Entity
                     + (await work.QuestionModificationRequests.GetAllAsync())
                     .Where(s => s.ScribeId == scribeId && s.Status == (int)Status.Denied).Count(),
 
-                TotalRomCount = 
+                TotalRomCount =
                     (await work.LawModificationRequests.GetAllAsync())
                     .Where(l => l.ScribeId == scribeId).Count()
                     + (await work.SignModificationRequests.GetAllAsync())

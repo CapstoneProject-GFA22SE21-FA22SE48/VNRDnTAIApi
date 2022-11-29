@@ -2,6 +2,7 @@
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary.SearchSign;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VNRDnTAIApi.Controllers
@@ -20,6 +21,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         //GET: api/SignCategories/GetSignCategoriesDTOList
+        [AllowAnonymous]
         [HttpGet("GetSignCategoriesDTOList")]
         [ProducesResponseType(typeof(IEnumerable<SignCategoryDTO>), 200)]
         [ProducesResponseType(500)]
@@ -36,6 +38,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/SignCategories/AssignedSignCategories/Scribes/5
+        [Authorize]
         [HttpGet("AssignedSignCategories/Scribes/{scribeId}")]
         [ProducesResponseType(typeof(IEnumerable<SignCategory>), 200)]
         [ProducesResponseType(500)]

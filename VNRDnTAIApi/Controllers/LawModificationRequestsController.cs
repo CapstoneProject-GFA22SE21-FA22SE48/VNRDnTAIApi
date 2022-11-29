@@ -3,10 +3,12 @@ using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
 using DTOsLibrary.ManageROM;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VNRDnTAIApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     [ApiVersion("1.0")]

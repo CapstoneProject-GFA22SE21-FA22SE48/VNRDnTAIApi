@@ -2,6 +2,7 @@
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VNRDnTAIApi.Controllers
@@ -20,6 +21,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // GET: api/Gpssigns/GetNearbyGpsSign
+        [AllowAnonymous]
         [HttpGet("GetNearbyGpsSign")]
         [ProducesResponseType(200)]
         [ProducesResponseType(500)]
@@ -36,6 +38,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         // POST: api/Gpssigns/AddGpsSignDTO
+        [Authorize]
         [HttpPost("AddGpsSignDTO")]
         [ProducesResponseType(typeof(Gpssign), 201)]
         [ProducesResponseType(500)]

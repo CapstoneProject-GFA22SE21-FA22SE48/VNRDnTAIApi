@@ -1,14 +1,15 @@
 ﻿using BusinessObjectLibrary;
 using DataAccessLibrary.Business_Entity;
 using DataAccessLibrary.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VNRDnTAIApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     [ApiVersion("1.0")]
-
     public class ColumnsController : ControllerBase
     {
         private readonly ColumnBusinessEntity _entity;
