@@ -586,7 +586,19 @@ namespace VNRDnTAIApi.Controllers
                 }
                 else
                 {
-                    if (profileDTO.email != null) user.Gmail = profileDTO.email.Trim();
+                    if (profileDTO.email != null)
+                    {
+                        User exist = await _entity.GetUserAsyncByGmail(profileDTO.email);
+                        if (exist != null)
+                        {
+                            return StatusCode(409, "Email này đã được đăng ký.");
+                        }
+                        else
+                        {
+                            user.Gmail = profileDTO.email.Trim();
+                        }
+
+                    }
                     if (profileDTO.avatar != null) user.Avatar = profileDTO.avatar.Trim();
                     if (profileDTO.displayName != null) user.DisplayName = profileDTO.displayName.Trim();
                     user = await _entity.UpdateUser(user);
