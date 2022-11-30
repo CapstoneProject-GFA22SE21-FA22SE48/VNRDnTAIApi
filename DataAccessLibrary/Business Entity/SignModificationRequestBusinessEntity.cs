@@ -476,9 +476,10 @@ namespace DataAccessLibrary.Business_Entity
                     .ThenInclude(m => m.Sign)
                     .Include(g => g.ModifiedGpssign)
                     .ThenInclude(m => m.Sign)
-                    .Include(g => g.User))
+                    .Include(g => g.User)
+                    .Include(g => g.Scribe))
                     )
-                    .Where( //Get only Unclaimed GPS Sign rom or scribe claimed GPS Sign Rom
+                    .Where( //Get only Unclaimed GPS Sign rom or scribe claimed GPS Sign Rom or Scribe Added GPS Rom
                         rom => !rom.IsDeleted
                         && rom.ModifyingGpssignId != null
                         && (rom.Status == (int)Status.Unclaimed || rom.ScribeId == scribeId)
