@@ -71,7 +71,7 @@ namespace DataAccessLibrary.Business_Entity
             newComment.UserId = userId;
             newComment.Content = commentDTO.Content;
             newComment.Rating = commentDTO.Rating;
-            newComment.CreatedDate = DateTime.Now.ToLocalTime();
+            newComment.CreatedDate = DateTime.UtcNow.AddHours(7);
             newComment.IsDeleted = false;
             await work.Comments.AddAsync(newComment);
             await work.Save();

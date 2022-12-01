@@ -89,7 +89,7 @@ namespace DataAccessLibrary.Business_Entity
 
             signModificationRequest.Id = Guid.NewGuid();
             signModificationRequest.Status = signModificationRequest.Status == 1 ? (int)Status.Unclaimed : (int)Status.Pending;
-            signModificationRequest.CreatedDate = DateTime.Now.ToLocalTime();
+            signModificationRequest.CreatedDate = DateTime.UtcNow.AddHours(7);
             signModificationRequest.IsDeleted = false;
             await work.SignModificationRequests.AddAsync(signModificationRequest);
             await work.Save();
@@ -104,7 +104,7 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<SignModificationRequest> ScribeAddGpsSignModificationRequest(SignModificationRequest signModificationRequest)
         {
             signModificationRequest.Id = Guid.NewGuid();
-            signModificationRequest.CreatedDate = DateTime.Now.ToLocalTime();
+            signModificationRequest.CreatedDate = DateTime.UtcNow.AddHours(7);
             signModificationRequest.IsDeleted = false;
             await work.SignModificationRequests.AddAsync(signModificationRequest);
             await work.Save();
