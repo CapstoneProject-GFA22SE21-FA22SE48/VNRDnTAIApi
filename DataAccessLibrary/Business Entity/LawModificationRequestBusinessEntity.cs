@@ -174,7 +174,7 @@ namespace DataAccessLibrary.Business_Entity
 
             lawModificationRequest.Id = Guid.NewGuid();
             lawModificationRequest.Status = (int)Status.Pending;
-            lawModificationRequest.CreatedDate = DateTime.Now.ToLocalTime();
+            lawModificationRequest.CreatedDate = DateTime.UtcNow.AddHours(7);
             lawModificationRequest.IsDeleted = false;
             await work.LawModificationRequests.AddAsync(lawModificationRequest);
             await work.Save();
