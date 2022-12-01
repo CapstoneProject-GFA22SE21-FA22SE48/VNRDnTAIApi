@@ -1,4 +1,5 @@
 ﻿using BusinessObjectLibrary;
+using BusinessObjectLibrary.Predefined_constants;
 using DataAccessLibrary.Interfaces;
 using DTOsLibrary;
 using System;
@@ -27,7 +28,7 @@ namespace DataAccessLibrary.Business_Entity
                 dto.Id = qc.Id;
                 dto.Name = qc.Name;
                 dto.TestCategoryId = qc.TestCategoryId;
-                dto.NoOfQuestion = qc.Questions.ToList().Count;
+                dto.NoOfQuestion = qc.Questions.Where(q => !q.IsDeleted && q.Status == (int)Status.Active).ToList().Count;
                 res.Add(dto);
             }
             return res;
