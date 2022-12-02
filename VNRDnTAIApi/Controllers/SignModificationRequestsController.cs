@@ -79,7 +79,7 @@ namespace VNRDnTAIApi.Controllers
         {
             try
             {
-                return StatusCode(200, await _entity.GetGpssignRoms(adminId));
+                return StatusCode(200, await _entity.GetAdminGpssignRoms(adminId));
             }
             catch (Exception ex)
             {
