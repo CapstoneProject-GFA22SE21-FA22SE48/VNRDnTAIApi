@@ -486,6 +486,26 @@ namespace DataAccessLibrary.Business_Entity
                     );
             return gpssignRoms;
         }
+        //--------------------------------------------------
+        public async Task<IEnumerable<SignModificationRequest>> GetAdminGpssignRoms(Guid adminId)
+        {
+            IEnumerable<SignModificationRequest> gpssignRoms =
+                (await work.SignModificationRequests.GetAllMultiIncludeAsync(
+                    include: gpsSign => gpsSign
+                    .Include(g => g.ModifyingGpssign)
+                    .ThenInclude(m => m.Sign)
+                    .Include(g => g.ModifiedGpssign)
+                    .ThenInclude(m => m.Sign)
+                    .Include(g => g.User)
+                    .Include(g => g.Scribe))
+                    )
+                    .Where(
+                        rom => !rom.IsDeleted
+                        && rom.ModifyingGpssignId != null
+                        && rom.AdminId == adminId
+                    );
+            return gpssignRoms;
+        }
 
         //--------------------------------------------------
         public async Task<IEnumerable<SignModificationRequest>> GetRetrainRoms(Guid scribeId)
