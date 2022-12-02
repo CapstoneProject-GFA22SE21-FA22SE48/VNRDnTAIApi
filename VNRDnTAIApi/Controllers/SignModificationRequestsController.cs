@@ -55,7 +55,7 @@ namespace VNRDnTAIApi.Controllers
         }
 
         //---------------------------------------------------
-        // GET: api/SignModificationRequests/GpssignROMs
+        // GET: api/SignModificationRequests/GpssignROMs/5
         [HttpGet("GpssignROMs/{scribeId}")]
         [ProducesResponseType(typeof(IEnumerable<SignModificationRequest>), 200)]
         [ProducesResponseType(500)]
@@ -64,6 +64,22 @@ namespace VNRDnTAIApi.Controllers
             try
             {
                 return StatusCode(200, await _entity.GetGpssignRoms(scribeId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        //---------------------------------------------------
+        // GET: api/SignModificationRequests/GpssignROMs/Admin/5
+        [HttpGet("GpssignROMs/Admin/{adminId}")]
+        [ProducesResponseType(typeof(IEnumerable<SignModificationRequest>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<SignModificationRequest>>> GetAdminGpssignRoms(Guid adminId)
+        {
+            try
+            {
+                return StatusCode(200, await _entity.GetGpssignRoms(adminId));
             }
             catch (Exception ex)
             {
