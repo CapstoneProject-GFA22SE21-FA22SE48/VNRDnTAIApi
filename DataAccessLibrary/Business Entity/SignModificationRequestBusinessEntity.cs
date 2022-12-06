@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VNRDnTAILibrary.Utilities;
 
 namespace DataAccessLibrary.Business_Entity
 {
@@ -861,6 +862,8 @@ namespace DataAccessLibrary.Business_Entity
         //--------------------------------------------------
         public async Task<SignModificationRequest> ApproveGpssignRom(Guid modifyingGpssignId)
         {
+            await work.Signs.GetAllAsync();
+            await work.Gpssigns.GetAllAsync();
             SignModificationRequest gpssignRom = (await work.SignModificationRequests.GetAllAsync())
                 .Where(s => s.ModifyingGpssignId == modifyingGpssignId).FirstOrDefault();
 
@@ -888,6 +891,27 @@ namespace DataAccessLibrary.Business_Entity
                     if (modifyingGpssign != null)
                     {
                         modifyingGpssign.Status = (int)Status.Active;
+                    }
+
+                    //Change status of all same gps with the same sign within 5m to -> Approved
+                    IEnumerable<SignModificationRequest> signRoms =
+                        (await work.SignModificationRequests.GetAllAsync());
+                   
+                    foreach(SignModificationRequest signRom in signRoms)
+                    {
+                        if(signRom.ModifyingGpssign.Sign.Id == gpssignRom.ModifyingGpssign.SignId && signRom.Id != gpssignRom.Id)
+                        {
+                            double distance = GpsUtils.GetDistance(
+                                (double)gpssignRom.ModifyingGpssign.Latitude, 
+                                (double)gpssignRom.ModifyingGpssign.Longitude, 
+                                (double)signRom.ModifyingGpssign.Latitude, 
+                                (double)signRom.ModifyingGpssign.Longitude, "M");
+                            if(distance <= 5)
+                            {
+                                signRom.Status = (int)Status.Approved;
+                                await work.Save();
+                            }
+                        }
                     }
                 }
                 else if (gpssignRom.OperationType == (int)OperationType.Update)
