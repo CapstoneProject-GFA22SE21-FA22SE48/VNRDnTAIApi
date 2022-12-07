@@ -189,9 +189,9 @@ namespace BusinessObjectLibrary
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.Latitude).HasColumnType("decimal(15, 12)");
+                entity.Property(e => e.Latitude).HasColumnType("decimal(18, 15)");
 
-                entity.Property(e => e.Longitude).HasColumnType("decimal(15, 12)");
+                entity.Property(e => e.Longitude).HasColumnType("decimal(18, 15)");
 
                 entity.HasOne(d => d.Sign)
                     .WithMany(p => p.Gpssigns)
