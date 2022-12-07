@@ -435,7 +435,7 @@ namespace DataAccessLibrary.Business_Entity
             user.IsDeleted = false;
 
             await work.Users.AddAsync(user);
-
+            await work.Save();
             return user;
         }
 
