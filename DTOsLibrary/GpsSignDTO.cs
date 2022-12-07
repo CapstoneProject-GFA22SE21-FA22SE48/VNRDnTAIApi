@@ -6,6 +6,7 @@ namespace DTOsLibrary
     {
         public Guid Id { get; set; }
         public Guid? SignId { get; set; }
+        public string SignName { get; set; }
         public string ImageUrl { get; set; }
         public decimal Latitude { get; set; }
         public decimal Longitude { get; set; }
