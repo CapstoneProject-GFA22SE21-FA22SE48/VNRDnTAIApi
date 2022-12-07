@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace BusinessObjectLibrary
 {
@@ -72,7 +75,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<AssignedColumn>(entity =>
             {
                 entity.HasKey(e => new { e.ColumnId, e.ScribeId })
-                    .HasName("PK__Assigned__C05B11FD6A71F19C");
+                    .HasName("PK__Assigned__C05B11FD0975D591");
 
                 entity.ToTable("AssignedColumn");
 
@@ -92,7 +95,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<AssignedQuestionCategory>(entity =>
             {
                 entity.HasKey(e => new { e.QuestionCategoryId, e.ScribeId })
-                    .HasName("PK__Assigned__920413735CBA70FF");
+                    .HasName("PK__Assigned__92041373B83DF0BF");
 
                 entity.ToTable("AssignedQuestionCategory");
 
@@ -112,7 +115,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<AssignedSignCategory>(entity =>
             {
                 entity.HasKey(e => new { e.SignCategoryId, e.ScribeId })
-                    .HasName("PK__Assigned__E7CAD64878483356");
+                    .HasName("PK__Assigned__E7CAD648D375CE3C");
 
                 entity.ToTable("AssignedSignCategory");
 
@@ -186,9 +189,9 @@ namespace BusinessObjectLibrary
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.Latitude).HasColumnType("decimal(18, 15)");
+                entity.Property(e => e.Latitude).HasColumnType("decimal(15, 12)");
 
-                entity.Property(e => e.Longitude).HasColumnType("decimal(18, 15)");
+                entity.Property(e => e.Longitude).HasColumnType("decimal(15, 12)");
 
                 entity.HasOne(d => d.Sign)
                     .WithMany(p => p.Gpssigns)
@@ -210,7 +213,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<KeywordParagraph>(entity =>
             {
                 entity.HasKey(e => new { e.KeywordId, e.ParagraphId })
-                    .HasName("PK__KeywordP__852C78FC872E9943");
+                    .HasName("PK__KeywordP__852C78FC21FF554F");
 
                 entity.ToTable("KeywordParagraph");
 
@@ -344,7 +347,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<QuestionModificationRequest>(entity =>
             {
                 entity.HasKey(e => e.ModifyingQuestionId)
-                    .HasName("PK__Question__94B14AC7B0799865");
+                    .HasName("PK__Question__94B14AC72A4C37A0");
 
                 entity.ToTable("QuestionModificationRequest");
 
@@ -381,7 +384,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<Reference>(entity =>
             {
                 entity.HasKey(e => new { e.ParagraphId, e.ReferenceParagraphId })
-                    .HasName("PK__Referenc__44419EC0AF56CCB0");
+                    .HasName("PK__Referenc__44419EC08B7A08C2");
 
                 entity.ToTable("Reference");
 
@@ -630,12 +633,10 @@ namespace BusinessObjectLibrary
                     .IsUnicode(false);
 
                 entity.Property(e => e.Password)
-                    .IsRequired()
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Username)
-                    .IsRequired()
                     .HasMaxLength(255)
                     .IsUnicode(false);
             });
@@ -643,7 +644,7 @@ namespace BusinessObjectLibrary
             modelBuilder.Entity<UserModificationRequest>(entity =>
             {
                 entity.HasKey(e => new { e.ModifyingUserId, e.ModifiedUserId })
-                    .HasName("PK__UserModi__C95E8661E41BF29E");
+                    .HasName("PK__UserModi__C95E8661B97351D0");
 
                 entity.ToTable("UserModificationRequest");
 

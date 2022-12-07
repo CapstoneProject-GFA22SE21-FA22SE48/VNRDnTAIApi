@@ -406,8 +406,8 @@ namespace DataAccessLibrary.Business_Entity
         public async Task<User> LoginWeb(string username, string password)
         {
             return (await work.Users.GetAllAsync())
-                .Where((user) => user.Username == username
-                    && user.Password == password && user.Role != (int)UserRoles.MEMBER
+                .Where((user) => !string.IsNullOrEmpty(user.Username) && user.Username == username
+                    && !string.IsNullOrEmpty(user.Password) && user.Password == password && user.Role != (int)UserRoles.MEMBER
                     && user.Status == (int)Status.Active)
                 .FirstOrDefault();
         }
