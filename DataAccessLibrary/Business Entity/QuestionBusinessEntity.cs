@@ -61,22 +61,31 @@ namespace DataAccessLibrary.Business_Entity
             return res;
         }
 
-        public async Task<IEnumerable<Question>> GetRandomTestSetByCategory(string testCatId)
+        public async Task<IEnumerable<Question>> GetRandomTestSetByCategory(Guid testCategoryId)
         {
             List<Question> res = new List<Question>();
 
             var noOfQuestionCat = 7;
 
             //Get noOfQuestionCat by testCat
-            noOfQuestionCat = (await work.Questions.GetAllAsync()).Where(q => q.TestCategoryId.ToString() == testCatId)
+            noOfQuestionCat = (await work.Questions.GetAllAsync()).Where(q => q.TestCategoryId == testCategoryId)
                 .GroupBy(g => new { g.QuestionCategoryId })
                          .Select(g => g.First())
                          .ToList()
                          .Count();
 
-            double rate = 25 / noOfQuestionCat;
+            TestCategory testCategory = await work.TestCategories.GetAsync(testCategoryId);
+
+            int numberOfQuestions = 25;
+
+            if(testCategory.Name.Contains("B1"))
+            {
+                numberOfQuestions = 30;
+            }
+
+            double rate = numberOfQuestions / noOfQuestionCat;
             var qs = (await work.Questions.GetAllAsync(nameof(Question.Answers)))
-                .Where(question => !question.IsDeleted && question.Status == (int)Status.Active && question.TestCategoryId.ToString() == testCatId);
+                .Where(question => !question.IsDeleted && question.Status == (int)Status.Active && question.TestCategoryId == testCategoryId);
             var qcs = (await work.QuestionCategories.GetAllAsync()).Where(qc => !qc.IsDeleted);
 
             foreach (var qc in qcs)
@@ -89,22 +98,27 @@ namespace DataAccessLibrary.Business_Entity
                 {
                     rate = Math.Floor(rate);
                 }
-                res.AddRange(qc.Questions.Where(question => !question.IsDeleted && question.Status == (int)Status.Active && question.TestCategoryId.ToString() == testCatId).OrderBy(x => Guid.NewGuid()).Take((int)rate));
+                res.AddRange(qc.Questions.Where(question => !question.IsDeleted && question.Status == (int)Status.Active && question.TestCategoryId == testCategoryId).OrderBy(x => Guid.NewGuid()).Take((int)rate));
             }
 
             res = res.DistinctBy(x => x.Content).OrderBy(x => Guid.NewGuid()).ToList();
 
-            if (res.Count > 25)
+            if (res.Count > numberOfQuestions)
             {
-                while (res.Count > 25) res.RemoveAt(res.Count - 1);
+                while (res.Count > numberOfQuestions) res.RemoveAt(res.Count - 1);
             }
-            else if (res.Count < 25)
+            else if (res.Count < numberOfQuestions)
             {
-                res.AddRange(qs.Where(q => !q.IsDeleted && !res.Any(r => r.Content == q.Content)).OrderBy(x => Guid.NewGuid()).Take(25 - res.Count));
+                res.AddRange(qs.Where(q => !q.IsDeleted && !res.Any(r => r.Content == q.Content)).OrderBy(x => Guid.NewGuid()).Take(numberOfQuestions - res.Count));
             }
             foreach (var question in res)
             {
                 question.QuestionCategory = null;
+                question.TestCategory = null;
+                foreach(Answer answer in question.Answers)
+                {
+                    answer.Question = null;
+                }
             }
             return res;
         }
