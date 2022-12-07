@@ -21,7 +21,7 @@ namespace DataAccessLibrary.Business_Entity
         {
             Gpssign gpsSign = new Gpssign();
             gpsSign.Id = Guid.NewGuid();
-            if(gpsSignDTO.SignId != Guid.Empty)
+            if (gpsSignDTO.SignId != Guid.Empty)
             {
                 gpsSign.SignId = gpsSignDTO.SignId;
             }
@@ -45,6 +45,7 @@ namespace DataAccessLibrary.Business_Entity
                          {
                              Id = gpssigns.Id,
                              SignId = signs.Id,
+                             SignName = signs.Name,
                              ImageUrl = signs.ImageUrl,
                              Latitude = gpssigns.Latitude,
                              Longitude = gpssigns.Longitude
