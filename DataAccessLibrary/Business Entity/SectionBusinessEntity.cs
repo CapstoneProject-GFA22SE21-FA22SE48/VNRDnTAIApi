@@ -152,7 +152,7 @@ namespace DataAccessLibrary.Business_Entity
                 });
             }
 
-            return res;
+            return res.OrderBy(r => r.MinPenalty);
 
         }
 
