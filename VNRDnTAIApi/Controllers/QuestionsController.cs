@@ -59,7 +59,7 @@ namespace VNRDnTAIApi.Controllers
         [HttpGet("GetRandomTestSetByCategoryId")]
         [ProducesResponseType(typeof(IEnumerable<Question>), 200)]
         [ProducesResponseType(500)]
-        public async Task<ActionResult<IEnumerable<Question>>> GetRandomTestSetByCategory([FromQuery] string categoryId)
+        public async Task<ActionResult<IEnumerable<Question>>> GetRandomTestSetByCategory([FromQuery] Guid categoryId)
         {
             try
             {
