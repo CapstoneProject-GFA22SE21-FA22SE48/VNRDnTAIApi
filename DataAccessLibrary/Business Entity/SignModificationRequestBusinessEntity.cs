@@ -104,16 +104,26 @@ namespace DataAccessLibrary.Business_Entity
 
         public async Task<SignModificationRequest> ScribeAddGpsSignModificationRequest(SignModificationRequest signModificationRequest)
         {
-            signModificationRequest.Id = Guid.NewGuid();
-            signModificationRequest.CreatedDate = DateTime.UtcNow.AddHours(7);
-            signModificationRequest.IsDeleted = false;
-            await work.SignModificationRequests.AddAsync(signModificationRequest);
-            await work.Save();
+            if (signModificationRequest.ModifyingGpssign != null)
+            {
+                signModificationRequest.ModifyingGpssign.Id = Guid.NewGuid();
+                Gpssign gps = await work.Gpssigns.AddAsync(signModificationRequest.ModifyingGpssign);
 
-            //Get data in return for notification adding
-            signModificationRequest.Scribe = (await work.Users.GetAllAsync())
-                .Where(u => u.Id == signModificationRequest.ScribeId)
-                .FirstOrDefault();
+                if (gps != null)
+                {
+                    signModificationRequest.Id = Guid.NewGuid();
+                    signModificationRequest.ModifyingGpssignId = gps.Id;
+                    signModificationRequest.CreatedDate = DateTime.UtcNow.AddHours(7);
+                    signModificationRequest.IsDeleted = false;
+                    await work.SignModificationRequests.AddAsync(signModificationRequest);
+                    await work.Save();
+
+                    //Get data in return for notification adding
+                    signModificationRequest.Scribe = (await work.Users.GetAllAsync())
+                        .Where(u => u.Id == signModificationRequest.ScribeId)
+                        .FirstOrDefault();
+                }
+            }
             return signModificationRequest;
         }
 

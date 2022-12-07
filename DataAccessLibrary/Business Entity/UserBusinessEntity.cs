@@ -424,12 +424,12 @@ namespace DataAccessLibrary.Business_Entity
         {
             User user = new User();
             user.Id = Guid.NewGuid();
-            user.CreatedDate = DateTime.UtcNow.AddHours(7);
-            user.Username = username;
+            user.Username = !String.IsNullOrEmpty(username) ? username : email;
             user.Password = password;
+            user.Gmail = email;
             user.DisplayName = !String.IsNullOrEmpty(username) ? username : email;
             user.Avatar = "https://firebasestorage.googleapis.com/v0/b/vnrdntai.appspot.com/o/images%2Favatar%2Fdefault_avatar_x025.png?alt=media";
-            user.Gmail = email;
+            user.CreatedDate = DateTime.UtcNow.AddHours(7);
             user.Status = (int)Status.Active;
             user.Role = (int)UserRoles.MEMBER;
             user.IsDeleted = false;
@@ -446,8 +446,8 @@ namespace DataAccessLibrary.Business_Entity
                 .FirstOrDefault();
             if (user == null)
             {
-                //string password = StringUtils.GenerateRandom(12);
-                return await RegisterMember(null, null, gmail);
+                user = await RegisterMember(null, null, gmail);
+                return user;
             }
             return user;
         }
