@@ -107,12 +107,14 @@ namespace DataAccessLibrary.Business_Entity
             if (signModificationRequest.ModifyingGpssign != null)
             {
                 signModificationRequest.ModifyingGpssign.Id = Guid.NewGuid();
+                signModificationRequest.ModifyingGpssign.Status = (int)Status.Deactivated;
                 Gpssign gps = await work.Gpssigns.AddAsync(signModificationRequest.ModifyingGpssign);
 
                 if (gps != null)
                 {
                     signModificationRequest.Id = Guid.NewGuid();
                     signModificationRequest.ModifyingGpssignId = gps.Id;
+                    signModificationRequest.ModifyingGpssign = gps;
                     signModificationRequest.CreatedDate = DateTime.UtcNow.AddHours(7);
                     signModificationRequest.IsDeleted = false;
                     await work.SignModificationRequests.AddAsync(signModificationRequest);
@@ -906,17 +908,17 @@ namespace DataAccessLibrary.Business_Entity
                     //Change status of all same gps with the same sign within 5m to -> Approved
                     IEnumerable<SignModificationRequest> signRoms =
                         (await work.SignModificationRequests.GetAllAsync());
-                   
-                    foreach(SignModificationRequest signRom in signRoms)
+
+                    foreach (SignModificationRequest signRom in signRoms)
                     {
-                        if(signRom.ModifyingGpssign.Sign != null && signRom.ModifyingGpssign.Sign.Id == gpssignRom.ModifyingGpssign.SignId && signRom.Id != gpssignRom.Id)
+                        if (signRom.ModifyingGpssign.Sign != null && signRom.ModifyingGpssign.Sign.Id == gpssignRom.ModifyingGpssign.SignId && signRom.Id != gpssignRom.Id)
                         {
                             double distance = GpsUtils.GetDistance(
-                                (double)gpssignRom.ModifyingGpssign.Latitude, 
-                                (double)gpssignRom.ModifyingGpssign.Longitude, 
-                                (double)signRom.ModifyingGpssign.Latitude, 
+                                (double)gpssignRom.ModifyingGpssign.Latitude,
+                                (double)gpssignRom.ModifyingGpssign.Longitude,
+                                (double)signRom.ModifyingGpssign.Latitude,
                                 (double)signRom.ModifyingGpssign.Longitude, "M");
-                            if(distance <= 5)
+                            if (distance <= 5)
                             {
                                 signRom.Status = (int)Status.Approved;
                                 await work.Save();
