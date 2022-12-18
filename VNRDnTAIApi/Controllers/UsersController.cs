@@ -637,7 +637,7 @@ namespace VNRDnTAIApi.Controllers
                     }
                     else
                     {
-                        return StatusCode(405, "Cập nhật mật thất bại.");
+                        return StatusCode(405, "Cập nhật thông tin thất bại.");
                     }
                 }
             }
