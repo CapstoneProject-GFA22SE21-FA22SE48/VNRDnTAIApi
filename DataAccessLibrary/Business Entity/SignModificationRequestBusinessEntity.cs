@@ -988,6 +988,26 @@ namespace DataAccessLibrary.Business_Entity
                 gpssignRom.ModifyingGpssign = (await work.Gpssigns.GetAsync((Guid)gpssignRom.ModifyingGpssignId));
             }
 
+            //minimize response
+            if (gpssignRom.Admin.SignModificationRequestAdmins != null)
+            {
+                gpssignRom.Admin.SignModificationRequestAdmins = null;
+            }
+
+            if(gpssignRom.ModifyingGpssign.Sign.Gpssigns != null)
+            {
+                gpssignRom.ModifyingGpssign.Sign.Gpssigns = null;
+            }
+
+            if(gpssignRom.Scribe.SignModificationRequestScribes != null)
+            {
+                gpssignRom.Scribe.SignModificationRequestScribes = null;
+            }
+
+            if(gpssignRom.Scribe.SignModificationRequestUsers != null)
+            {
+                gpssignRom.Scribe.SignModificationRequestUsers = null;
+            }
             return gpssignRom;
         }
         //----------------------------------------------------
