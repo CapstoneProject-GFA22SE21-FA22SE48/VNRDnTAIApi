@@ -449,7 +449,11 @@ namespace DataAccessLibrary.Business_Entity
                 user = await RegisterMember(null, null, gmail);
                 return user;
             }
-            return user;
+            else if (user.Status == (int)Status.Active)
+            {
+                return user;
+            }
+            return null;
         }
 
         public async Task<MemberByYearReportDTO> GetMemberByYearReport()

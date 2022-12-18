@@ -475,7 +475,7 @@ namespace VNRDnTAIApi.Controllers
                 }
                 else
                 {
-                    throw new ApplicationException("Sai tên đăng nhập hoặc mật khẩu");
+                    throw new ApplicationException("Sai thông tin đăng nhập hoặc tài khoản đã ngưng hoạt động");
                 }
             }
             catch (ArgumentException ae)
@@ -637,7 +637,7 @@ namespace VNRDnTAIApi.Controllers
                     }
                     else
                     {
-                        return StatusCode(405, "Cập nhật mật thất bại.");
+                        return StatusCode(405, "Cập nhật thông tin thất bại.");
                     }
                 }
             }
