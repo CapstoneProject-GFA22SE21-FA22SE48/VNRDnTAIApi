@@ -586,7 +586,7 @@ namespace VNRDnTAIApi.Controllers
                 }
                 else
                 {
-                    if (profileDTO.email != null)
+                    if (profileDTO.email != null && profileDTO.email.Trim() != user.Gmail)
                     {
                         User exist = await _entity.GetUserAsyncByGmail(profileDTO.email);
                         if (exist != null)
