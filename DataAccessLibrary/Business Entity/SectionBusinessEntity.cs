@@ -7,6 +7,7 @@ using DTOsLibrary.SearchLaw;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static VNRDnTAILibrary.Utilities.StringUtils;
 
@@ -26,7 +27,7 @@ namespace DataAccessLibrary.Business_Entity
                 .Where(section => !section.IsDeleted
                         && section.Status == (int)Status.Active
                         && section.StatueId == statueId)
-                .OrderBy(section => int.Parse(section.Name.Split(" ")[1]));
+                .OrderBy(section => int.Parse(Regex.Replace(section.Name.Split(" ")[1], "[a-z]", "")));
 
             List<Paragraph> paragraphs = (await work.Paragraphs.GetAllAsync())
                 .Where(paragraph => !paragraph.IsDeleted
