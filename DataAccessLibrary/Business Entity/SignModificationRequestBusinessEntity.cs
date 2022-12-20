@@ -911,6 +911,10 @@ namespace DataAccessLibrary.Business_Entity
 
                     foreach (SignModificationRequest signRom in signRoms)
                     {
+                        if (signRom.ModifyingGpssign == null)
+                        {
+                            return gpssignRom;
+                        }
                         if (signRom.ModifyingGpssign.Sign != null && signRom.ModifyingGpssign.Sign.Id == gpssignRom.ModifyingGpssign.SignId && signRom.Id != gpssignRom.Id)
                         {
                             double distance = GpsUtils.GetDistance(
