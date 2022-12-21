@@ -907,7 +907,8 @@ namespace DataAccessLibrary.Business_Entity
 
                     //Change status of all same gps with the same sign within 5m to -> Approved
                     IEnumerable<SignModificationRequest> signRoms =
-                        (await work.SignModificationRequests.GetAllAsync());
+                        (await work.SignModificationRequests.GetAllAsync())
+                        .Where(rom => rom.ModifyingGpssign != null);
 
                     foreach (SignModificationRequest signRom in signRoms)
                     {
